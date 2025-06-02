@@ -98,11 +98,6 @@
                                     </div>
                                 </div>
                             </li>
-                            <li>
-                                <a href="#!" onclick="javascript:toggleFullScreen()">
-                                    <i class="feather icon-maximize full-screen"></i>
-                                </a>
-                            </li>
                         </ul>
                         <ul class="nav-right">
                             <li class="header-notification">
@@ -147,14 +142,6 @@
                                             </div>
                                         </li>
                                     </ul>
-                                </div>
-                            </li>
-                            <li class="header-notification">
-                                <div class="dropdown-primary dropdown">
-                                    <div class="displayChatbox dropdown-toggle" data-toggle="dropdown">
-                                        <i class="feather icon-message-square"></i>
-                                        <span class="badge bg-c-green">3</span>
-                                    </div>
                                 </div>
                             </li>
                             <li class="user-profile header-notification">
