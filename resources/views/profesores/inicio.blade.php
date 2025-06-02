@@ -14,7 +14,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="#">
-    <meta name="keywords" content="Admin , Responsive, Landing, Bootstrap, App, Template, Mobile, iOS, Android, apple, creative app">
+    <meta name="keywords"
+        content="Admin , Responsive, Landing, Bootstrap, App, Template, Mobile, iOS, Android, apple, creative app">
     <meta name="author" content="#">
     <!-- Favicon icon -->
     <link rel="icon" href="libraries\assets\images\favicon.ico" type="image/x-icon">
@@ -71,7 +72,7 @@
     <div id="pcoded" class="pcoded">
         <div class="pcoded-overlay-box"></div>
         <div class="pcoded-container navbar-wrapper">
-
+            <!-- Header -->
             <nav class="navbar header-navbar pcoded-header">
                 <div class="navbar-wrapper">
 
@@ -92,9 +93,11 @@
                             <li class="header-search">
                                 <div class="main-search morphsearch-search">
                                     <div class="input-group">
-                                        <span class="input-group-addon search-close"><i class="feather icon-x"></i></span>
+                                        <span class="input-group-addon search-close"><i
+                                                class="feather icon-x"></i></span>
                                         <input type="text" class="form-control">
-                                        <span class="input-group-addon search-btn"><i class="feather icon-search"></i></span>
+                                        <span class="input-group-addon search-btn"><i
+                                                class="feather icon-search"></i></span>
                                     </div>
                                 </div>
                             </li>
@@ -106,37 +109,47 @@
                                         <i class="feather icon-bell"></i>
                                         <span class="badge bg-c-pink">5</span>
                                     </div>
-                                    <ul class="show-notification notification-view dropdown-menu" data-dropdown-in="fadeIn" data-dropdown-out="fadeOut">
+                                    <ul class="show-notification notification-view dropdown-menu"
+                                        data-dropdown-in="fadeIn" data-dropdown-out="fadeOut">
                                         <li>
                                             <h6>Notifications</h6>
                                             <label class="label label-danger">New</label>
                                         </li>
                                         <li>
                                             <div class="media">
-                                                <img class="d-flex align-self-center img-radius" src="libraries\assets\images\avatar-4.jpg" alt="Generic placeholder image">
+                                                <img class="d-flex align-self-center img-radius"
+                                                    src="libraries\assets\images\avatar-4.jpg"
+                                                    alt="Generic placeholder image">
                                                 <div class="media-body">
                                                     <h5 class="notification-user">John Doe</h5>
-                                                    <p class="notification-msg">Lorem ipsum dolor sit amet, consectetuer elit.</p>
+                                                    <p class="notification-msg">Lorem ipsum dolor sit amet, consectetuer
+                                                        elit.</p>
                                                     <span class="notification-time">30 minutes ago</span>
                                                 </div>
                                             </div>
                                         </li>
                                         <li>
                                             <div class="media">
-                                                <img class="d-flex align-self-center img-radius" src="libraries\assets\images\avatar-3.jpg" alt="Generic placeholder image">
+                                                <img class="d-flex align-self-center img-radius"
+                                                    src="libraries\assets\images\avatar-3.jpg"
+                                                    alt="Generic placeholder image">
                                                 <div class="media-body">
                                                     <h5 class="notification-user">Joseph William</h5>
-                                                    <p class="notification-msg">Lorem ipsum dolor sit amet, consectetuer elit.</p>
+                                                    <p class="notification-msg">Lorem ipsum dolor sit amet,
+                                                        consectetuer elit.</p>
                                                     <span class="notification-time">30 minutes ago</span>
                                                 </div>
                                             </div>
                                         </li>
                                         <li>
                                             <div class="media">
-                                                <img class="d-flex align-self-center img-radius" src="libraries\assets\images\avatar-4.jpg" alt="Generic placeholder image">
+                                                <img class="d-flex align-self-center img-radius"
+                                                    src="libraries\assets\images\avatar-4.jpg"
+                                                    alt="Generic placeholder image">
                                                 <div class="media-body">
                                                     <h5 class="notification-user">Sara Soudein</h5>
-                                                    <p class="notification-msg">Lorem ipsum dolor sit amet, consectetuer elit.</p>
+                                                    <p class="notification-msg">Lorem ipsum dolor sit amet,
+                                                        consectetuer elit.</p>
                                                     <span class="notification-time">30 minutes ago</span>
                                                 </div>
                                             </div>
@@ -147,11 +160,13 @@
                             <li class="user-profile header-notification">
                                 <div class="dropdown-primary dropdown">
                                     <div class="dropdown-toggle" data-toggle="dropdown">
-                                        <img src="libraries\assets\images\avatar-4.jpg" class="img-radius" alt="User-Profile-Image">
+                                        <img src="libraries\assets\images\avatar-4.jpg" class="img-radius"
+                                            alt="User-Profile-Image">
                                         <span>John Doe</span>
                                         <i class="feather icon-chevron-down"></i>
                                     </div>
-                                    <ul class="show-notification profile-notification dropdown-menu" data-dropdown-in="fadeIn" data-dropdown-out="fadeOut">
+                                    <ul class="show-notification profile-notification dropdown-menu"
+                                        data-dropdown-in="fadeIn" data-dropdown-out="fadeOut">
                                         <li>
                                             <a href="#!">
                                                 <i class="feather icon-settings"></i> Settings
@@ -194,7 +209,8 @@
                             <div class="chat-inner-header">
                                 <div class="back_chatBox">
                                     <div class="right-icon-control">
-                                        <input type="text" class="form-control  search-text" placeholder="Search Friend" id="search-friends">
+                                        <input type="text" class="form-control  search-text"
+                                            placeholder="Search Friend" id="search-friends">
                                         <div class="form-icon">
                                             <i class="icofont icofont-search"></i>
                                         </div>
@@ -202,45 +218,64 @@
                                 </div>
                             </div>
                             <div class="main-friend-list">
-                                <div class="media userlist-box" data-id="1" data-status="online" data-username="Josephin Doe" data-toggle="tooltip" data-placement="left" title="Josephin Doe">
+                                <div class="media userlist-box" data-id="1" data-status="online"
+                                    data-username="Josephin Doe" data-toggle="tooltip" data-placement="left"
+                                    title="Josephin Doe">
                                     <a class="media-left" href="#!">
-                                        <img class="media-object img-radius img-radius" src="libraries\assets\images\avatar-3.jpg" alt="Generic placeholder image ">
+                                        <img class="media-object img-radius img-radius"
+                                            src="libraries\assets\images\avatar-3.jpg"
+                                            alt="Generic placeholder image ">
                                         <div class="live-status bg-success"></div>
                                     </a>
                                     <div class="media-body">
                                         <div class="f-13 chat-header">Josephin Doe</div>
                                     </div>
                                 </div>
-                                <div class="media userlist-box" data-id="2" data-status="online" data-username="Lary Doe" data-toggle="tooltip" data-placement="left" title="Lary Doe">
+                                <div class="media userlist-box" data-id="2" data-status="online"
+                                    data-username="Lary Doe" data-toggle="tooltip" data-placement="left"
+                                    title="Lary Doe">
                                     <a class="media-left" href="#!">
-                                        <img class="media-object img-radius" src="libraries\assets\images\avatar-2.jpg" alt="Generic placeholder image">
+                                        <img class="media-object img-radius"
+                                            src="libraries\assets\images\avatar-2.jpg"
+                                            alt="Generic placeholder image">
                                         <div class="live-status bg-success"></div>
                                     </a>
                                     <div class="media-body">
                                         <div class="f-13 chat-header">Lary Doe</div>
                                     </div>
                                 </div>
-                                <div class="media userlist-box" data-id="3" data-status="online" data-username="Alice" data-toggle="tooltip" data-placement="left" title="Alice">
+                                <div class="media userlist-box" data-id="3" data-status="online"
+                                    data-username="Alice" data-toggle="tooltip" data-placement="left"
+                                    title="Alice">
                                     <a class="media-left" href="#!">
-                                        <img class="media-object img-radius" src="libraries\assets\images\avatar-4.jpg" alt="Generic placeholder image">
+                                        <img class="media-object img-radius"
+                                            src="libraries\assets\images\avatar-4.jpg"
+                                            alt="Generic placeholder image">
                                         <div class="live-status bg-success"></div>
                                     </a>
                                     <div class="media-body">
                                         <div class="f-13 chat-header">Alice</div>
                                     </div>
                                 </div>
-                                <div class="media userlist-box" data-id="4" data-status="online" data-username="Alia" data-toggle="tooltip" data-placement="left" title="Alia">
+                                <div class="media userlist-box" data-id="4" data-status="online"
+                                    data-username="Alia" data-toggle="tooltip" data-placement="left" title="Alia">
                                     <a class="media-left" href="#!">
-                                        <img class="media-object img-radius" src="libraries\assets\images\avatar-3.jpg" alt="Generic placeholder image">
+                                        <img class="media-object img-radius"
+                                            src="libraries\assets\images\avatar-3.jpg"
+                                            alt="Generic placeholder image">
                                         <div class="live-status bg-success"></div>
                                     </a>
                                     <div class="media-body">
                                         <div class="f-13 chat-header">Alia</div>
                                     </div>
                                 </div>
-                                <div class="media userlist-box" data-id="5" data-status="online" data-username="Suzen" data-toggle="tooltip" data-placement="left" title="Suzen">
+                                <div class="media userlist-box" data-id="5" data-status="online"
+                                    data-username="Suzen" data-toggle="tooltip" data-placement="left"
+                                    title="Suzen">
                                     <a class="media-left" href="#!">
-                                        <img class="media-object img-radius" src="libraries\assets\images\avatar-2.jpg" alt="Generic placeholder image">
+                                        <img class="media-object img-radius"
+                                            src="libraries\assets\images\avatar-2.jpg"
+                                            alt="Generic placeholder image">
                                         <div class="live-status bg-success"></div>
                                     </a>
                                     <div class="media-body">
@@ -265,14 +300,15 @@
                                         <span class="pcoded-micon"><i class="feather icon-home"></i></span>
                                         <span class="pcoded-mtext">Dashboard</span>
                                     </a>
-                                    
-                            
-                            </div>
+                                </li>
+                            </ul>
                         </div>
-                    </div>
+                    </nav>
                 </div>
             </div>
         </div>
+    </div>
+    </div>
     </div>
 
     <!-- Warning Section Starts -->
@@ -320,7 +356,8 @@
 <![endif]-->
     <!-- Warning Section Ends -->
     <!-- Required Jquery -->
-    <script data-cfasync="false" src="..\..\..\cdn-cgi\scripts\5c5dd728\cloudflare-static\email-decode.min.js"></script><script type="text/javascript" src="libraries\bower_components\jquery\js\jquery.min.js"></script>
+    <script data-cfasync="false" src="..\..\..\cdn-cgi\scripts\5c5dd728\cloudflare-static\email-decode.min.js"></script>
+    <script type="text/javascript" src="libraries\bower_components\jquery\js\jquery.min.js"></script>
     <script type="text/javascript" src="libraries\bower_components\jquery-ui\js\jquery-ui.min.js"></script>
     <script type="text/javascript" src="libraries\bower_components\popper.js\js\popper.min.js"></script>
     <script type="text/javascript" src="libraries\bower_components\bootstrap\js\bootstrap.min.js"></script>
@@ -341,15 +378,18 @@
     <script src="libraries\assets\js\vartical-layout.min.js"></script>
     <script type="text/javascript" src="libraries\assets\pages\dashboard\custom-dashboard.js"></script>
     <script type="text/javascript" src="libraries\assets\js\script.min.js"></script>
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-23581568-13"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-23581568-13"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
 
-  gtag('config', 'UA-23581568-13');
-</script>
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-23581568-13');
+    </script>
 </body>
 
 </html>
