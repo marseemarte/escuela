@@ -7,7 +7,7 @@
                     <li class="pcoded-hasmenu active pcoded-trigger">
                         <a href="javascript:void(0)">
                             <span class="pcoded-micon"><i class="feather icon-home"></i></span>
-                            <span class="pcoded-mtext">Dashboard</span>
+                            <span class="pcoded-mtext">Inicio</span>
                         </a>
                     </li>
                 </ul>
@@ -15,7 +15,15 @@
                     <li class="pcoded-hasmenu active pcoded-trigger">
                         <a href="javascript:void(0)">
                             <span class="pcoded-micon"><i class="feather icon-home"></i></span>
-                            <span class="pcoded-mtext">hola</span>
+                            <span class="pcoded-mtext">Notas</span>
+                        </a>
+                    </li>
+                </ul>
+                <ul class="pcoded-item pcoded-left-item">
+                    <li class="pcoded-hasmenu active pcoded-trigger">
+                        <a href="javascript:void(0)">
+                            <span class="pcoded-micon"><i class="feather icon-home"></i></span>
+                            <span class="pcoded-mtext">Notas</span>
                         </a>
                     </li>
                 </ul>
