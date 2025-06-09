@@ -7,8 +7,9 @@ use App\Http\Controllers\ProfesoresController;
 Route::get('/', function () {
     return view('app');
 })->name('home');
-Route::get('/administracion/profesores', [ProfesoresController::class, 'index'])
-    ->name('profesores.index');
+Route::get('/administracion/profesores/{seccion?}', [ProfesoresController::class, 'index'])
+    ->where('seccion', 'inicio|notas|asistencias|tareas|alumnos')
+    ->name('profesores.seccion');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])

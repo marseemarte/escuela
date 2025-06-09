@@ -62,6 +62,7 @@
 
 
     <script>
+        window.history.pushState({}, '', '/administracion/profesores/inicio');
         const inicio = document.getElementById('inicio');
         const notas = document.getElementById("notas");
         const asistencias = document.getElementById("asistencias");
@@ -78,6 +79,8 @@
                 // Add 'active' class to the clicked nav item
                 document.getElementById(this.id + 'Content').style.display = 'block';
                 this.classList.add('active');
+
+                window.history.pushState({}, '', '/administracion/profesores/' + this.id);
             });
 
         });
