@@ -14,21 +14,23 @@
         </div>
     </div>
     <!-- section corresponding to notas -->
-    <div class="pcoded-content hidden" id="notasContent">
+    <div class="pcoded-content" id="notasContent">
         <div class="pcoded-inner-content">
             <div class="main-body">
                 <div class="page-wrapper">
                     <div class="page-body">
                         <!-- Your content goes here -->
                         <h1>Notas</h1>
-                        <p>Esta es la sección de notas.</p>
+                        <br>
+                                 <x-layouts.profesores.notas>
+                    </x-layouts.profesores.notas>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <!-- section corresponding to asistencias -->
-    <div class="pcoded-content hidden" id="asistenciasContent">
+    <div class="pcoded-content" id="asistenciasContent">
         <div class="pcoded-inner-content">
             <div class="main-body">
                 <div class="page-wrapper">
@@ -42,7 +44,7 @@
         </div>
     </div>
     <!-- section corresponding to tareas -->
-    <div class="pcoded-content hidden" id="tareasContent">
+    <div class="pcoded-content" id="tareasContent">
         <div class="pcoded-inner-content">
             <div class="main-body">
                 <div class="page-wrapper">
@@ -56,7 +58,7 @@
         </div>
     </div>
     <!-- section corresponding to alumnos -->
-    <div class="pcoded-content hidden" id="alumnosContent">
+    <div class="pcoded-content" id="alumnosContent">
         <div class="pcoded-inner-content">
             <div class="main-body">
                 <div class="page-wrapper">
