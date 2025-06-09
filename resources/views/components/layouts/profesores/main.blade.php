@@ -22,7 +22,7 @@
                     <ul class="pcoded-item pcoded-left-item">
                         <li class="pcoded-hasmenu" id="notas">
                             <a href="javascript:void(0)">
-                                <span class="pcoded-micon"><i class="feather icon-home"></i></span>
+                                <span class="pcoded-micon"><i class="feather icon-file-text"></i></span>
                                 <span class="pcoded-mtext">Notas</span>
                             </a>
                         </li>
@@ -30,7 +30,7 @@
                     <ul class="pcoded-item pcoded-left-item">
                         <li class="pcoded-hasmenu" id="asistencias">
                             <a href="javascript:void(0)">
-                                <span class="pcoded-micon"><i class="feather icon-home"></i></span>
+                                <span class="pcoded-micon"><i class="feather icon-check"></i></span>
                                 <span class="pcoded-mtext">Asistencias</span>
                             </a>
                         </li>
@@ -38,7 +38,7 @@
                     <ul class="pcoded-item pcoded-left-item">
                         <li class="pcoded-hasmenu" id="tareas">
                             <a href="javascript:void(0)">
-                                <span class="pcoded-micon"><i class="feather icon-home"></i></span>
+                                <span class="pcoded-micon"><i class="feather icon-clipboard"></i></span>
                                 <span class="pcoded-mtext">Tareas</span>
                             </a>
                         </li>
@@ -46,7 +46,7 @@
                     <ul class="pcoded-item pcoded-left-item">
                         <li class="pcoded-hasmenu" id="alumnos">
                             <a href="javascript:void(0)">
-                                <span class="pcoded-micon"><i class="feather icon-home"></i></span>
+                                <span class="pcoded-micon"><i class="feather icon-users"></i></span>
                                 <span class="pcoded-mtext">Alumnos</span>
                             </a>
                         </li>
