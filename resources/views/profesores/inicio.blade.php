@@ -22,8 +22,7 @@
                         <!-- Your content goes here -->
                         <h1>Notas</h1>
                         <br>
-                                 <x-layouts.profesores.notas>
-                    </x-layouts.profesores.notas>
+                        <x-layouts.profesores.notas />
                     </div>
                 </div>
             </div>
@@ -37,7 +36,8 @@
                     <div class="page-body">
                         <!-- Your content goes here -->
                         <h1>Asistencias</h1>
-                        <p>Esta es la sección de asistencias.</p>
+                        
+                    <x-layouts.profesores.asistencias />
                     </div>
                 </div>
             </div>
