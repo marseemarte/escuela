@@ -1,5 +1,10 @@
 <?php
 
+use App\Http\Controllers\Profesores\AlumnoController;
+use App\Http\Controllers\Profesores\AsistenciaController;
+use App\Http\Controllers\Profesores\NotaController;
+use App\Http\Controllers\Profesores\ProfesorController;
+use App\Http\Controllers\Profesores\TareaController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\ProfesoresController;
@@ -7,9 +12,14 @@ use App\Http\Controllers\ProfesoresController;
 Route::get('/', function () {
     return view('app');
 })->name('home');
-Route::get('/administracion/profesores/{seccion?}', [ProfesoresController::class, 'index'])
-    ->where('seccion', 'inicio|notas|asistencias|tareas|alumnos')
-    ->name('profesores.seccion');
+
+Route::prefix('profesores')->group(function () {
+    Route::apiResource('/', ProfesorController::class);
+    Route::apiResource('notas', NotaController::class);
+    Route::apiResource('asistencias', AsistenciaController::class);
+    Route::apiResource('tareas', TareaController::class);
+    Route::apiResource('alumnos', AlumnoController::class);
+});
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
