@@ -1,13 +1,13 @@
 <x-layouts.profesores.dashboard>
-    <!-- section corresponding to inicio -->
-    <div class="pcoded-content" id="inicioContent">
+    <!-- section corresponding to alumnos -->
+    <div class="pcoded-content" id="alumnosContent">
         <div class="pcoded-inner-content">
             <div class="main-body">
                 <div class="page-wrapper">
                     <div class="page-body">
                         <!-- Your content goes here -->
-                        <h1>Bienvenido al Dashboard del Profesor</h1>
-                        <p>Esta es la sección de inicio.</p>
+                        <h1>Alumnos</h1>
+                        <p>Esta es la sección de alumnos.</p>
                     </div>
                 </div>
             </div>

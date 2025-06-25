@@ -7,7 +7,6 @@ use App\Http\Controllers\Profesores\ProfesorController;
 use App\Http\Controllers\Profesores\TareaController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
-use App\Http\Controllers\ProfesoresController;
 
 Route::get('/', function () {
     return view('app');

@@ -7,5 +7,8 @@ use Illuminate\Http\Request;
 
 class ProfesorController extends Controller
 {
-    //
+    public function index(Request $request)
+    {
+        return view('profesores.inicio');
+    }
 }

@@ -62,8 +62,8 @@
 
 
     <script>
-        window.history.pushState({}, '', '/administracion/profesores/inicio');
-        const inicio = document.getElementById('inicio');
+        window.history.pushState({}, '', '/profesores/');
+        const inicio = document.getElementById('');
         const notas = document.getElementById("notas");
         const asistencias = document.getElementById("asistencias");
         const alumnos = document.getElementById("alumnos");
@@ -80,7 +80,7 @@
                 document.getElementById(this.id + 'Content').style.display = 'block';
                 this.classList.add('active');
 
-                window.history.pushState({}, '', '/administracion/profesores/' + this.id);
+                window.history.pushState({}, '', '/profesores/' + this.id);
             });
 
         });
