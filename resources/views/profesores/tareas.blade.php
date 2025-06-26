@@ -1,4 +1,4 @@
-<x-layouts.profesores.dashboard>
+<x-layouts.profesores.dashboard tareas='true'>
     <!-- section corresponding to tareas -->
     <div class="pcoded-content" id="tareasContent">
         <div class="pcoded-inner-content">

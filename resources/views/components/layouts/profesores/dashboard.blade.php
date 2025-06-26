@@ -10,9 +10,17 @@
     <div id="pcoded" class="pcoded">
         <div class="pcoded-overlay-box"></div>
         <div class="pcoded-container navbar-wrapper">
+            @php
+                $inicio = isset($inicio) ? $inicio : 'false';
+                $asistencias = isset($asistencias) ? $asistencias : 'false';
+                $tareas = isset($tareas) ? $tareas : 'false';
+                $alumnos = isset($alumnos) ? $alumnos : 'false';
+                $notas = isset($notas) ? $notas : 'false';
+            @endphp
             <!-- Header and main -->
             <x-layouts.profesores.header>
-                <x-layouts.profesores.main>
+                <x-layouts.profesores.main :inicio='$inicio' :asistencias='$asistencias' :tareas='$tareas' :alumnos='$alumnos'
+                    :notas='$notas'>
                     {{ $slot }}
                 </x-layouts.profesores.main>
             </x-layouts.profesores.header>

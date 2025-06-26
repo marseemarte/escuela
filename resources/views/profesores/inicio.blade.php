@@ -1,4 +1,4 @@
-<x-layouts.profesores.dashboard>
+<x-layouts.profesores.dashboard inicio='true'>
     <!-- section corresponding to inicio -->
     <div class="pcoded-content" id="inicioContent">
         <div class="pcoded-inner-content">
