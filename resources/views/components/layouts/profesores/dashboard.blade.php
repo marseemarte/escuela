@@ -23,6 +23,9 @@
             {{ $slot }}
         </x-layouts.profesores.main>
     </div>
+
+
 </body>
+
 
 </html>
