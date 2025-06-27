@@ -24,7 +24,7 @@
         </x-layouts.profesores.main>
     </div>
 
-
+    @vite('resources/js/profesores/sidebar.js')
 </body>
 
 
