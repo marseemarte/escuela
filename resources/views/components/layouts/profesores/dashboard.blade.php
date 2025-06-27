@@ -21,7 +21,9 @@
             <x-layouts.profesores.header>
                 <x-layouts.profesores.main :inicio='$inicio' :asistencias='$asistencias' :tareas='$tareas' :alumnos='$alumnos'
                     :notas='$notas'>
-                    {{ $slot }}
+                    <div class="p-3">
+                        {{ $slot }}
+                    </div>
                 </x-layouts.profesores.main>
             </x-layouts.profesores.header>
         </div>

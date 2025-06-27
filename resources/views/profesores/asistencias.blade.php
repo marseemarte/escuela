@@ -51,6 +51,34 @@
                                             </td>
 
                                         </tr>
+                                        <tr>
+                                            <th scope="row">1</th>
+                                            <td>Sosa</td>
+                                            <td>Federico</td>
+                                            <td>
+                                                <select name="color" class="form-select rounded-pill">
+                                                    <option value=""></option>
+                                                    <option value="">Presente</option>
+                                                    <option value="">Ausente</option>
+                                                    <option value="">Justificado</option>
+                                                </select>
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">1</th>
+                                            <td>Sosa</td>
+                                            <td>Federico</td>
+                                            <td>
+                                                <select name="color" class="form-select rounded-pill">
+                                                    <option value=""></option>
+                                                    <option value="">Presente</option>
+                                                    <option value="">Ausente</option>
+                                                    <option value="">Justificado</option>
+                                                </select>
+                                            </td>
+
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
