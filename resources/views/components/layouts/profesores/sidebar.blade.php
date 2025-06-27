@@ -1,34 +1,34 @@
 <div class="sidebar w-[16vw] h-[92vh] bg-[#4d4d61]">
     <nav class="sidebar-navbar">
-        <ul class="">
-            <li class="pcoded-hasmenu {{ $inicio == 'true' ? 'activo' : '' }}" id="inicio">
-                <a href="/profesores">
-                    <span class="pcoded-micon"><i class="feather icon-home"></i></span>
-                    <span class="pcoded-mtext">Inicio</span>
+        <ul class="navbar-content flex flex-col w-full h-[92vh]">
+            <li class="navbar-item w-full border-l-3 border-[#4d4d61] h-[7%]  {{ $inicio == 'true' ? 'activo bg-[#626277] border-amber-400' : 'transition hover:bg-[#626277] hover:border-amber-400' }}"
+                id="inicio">
+                <a href="/profesores" class="flex items-center h-full">
+                    <span class="pl-4 ">Inicio</span>
                 </a>
             </li>
-            <li class="pcoded-hasmenu {{ $notas == 'true' ? 'activo' : '' }}" id="notas">
-                <a href="/profesores/notas">
-                    <span class="pcoded-micon"><i class="feather icon-check"></i></span>
-                    <span class="pcoded-mtext">Notas</span>
+            <li class="navbar-item w-full border-l-3 border-[#4d4d61] h-[7%] {{ $notas == 'true' ? 'activo bg-[#626277] border-amber-400' : 'transition hover:bg-[#626277] hover:border-amber-400' }}"
+                id="notas">
+                <a href="/profesores/notas" class="flex items-center h-full">
+                    <span class="pl-4">Notas</span>
                 </a>
             </li>
-            <li class="pcoded-hasmenu  {{ $asistencias == 'true' ? 'activo' : '' }}" id="asistencias">
-                <a href="/profesores/asistencias">
-                    <span class="pcoded-micon"><i class="feather icon-check"></i></span>
-                    <span class="pcoded-mtext">Asistencias</span>
+            <li class="navbar-item w-full border-l-3 border-[#4d4d61] h-[7%]  {{ $asistencias == 'true' ? 'activo bg-[#626277] border-amber-400' : 'transition hover:bg-[#626277] hover:border-amber-400' }}"
+                id="asistencias">
+                <a href="/profesores/asistencias" class="flex items-center h-full">
+                    <span class="pl-4">Asistencias</span>
                 </a>
             </li>
-            <li class="pcoded-hasmenu {{ $tareas == 'true' ? 'activo' : '' }}" id="tareas">
-                <a href="/profesores/tareas">
-                    <span class="pcoded-micon"><i class="feather icon-clipboard"></i></span>
-                    <span class="pcoded-mtext">Tareas</span>
+            <li class="navbar-item w-full border-l-3 border-[#4d4d61] h-[7%] {{ $tareas == 'true' ? 'activo bg-[#626277] border-amber-400' : 'transition hover:bg-[#626277] hover:border-amber-400' }}"
+                id="tareas">
+                <a href="/profesores/tareas" class="flex items-center h-full">
+                    <span class="pl-4">Tareas</span>
                 </a>
             </li>
-            <li class="pcoded-hasmenu {{ $alumnos == 'true' ? 'activo' : '' }}" id="alumnos">
-                <a href="/profesores/alumnos">
-                    <span class="pcoded-micon"><i class="feather icon-users"></i></span>
-                    <span class="pcoded-mtext">Alumnos</span>
+            <li class="navbar-item w-full border-l-3 border-[#4d4d61] h-[7%] {{ $alumnos == 'true' ? 'activo bg-[#626277] border-amber-400' : 'transition hover:bg-[#626277] hover:border-amber-400' }}"
+                id="alumnos">
+                <a href="/profesores/alumnos" class="flex items-center h-full">
+                    <span class="pl-4">Alumnos</span>
                 </a>
             </li>
         </ul>
