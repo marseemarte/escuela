@@ -1,9 +1,10 @@
 const sidebar = $("#sidebar-button");
 sidebar.on("click", () => {
-    console.log("hola");
-    if ($("#sidebar").hasClass("hidden")) {
-        $("#sidebar").removeClass("hidden");
+    if ($("#sidebar").hasClass("-translate-x-full")) {
+        $("#sidebar").removeClass("-translate-x-full");
+        $("#main").removeClass("w-full");
     } else {
-        $("#sidebar").addClass("hidden");
+        $("#sidebar").addClass("-translate-x-full");
+        $("#main").addClass("w-full");
     }
 });

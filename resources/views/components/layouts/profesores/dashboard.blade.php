@@ -16,7 +16,7 @@
 <body>
     <!-- Header, main y sidebar -->
     <x-layouts.profesores.header />
-    <div class="flex">
+    <div class="flex justify-end">
         <x-layouts.profesores.sidebar :inicio='$inicio' :asistencias='$asistencias' :tareas='$tareas' :alumnos='$alumnos'
             :notas='$notas' />
         <x-layouts.profesores.main>

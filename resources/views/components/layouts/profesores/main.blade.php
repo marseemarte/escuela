@@ -1,3 +1,3 @@
-<div class="main w-[84vw] p-5">
+<div class="main w-[84vw] p-5 transition-all" id="main">
     {{ $slot }}
 </div>

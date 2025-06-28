@@ -1,4 +1,4 @@
-<div class="sidebar w-[16vw] h-[93vh] bg-[#4d4d61]" id="sidebar">
+<div class="sidebar w-[16vw] h-[93vh] bg-[#4d4d61] fixed top-[7vh] left-0 z-20 transition-all" id="sidebar">
     <nav class="sidebar-navbar text-gray-300">
         <ul class="navbar-content flex flex-col w-full h-[93vh]">
             <li class="navbar-item w-full border-l-3 my-1 border-[#4d4d61] h-[6%]  {{ $inicio == 'true' ? 'activo bg-[#626277] border-amber-400' : 'transition hover:bg-[#626277] hover:border-amber-400' }}"
