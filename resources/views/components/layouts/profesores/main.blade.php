@@ -1,7 +1,7 @@
 @php
     $mainResponsive = [
-        'df' => 'w-[50vw]',
-        'sm' => 'sm:w-[67vw]',
+        'df' => 'w-[100vw]',
+        'sm' => 'sm:w-[100vw]',
         'md' => 'md:w-[73vw]',
         'lg' => 'lg:w-[77vw]',
         'xl' => 'xl:w-[80vw]',
