@@ -1,8 +1,8 @@
 @php
     $headerResponsive = [
-        'df' => 'h-[9vh]',
+        'df' => 'h-[9vh] relative',
         'sm' => 'sm:h-[10vh]',
-        'md' => 'md:h-[10vh]',
+        'md' => 'md:h-[10vh] md:static',
         'lg' => 'lg:h-[9vh]',
         'xl' => 'xl:h-[8vh]',
         '2xl' => '2xl:h-[7vh]',
@@ -10,9 +10,9 @@
     $headerResponsive = implode(' ', $headerResponsive);
 
     $sidebarHeaderResponsive = [
-        'df' => 'w-[50vw]',
-        'sm' => 'sm:w-[33vw]',
-        'md' => 'md:w-[27vw]',
+        'df' => 'w-[60vw] absolute',
+        'sm' => 'sm:w-[40vw]',
+        'md' => 'md:w-[27vw] md:static',
         'lg' => 'lg:w-[23vw]',
         'xl' => 'xl:w-[20vw]',
         '2xl' => '2xl:w-[16vw]',
@@ -28,16 +28,28 @@
         '2xl' => '2xl:text-xl 2xl:py-2 2xl:px-2.5',
     ];
     $sidebarHeaderCloseButtonResponsive = implode(' ', $sidebarHeaderCloseButtonResponsive);
+
+    $mainResponsive = [
+        'df' => 'w-[100vw]',
+        'sm' => 'sm:w-[100vw]',
+        'md' => 'md:w-[73vw]',
+        'lg' => 'lg:w-[77vw]',
+        'xl' => 'xl:w-[80vw]',
+        '2xl' => '2xl:w-[84vw]',
+    ];
+    $mainResponsive = implode(' ', $mainResponsive);
 @endphp
 
-<nav class="header bg-[#f3e5e5] shadow-lg w-full {{ $headerResponsive }}">
-    <div class="sidebar-header bg-[#565668] h-full shadow-lg flex items-center justify-between text-gray-300 p-4 transition-all duration-150 {{ $sidebarHeaderResponsive }}"
+<nav class="flex bg-[#f3e5e5] shadow-lg w-full transition-all {{ $headerResponsive }}">
+    <div class="bg-[#565668] shadow-lg flex items-center h-full justify-between text-gray-300 p-4 {{ $sidebarHeaderResponsive }}"
         id="sidebarHeader">
 
         <a href="{{ route('index') }}">Profesores</a>
         <button class="cursor-pointer" id="sidebar-button">
-            <i
-                class="fa-solid fa-bars transition hover:bg-[#6c6c81] rounded-xl {{ $sidebarHeaderCloseButtonResponsive }}"></i>
+            <i class="fa-solid fa-bars hover:bg-[#6c6c81] rounded-xl {{ $sidebarHeaderCloseButtonResponsive }}"></i>
         </button>
+    </div>
+    <div class="h-full flex items-center p-4">
+        <h2>Inicio</h2>
     </div>
 </nav>
