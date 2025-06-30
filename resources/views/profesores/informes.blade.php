@@ -164,8 +164,62 @@
         </aside>
         <!-- Main Content Placeholder -->
         <main class="main-content">
-            <h1 style="font-size: 24px; font-weight: 600; margin-bottom: 24px;">Informes 2025</h1>
-
+            <h1 style="font-size: 24px; font-weight: 600; margin-bottom: 24px; text-align:center;">Informes 2025</h1>
+            <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 24px; text-align:center; color:red;">Ingrese notas numericas</h2>
+            <table style="width:100%; border-collapse:collapse; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.03); border-radius:8px; overflow:hidden;">
+                <thead style="background:#a6c5e4;">
+                    <tr>
+                        <th style="padding:12px 8px; text-align:left; font-weight:600; color:#222; border-bottom:1px solid #e5e7eb;">Apellido</th>
+                        <th style="padding:12px 8px; text-align:left; font-weight:600; color:#222; border-bottom:1px solid #e5e7eb;">Nombre</th>
+                        <th style="padding:12px 8px; text-align:left; font-weight:600; color:#222; border-bottom:1px solid #e5e7eb;">1° Informe</th>
+                        <th style="padding:12px 8px; text-align:left; font-weight:600; color:#222; border-bottom:1px solid #e5e7eb;">1° Cuatrimestre</th>
+                        <th style="padding:12px 8px; text-align:left; font-weight:600; color:#222; border-bottom:1px solid #e5e7eb;">2° Informe</th>
+                        <th style="padding:12px 8px; text-align:left; font-weight:600; color:#222; border-bottom:1px solid #e5e7eb;">2° Cuatrimestre</th>
+                        <th style="padding:12px 8px; text-align:left; font-weight:600; color:#222; border-bottom:1px solid #e5e7eb;">Cierre</th>
+                        <th style="padding:12px 8px; text-align:left; font-weight:600; color:#222; border-bottom:1px solid #e5e7eb;">Diciembre</th>
+                        <th style="padding:12px 8px; text-align:left; font-weight:600; color:#222; border-bottom:1px solid #e5e7eb;">Febrero</th>
+                        <th style="padding:12px 8px; text-align:left; font-weight:600; color:#222; border-bottom:1px solid #e5e7eb;">Nota Final</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding:10px 8px; border-bottom:1px solid #f1f5f9;">Pérez</td>
+                        <td style="padding:10px 8px; border-bottom:1px solid #f1f5f9;">Juan</td>
+                        <td style="padding:10px 8px; border-bottom:1px solid #f1f5f9;">-</td>
+                        <td style="padding:10px 8px; border-bottom:1px solid #f1f5f9;">-</td>
+                        <td style="padding:10px 8px; border-bottom:1px solid #f1f5f9;">-</td>
+                        <td style="padding:10px 8px; border-bottom:1px solid #f1f5f9;">-</td>
+                        <td style="padding:10px 8px; border-bottom:1px solid #f1f5f9;">-</td>
+                        <td style="padding:10px 8px; border-bottom:1px solid #f1f5f9;">-</td>
+                        <td style="padding:10px 8px; border-bottom:1px solid #f1f5f9;">-</td>
+                        <td style="padding:10px 8px; border-bottom:1px solid #f1f5f9;"><span style="color:#22c55e; font-weight:500;">TEA</span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:10px 8px; border-bottom:1px solid #f1f5f9;">López</td>
+                        <td style="padding:10px 8px; border-bottom:1px solid #f1f5f9;">María</td>
+                        <td style="padding:10px 8px; border-bottom:1px solid #f1f5f9;">-</td>
+                        <td style="padding:10px 8px; border-bottom:1px solid #f1f5f9;">-</td>
+                        <td style="padding:10px 8px; border-bottom:1px solid #f1f5f9;">-</td>
+                        <td style="padding:10px 8px; border-bottom:1px solid #f1f5f9;">-</td>
+                        <td style="padding:10px 8px; border-bottom:1px solid #f1f5f9;">-</td>
+                        <td style="padding:10px 8px; border-bottom:1px solid #f1f5f9;">-</td>
+                        <td style="padding:10px 8px; border-bottom:1px solid #f1f5f9;">-</td>
+                        <td style="padding:10px 8px; border-bottom:1px solid #f1f5f9;"><span style="color:#f59e42; font-weight:500;">TEP</span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:10px 8px;">Gómez</td>
+                        <td style="padding:10px 8px;">Carlos</td>
+                        <td style="padding:10px 8px;">-</td>
+                        <td style="padding:10px 8px;">-</td>
+                        <td style="padding:10px 8px;">-</td>
+                        <td style="padding:10px 8px;">-</td>
+                        <td style="padding:10px 8px;">-</td>
+                        <td style="padding:10px 8px;">-</td>
+                        <td style="padding:10px 8px;">-</td>
+                        <td style="padding:10px 8px;"><span style="color:#ef4444; font-weight:500;">TED</span></td>
+                    </tr>
+                </tbody>
+            </table>
         </main>
     </div>
     <script>
