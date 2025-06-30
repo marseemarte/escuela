@@ -11,8 +11,8 @@
     $sidebarResponsive = implode(' ', $sidebarResponsive);
 
     $sidebarItemsResponsive = [
-        'df' => 'h-[13%]',
-        'sm' => 'sm:h-[12%]',
+        'df' => 'h-[11%]',
+        'sm' => 'sm:h-[11%]',
         'md' => 'md:h-[11%]',
         'lg' => 'lg:h-[10%]',
         'xl' => 'xl:h-[9%]',
@@ -20,7 +20,8 @@
     ];
     $sidebarItemsResponsive = implode(' ', $sidebarItemsResponsive);
 @endphp
-<div class="sidebar bg-[#4d4d61] fixed left-0 z-20 {{ $sidebarResponsive }} " id="sidebar">
+<div class="sidebar bg-[#4d4d61] fixed left-0 z-20 transition-none md:transition-all {{ $sidebarResponsive }} "
+    id="sidebar">
     <nav class="sidebar-navbar text-gray-300">
         <ul class="navbar-content flex flex-col w-full h-[93vh]">
             <li class="navbar-item w-full border-l-3 my-1 border-[#4d4d61] {{ $sidebarItemsResponsive }}  {{ $inicio == 'true' ? 'activo bg-[#626277] border-amber-400' : 'transition hover:bg-[#626277] hover:border-amber-400' }}"

@@ -40,16 +40,30 @@
     $mainResponsive = implode(' ', $mainResponsive);
 @endphp
 
-<nav class="flex bg-[#f3e5e5] shadow-lg w-full transition-all {{ $headerResponsive }}">
-    <div class="bg-[#565668] shadow-lg flex items-center h-full justify-between text-gray-300 p-4 {{ $sidebarHeaderResponsive }}"
+<nav class="flex bg-[#fcf8f8] w-full transition-all shadow-lg {{ $headerResponsive }}">
+    <div class="bg-[#565668] flex items-center h-full justify-between text-gray-300 p-4 {{ $sidebarHeaderResponsive }}"
         id="sidebarHeader">
 
-        <a href="{{ route('index') }}">Profesores</a>
+        <a href="{{ route('index') }}" class="text-2xl">Profesores</a>
         <button class="cursor-pointer" id="sidebar-button">
             <i class="fa-solid fa-bars hover:bg-[#6c6c81] rounded-xl {{ $sidebarHeaderCloseButtonResponsive }}"></i>
         </button>
     </div>
-    <div class="h-full flex items-center p-4">
-        <h2>Inicio</h2>
-    </div>
+    @if ($titulo !== 'Indefinido')
+        <div class="h-full flex items-center text-[19px] text-gray-900 p-4">
+            <h2>{{ $titulo }}</h2>
+        </div>
+    @else
+        <ul class="flex flex-wrap text-sm font-medium text-center text-gray-500">
+            <li class="me-2">
+                <button
+                    class="inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500">Asistencias</button>
+            </li>
+            <li class="me-2">
+                <button class="inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50">Asistencias
+                    Totales</button>
+            </li>
+        </ul>
+    @endif
+
 </nav>

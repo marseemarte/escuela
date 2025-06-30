@@ -11,11 +11,13 @@
     $tareas = isset($tareas) ? $tareas : 'false';
     $alumnos = isset($alumnos) ? $alumnos : 'false';
     $notas = isset($notas) ? $notas : 'false';
+
+    $titulo = isset($titulo) ? $titulo : 'Indefinido';
 @endphp
 
-<body>
+<body class="font-['Lato',sans-serif]">
     <!-- Header, main y sidebar -->
-    <x-layouts.profesores.header />
+    <x-layouts.profesores.header :titulo='$titulo' />
     <div class="flex justify-end">
         <x-layouts.profesores.sidebar :inicio='$inicio' :asistencias='$asistencias' :tareas='$tareas' :alumnos='$alumnos'
             :notas='$notas' />
