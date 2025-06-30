@@ -10,7 +10,7 @@ function closeSidebar() {
         "w-[9vh] sm:w-[10vh] md:w-[10vh] lg:w-[9vh] xl:w-[8vh] 2xl:w-[7vh] justify-center"
     );
     $("#sidebarHeader").removeClass(
-        "w-[60vw] sm:w-[40vw] md:w-[27vw] lg:w-[23vw] xl:w-[20vw] 2xl:w-[16vw] justify-between absolute"
+        "w-[60%] sm:w-[40%] md:w-[27%] lg:w-[23%] xl:w-[20%] 2xl:w-[16%] justify-between absolute"
     );
     $("#sidebarHeader").children("a").addClass("hidden");
     $("#main").addClass(
@@ -23,7 +23,7 @@ function openSidebar() {
     }
     $("#sidebar").removeClass("-translate-x-full");
     $("#sidebarHeader").addClass(
-        "w-[60vw] sm:w-[40vw] md:w-[27vw] lg:w-[23vw] xl:w-[20vw] 2xl:w-[16vw] justify-between absolute"
+        "w-[60%] sm:w-[40%] md:w-[27%] lg:w-[23%] xl:w-[20%] 2xl:w-[16%] justify-between absolute"
     );
     $("#sidebarHeader").removeClass(
         "w-[9vh] sm:w-[10vh] md:w-[10vh] lg:w-[9vh] xl:w-[8vh] 2xl:w-[7vh] justify-center"

@@ -15,7 +15,7 @@
     $titulo = isset($titulo) ? $titulo : 'Indefinido';
 @endphp
 
-<body class="font-['Lato',sans-serif]">
+<body class="font-['Lato',sans-serif] relative w-[100%] ">
     <!-- Header, main y sidebar -->
     <x-layouts.profesores.header :titulo='$titulo' />
     <div class="flex justify-end">

@@ -1,8 +1,8 @@
 @php
     $headerResponsive = [
-        'df' => 'h-[9vh] relative',
+        'df' => 'h-[9vh]',
         'sm' => 'sm:h-[10vh]',
-        'md' => 'md:h-[10vh] md:static',
+        'md' => 'md:h-[10vh]',
         'lg' => 'lg:h-[9vh]',
         'xl' => 'xl:h-[8vh]',
         '2xl' => '2xl:h-[7vh]',
@@ -10,12 +10,12 @@
     $headerResponsive = implode(' ', $headerResponsive);
 
     $sidebarHeaderResponsive = [
-        'df' => 'w-[60vw] absolute',
-        'sm' => 'sm:w-[40vw]',
-        'md' => 'md:w-[27vw] md:static',
-        'lg' => 'lg:w-[23vw]',
-        'xl' => 'xl:w-[20vw]',
-        '2xl' => '2xl:w-[16vw]',
+        'df' => 'w-[60%] absolute',
+        'sm' => 'sm:w-[40%]',
+        'md' => 'md:w-[27%] md:static',
+        'lg' => 'lg:w-[23%]',
+        'xl' => 'xl:w-[20%]',
+        '2xl' => '2xl:w-[16%]',
     ];
     $sidebarHeaderResponsive = implode(' ', $sidebarHeaderResponsive);
 
@@ -29,18 +29,9 @@
     ];
     $sidebarHeaderCloseButtonResponsive = implode(' ', $sidebarHeaderCloseButtonResponsive);
 
-    $mainResponsive = [
-        'df' => 'w-[100vw]',
-        'sm' => 'sm:w-[100vw]',
-        'md' => 'md:w-[73vw]',
-        'lg' => 'lg:w-[77vw]',
-        'xl' => 'xl:w-[80vw]',
-        '2xl' => '2xl:w-[84vw]',
-    ];
-    $mainResponsive = implode(' ', $mainResponsive);
 @endphp
 
-<nav class="flex bg-[#fcf8f8] w-full transition-all shadow-lg {{ $headerResponsive }}">
+<nav class="sticky top-0 flex bg-[#fcf8f8] w-full transition-all shadow-lg {{ $headerResponsive }}">
     <div class="bg-[#565668] flex items-center h-full justify-between text-gray-300 p-4 {{ $sidebarHeaderResponsive }}"
         id="sidebarHeader">
 

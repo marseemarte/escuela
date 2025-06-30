@@ -1,12 +1,12 @@
 @php
 
     $sidebarResponsive = [
-        'df' => 'w-[60vw] h-[91vh] top-[9vh]',
-        'sm' => 'sm:w-[40vw] sm:h-[90vh] sm:top-[10vh]',
-        'md' => 'md:w-[27vw] md:h-[90vh] md:top-[10vh]',
-        'lg' => 'lg:w-[23vw] lg:h-[91vh] lg:top-[9vh]',
-        'xl' => 'xl:w-[20vw] xl:h-[92vh] xl:top-[8vh]',
-        '2xl' => '2xl:w-[16vw] 2xl:h-[93vh] 2xl:top-[7vh]',
+        'df' => 'w-[60%] h-[91vh] top-[9vh]',
+        'sm' => 'sm:w-[40%] sm:h-[90vh] sm:top-[10vh]',
+        'md' => 'md:w-[27%] md:h-[90vh] md:top-[10vh]',
+        'lg' => 'lg:w-[23%] lg:h-[91vh] lg:top-[9vh]',
+        'xl' => 'xl:w-[20%] xl:h-[92vh] xl:top-[8vh]',
+        '2xl' => '2xl:w-[16%] 2xl:h-[93vh] 2xl:top-[7vh]',
     ];
     $sidebarResponsive = implode(' ', $sidebarResponsive);
 

@@ -15,9 +15,3 @@
     rel="stylesheet">
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
-<style>
-    body {
-        width: 100vw;
-        overflow-x: hidden;
-    }
-</style>
