@@ -338,6 +338,18 @@
                                         <span class="pcoded-mtext">Cursos</span>
                                     </a>
                                 </li>
+                                <li class="">
+                                    <a href="{{ route('orientaciones.index') }}">
+                                        <span class="pcoded-micon"><i class="feather icon-compass"></i></span>
+                                        <span class="pcoded-mtext">Orientaciones</span>
+                                    </a>
+                                </li>
+                                <li class="">
+                                    <a href="{{ route('materias.index') }}">
+                                        <span class="pcoded-micon"><i class="feather icon-clipboard"></i></span>
+                                        <span class="pcoded-mtext">Materias</span>
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </nav>
