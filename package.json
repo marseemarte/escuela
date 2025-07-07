@@ -10,7 +10,6 @@
         "autoprefixer": "^10.4.20",
         "axios": "^1.7.4",
         "concurrently": "^9.0.1",
-        "jquery": "^3.7.1",
         "laravel-vite-plugin": "^1.0",
         "tailwindcss": "^4.0.7",
         "vite": "^6.0"
@@ -21,6 +20,7 @@
         "lightningcss-linux-x64-gnu": "^1.29.1"
     },
     "devDependencies": {
-        "@rollup/plugin-inject": "^5.0.5"
+        "@rollup/plugin-inject": "^5.0.5",
+        "jquery": "^3.7.1"
     }
 }
