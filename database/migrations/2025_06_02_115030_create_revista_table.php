@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('revista', function (Blueprint $table) {
             $table->id();
+            $table->integer('cupof');
+            $table->date('fd');
+            $table->date('fh');
+            $table->integer('id_tipousuario');
+            $table->integer('secuencia');
+            $table->string('situacion', 30);
             $table->timestamps();
         });
     }

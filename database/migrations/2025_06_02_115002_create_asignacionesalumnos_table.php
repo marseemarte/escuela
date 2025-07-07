@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('asignacionesalumnos', function (Blueprint $table) {
             $table->id();
+            $table->integer('id_cursosciclolectivo');
+            $table->integer('id_tipousuario');
+            $table->tinyInteger('id_grupos');
+            $table->string('estado', 1);
             $table->timestamps();
         });
     }

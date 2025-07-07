@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('padresalumnos', function (Blueprint $table) {
             $table->id();
+            $table->integer('id_personaalumno');
+            $table->integer('id_personatutor');
+            $table->tinyInteger('id_parentesco');
             $table->timestamps();
         });
     }
