@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('horas', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('nombre', 15);
-            $table->char('turno', 1);
-            $table->time('hd');
-            $table->time('hh');
+        Schema::create('grupos', function (Blueprint $table) {
+            $table->id();
+            $table->string('nombre');
+            $table->foreignId('id_cursos')->constrained('cursos')->onDelete('cascade');
+            $table->timestamps();
         });
     }
 
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('horas');
+        Schema::dropIfExists('grupos');
     }
 };

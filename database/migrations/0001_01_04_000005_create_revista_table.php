@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('revista', function (Blueprint $table) {
             $table->id();
-            $table->integer('cupof');
+            $table->foreignId('cupof')->constrained('cupof', 'cupof')->onDelete('cascade');
+            $table->foreignId('id_tipousuario')->constrained('tipousuario')->onDelete('cascade');
             $table->date('fd');
             $table->date('fh');
-            $table->integer('id_tipousuario');
             $table->integer('secuencia');
             $table->string('situacion', 30);
             $table->timestamps();

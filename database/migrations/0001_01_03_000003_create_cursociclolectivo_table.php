@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tipousuario', function (Blueprint $table) {
+        Schema::create('cursociclolectivo', function (Blueprint $table) {
             $table->id();
-            $table->integer('id_persona');
-            $table->integer('id_tipopersona');
+            $table->string('estado');
+            $table->integer('ciclolectivo');
+            $table->foreignId('id_cursos')->constrained('cursos')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -24,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tipousuario');
+        Schema::dropIfExists('cursociclolectivo');
     }
 };

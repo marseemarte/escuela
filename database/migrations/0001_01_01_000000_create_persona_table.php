@@ -20,12 +20,13 @@ return new class extends Migration
             $table->string('sexo', 1);
             $table->string('domicilio', 50);
             $table->integer('id_localidad');
+            // Cuando se agregue provincias usar la linea de abajo y borrar la de arriba
+            //$table->foreignId('id_localidad')->constrained('localidades')->onDelete('cascade');
             $table->integer('pass');
             $table->string('telefono', 40);
             $table->string('mail', 191)->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
-
             $table->timestamps();
         });
 

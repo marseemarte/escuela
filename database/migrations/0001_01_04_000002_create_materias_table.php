@@ -8,11 +8,12 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('materias', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id();
             $table->string('nombre', 70);
             $table->string('abreviatura', 15);
             $table->char('estado', 1)->default('H');
             $table->string('resumen', 50);
+            $table->timestamps();
         });
     }
 

@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('asignacionesalumnos', function (Blueprint $table) {
             $table->id();
-            $table->integer('id_cursosciclolectivo');
-            $table->integer('id_tipousuario');
-            $table->tinyInteger('id_grupos');
+            $table->foreignId('id_cursosciclolectivo')->constrained('cursociclolectivo')->onDelete('cascade');
+            $table->foreignId('id_tipousuario')->constrained('tipousuario')->onDelete('cascade');
+            $table->foreignId('id_grupos')->constrained('grupos')->onDelete('cascade');
             $table->string('estado', 1);
             $table->timestamps();
         });

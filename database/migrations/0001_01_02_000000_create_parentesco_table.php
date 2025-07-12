@@ -8,8 +8,9 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('parentesco', function (Blueprint $table) {
-            $table->tinyIncrements('id');
+            $table->id();
             $table->string('parentesco', 30);
+            $table->timestamps();
         });
     }
 

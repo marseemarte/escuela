@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('grupos', function (Blueprint $table) {
+        Schema::create('localidades', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
-            $table->foreignId('id_cursos')
-                ->references('id')
-                ->on('cursos')
-                ->constrained()
-                ->onDelete('cascade');
+            $table->string('localidad');
+            $table->integer('cp');
+            $table->string('id_provincias');
+            // Cuando se agregue provincias usar la linea de abajo y borrar la de arriba
+            //$table->foreignId('id_provincias')->constrained('provincias')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('grupos');
+        Schema::dropIfExists('localidades');
     }
 };
