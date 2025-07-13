@@ -4,7 +4,7 @@ namespace App\Models\Cursos;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Orientaciones extends Model
+class Orientacion extends Model
 {
     protected $table = 'orientaciones';
     protected $fillable = [
