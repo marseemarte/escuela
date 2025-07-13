@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Orientaciones extends Model
 {
+    protected $table = 'orientaciones';
     protected $fillable = [
         'nombre',
         'descripcion',

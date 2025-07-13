@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 //PROFESORES
 //ALUMNOS
 //
-class Alumno extends Model
+class Grupo extends Model
 {
-    protected $table  = 'asignacionesalumnos';
+    protected $table = 'grupos';
     //
 }
