@@ -4,8 +4,8 @@ namespace App\Models\Personas;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Alumno extends Model
+class TipoTutor extends Model
 {
-    protected $table  = 'asignacionesalumnos';
+    protected $table = 'parentesco';
     //
 }
