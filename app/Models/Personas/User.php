@@ -1,6 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Personas;
+
+//
+//
+// ESTO HAY QUE ADAPTARLO AL MODEL PERSONA
+//
+//
+
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -55,7 +62,7 @@ class User extends Authenticatable
     {
         return Str::of($this->name)
             ->explode(' ')
-            ->map(fn (string $name) => Str::of($name)->substr(0, 1))
+            ->map(fn(string $name) => Str::of($name)->substr(0, 1))
             ->implode('');
     }
 }
