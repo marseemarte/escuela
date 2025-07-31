@@ -33,33 +33,12 @@
                     </td>
                     <td class="px-6 py-4">
                         <div class="w-full flex justify-center">
-                            <div class="flex relative">
-                                <button data-id="0"
-                                    class="inline-flex text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center items-center">
-                                    Presente
-                                    <svg class="w-2.5 h-2.5 ms-3" fill="none" viewBox="0 0 10 6">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="m1 1 4 4 4-4" />
-                                    </svg>
-                                </button>
-                                <!-- Dropdown menu -->
-                                <div id="dropdown[0]" data-id="0"
-                                    class="dropdown hidden z-10 absolute top-[100%] mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44">
-                                    <ul class="py-2 text-sm text-gray-700">
-                                        <li>
-                                            <button id="dropdownOptionPresente"
-                                                class="block px-4 py-2 hover:bg-gray-100 w-full cursor-pointer">Presente</button>
-                                        </li>
-                                        <li>
-                                            <button id="dropdownOptionAusente"
-                                                class="block px-4 py-2 hover:bg-gray-100 w-full cursor-pointer">Ausente</button>
-                                        </li>
-                                        <li>
-                                            <button id="dropdownOptionJustificado"
-                                                class="block px-4 py-2 hover:bg-gray-100 w-full cursor-pointer">Justificado</button>
-                                        </li>
-                                    </ul>
-                                </div>
+                            <div class="w-[35%]">
+                                <x-profesores.dropdown.button id="0" defaultLabel="Presente">
+                                    <x-profesores.dropdown.menu content="Presente" />
+                                    <x-profesores.dropdown.menu content="Ausente" />
+                                    <x-profesores.dropdown.menu content="Justificado" />
+                                </x-profesores.dropdown.button>
                             </div>
                         </div>
                     </td>
@@ -76,33 +55,12 @@
                     </td>
                     <td class="px-6 py-4">
                         <div class="w-full flex justify-center">
-                            <div class="flex relative">
-                                <button data-id="1"
-                                    class="inline-flex text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center items-center">
-                                    Presente
-                                    <svg class="w-2.5 h-2.5 ms-3" fill="none" viewBox="0 0 10 6">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="m1 1 4 4 4-4" />
-                                    </svg>
-                                </button>
-                                <!-- Dropdown menu -->
-                                <div id="dropdown[1]" data-id="1"
-                                    class="dropdown hidden z-10 absolute top-[100%] mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44">
-                                    <ul class="py-2 text-sm text-gray-700">
-                                        <li>
-                                            <button id="dropdownOptionPresente"
-                                                class="block px-4 py-2 hover:bg-gray-100 w-full cursor-pointer">Presente</button>
-                                        </li>
-                                        <li>
-                                            <button id="dropdownOptionAusente"
-                                                class="block px-4 py-2 hover:bg-gray-100 w-full cursor-pointer">Ausente</button>
-                                        </li>
-                                        <li>
-                                            <button id="dropdownOptionJustificado"
-                                                class="block px-4 py-2 hover:bg-gray-100 w-full cursor-pointer">Justificado</button>
-                                        </li>
-                                    </ul>
-                                </div>
+                            <div class="w-[35%]">
+                                <x-profesores.dropdown.button id="1" defaultLabel="Presente">
+                                    <x-profesores.dropdown.menu content="Presente" />
+                                    <x-profesores.dropdown.menu content="Ausente" />
+                                    <x-profesores.dropdown.menu content="Justificado" />
+                                </x-profesores.dropdown.button>
                             </div>
                         </div>
                     </td>
@@ -119,33 +77,12 @@
                     </td>
                     <td class="px-6 py-4">
                         <div class="w-full flex justify-center">
-                            <div class="flex relative">
-                                <button data-id="2"
-                                    class="inline-flex text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center items-center">
-                                    Presente
-                                    <svg class="w-2.5 h-2.5 ms-3" fill="none" viewBox="0 0 10 6">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="m1 1 4 4 4-4" />
-                                    </svg>
-                                </button>
-                                <!-- Dropdown menu -->
-                                <div id="dropdown[2]" data-id="2"
-                                    class="dropdown hidden z-10 absolute top-[100%] mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44">
-                                    <ul class="py-2 text-sm text-gray-700">
-                                        <li>
-                                            <button id="dropdownOptionPresente"
-                                                class="block px-4 py-2 hover:bg-gray-100 w-full cursor-pointer">Presente</button>
-                                        </li>
-                                        <li>
-                                            <button id="dropdownOptionAusente"
-                                                class="block px-4 py-2 hover:bg-gray-100 w-full cursor-pointer">Ausente</button>
-                                        </li>
-                                        <li>
-                                            <button id="dropdownOptionJustificado"
-                                                class="block px-4 py-2 hover:bg-gray-100 w-full cursor-pointer">Justificado</button>
-                                        </li>
-                                    </ul>
-                                </div>
+                            <div class="w-[35%]">
+                                <x-profesores.dropdown.button id="2" defaultLabel="Presente">
+                                    <x-profesores.dropdown.menu content="Presente" />
+                                    <x-profesores.dropdown.menu content="Ausente" />
+                                    <x-profesores.dropdown.menu content="Justificado" />
+                                </x-profesores.dropdown.button>
                             </div>
                         </div>
                     </td>
@@ -154,4 +91,5 @@
         </table>
     </div>
     @vite('resources/js/profesores/components/dropdown.js')
+    @vite('resources/js/profesores/asistencias.js')
 </x-layouts.profesores.dashboard>
