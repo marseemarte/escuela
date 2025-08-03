@@ -18,7 +18,11 @@ Route::get('/', function () {
 
 Route::prefix('profesores')->group(function () {
     Route::apiResource('/', ProfesorController::class);
+
     Route::apiResource('notas', NotaController::class);
+    Route::post('notas/materias', [NotaController::class, 'materias'])->name('profesores.notas.materias');
+    Route::post('notas/materias/lista', [NotaController::class, 'lista'])->name('profesores.notas.materias.lista');
+
     Route::apiResource('asistencias', AsistenciaController::class);
     Route::apiResource('tareas', TareaController::class);
     Route::apiResource('alumnos', AlumnoController::class);
