@@ -1,10 +1,17 @@
 <x-layouts.profesores.dashboard asistencias='true'>
-    <div id="tab[0]">
+
+    <x-profesores.tab id="0" mainTab>
+
         @include('partials.profesores.asistencias.asistencias-tomar')
-    </div>
-    <div id="tab[1]" class="hidden">
+
+    </x-profesores.tab>
+
+    <x-profesores.tab id="1">
+
         @include('partials.profesores.asistencias.asistencias-totales')
-    </div>
+
+    </x-profesores.tab>
+
     @vite('resources/js/profesores/components/dropdown.js')
     @vite('resources/js/profesores/asistencias.js')
 </x-layouts.profesores.dashboard>
