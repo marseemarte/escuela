@@ -45,13 +45,13 @@
             <h2>{{ $titulo }}</h2>
         </div>
     @else
-        <ul class="flex flex-wrap text-sm font-medium text-center text-gray-500">
+        <ul class="flex flex-wrap text-sm font-medium text-center h-full text-gray-500">
             <li class="me-2">
                 <button
-                    class="inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500">Asistencias</button>
+                    class="h-full inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500">Asistencias</button>
             </li>
             <li class="me-2">
-                <button class="inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50">Asistencias
+                <button class="h-full inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50">Asistencias
                     Totales</button>
             </li>
         </ul>
