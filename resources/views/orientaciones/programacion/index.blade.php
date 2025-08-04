@@ -8,7 +8,13 @@
             <li class="breadcrumb-item active" aria-current="page">Programación</li>
         </ol>
     </nav>
-    <h1 class="display-4 text-center mb-4" style="font-size:2.5rem; font-weight:600;">Programación</h1>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Programación</h1>
+        <button type="button" class="btn btn-primary btn-sm mb-3" onclick="window.location.href='{{ route('orientaciones.create') }}'">
+            + Crear Materia
+        </button>   
+    </div>
+    <i>Plan de estudio de la orientación de Programación</i>     
 
     <ul class="nav nav-tabs justify-content-center mb-4 border-0" id="anioTabs" role="tablist">
         @foreach([4,5,6,7] as $anio)
@@ -44,18 +50,26 @@
                                         <tr>
                                             <th>Nombre</th>
                                             <th>Descripción</th>
+                                            <th>Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @if($anio == 4)
-                                            <tr><td>Sistemas Digitales</td><td>Introducción a los sistemas digitales.</td></tr>
-                                        @elseif($anio == 5)
-                                            <tr><td>Hardware</td><td>Estudio de componentes físicos de computadoras.</td></tr>
-                                        @elseif($anio == 6)
-                                            <tr><td>Redes</td><td>Conceptos básicos de redes informáticas.</td></tr>
-                                        @elseif($anio == 7)
-                                            <tr><td>Base de Datos</td><td>Diseño y administración de bases de datos.</td></tr>
-                                        @endif
+                                        <tr>
+                                            @if($anio == 4)
+                                                <td>Sistemas Digitales</td><td>Introducción a los sistemas digitales.</td>
+                                            @elseif($anio == 5)
+                                                <td>Hardware</td><td>Estudio de componentes físicos de computadoras.</td>
+                                            @elseif($anio == 6)
+                                                <td>Redes</td><td>Conceptos básicos de redes informáticas.</td>
+                                            @elseif($anio == 7)
+                                                <td>Base de Datos</td><td>Diseño y administración de bases de datos.</td>
+                                            @endif
+                                            <td>
+                                                <a href="#" class="btn btn-primary btn-sm">Ver</a>
+                                                <a href="#" class="btn btn-secondary btn-sm">Editar</a>
+                                                <a href="#" class="btn btn-danger btn-sm">Eliminar</a>
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -75,18 +89,27 @@
                                         <tr>
                                             <th>Nombre</th>
                                             <th>Descripción</th>
+                                            <th>Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @if($anio == 4)
-                                            <tr><td>Taller de Informática</td><td>Uso básico de computadoras.</td></tr>
-                                        @elseif($anio == 5)
-                                            <tr><td>Taller de Hardware</td><td>Armado y reparación de PCs.</td></tr>
-                                        @elseif($anio == 6)
-                                            <tr><td>Taller de Redes</td><td>Instalación y configuración de redes.</td></tr>
-                                        @elseif($anio == 7)
-                                            <tr><td>Taller de Programación</td><td>Desarrollo de aplicaciones.</td></tr>
-                                        @endif
+                                        <tr>
+                                            @if($anio == 4)
+                                                <td>Taller de Informática</td><td>Uso básico de computadoras.</td>
+                                            @elseif($anio == 5)
+                                                <td>Taller de Hardware</td><td>Armado y reparación de PCs.</td>
+                                            @elseif($anio == 6)
+                                                <td>Taller de Redes</td><td>Instalación y configuración de redes.</td>
+                                            @elseif($anio == 7)
+                                                <td>Taller de Programación</td><td>Desarrollo de aplicaciones.</td>
+                                            @endif
+                                            <td>
+                                                <a href="#" class="btn btn-primary btn-sm">Ver</a>
+                                                <a href="#" class="btn btn-secondary btn-sm">Editar</a>
+                                                <a href="#" class="btn btn-danger btn-sm">Eliminar</a>
+                                            </td>
+                                        </tr>
+
                                     </tbody>
                                 </table>
                             </div>
