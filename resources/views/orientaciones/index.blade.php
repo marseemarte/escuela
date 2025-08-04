@@ -4,7 +4,8 @@
     <h1 class="mb-4">Planes de Estudio</h1>
     <div class="row justify-content-center">
         <div class="col-md-3 mb-4">
-            <a href="{{ route('programacion') }}" class="card text-center shadow-lg orientacion-card" style="background: #1565c0; color: #fff; text-decoration: none; border-radius: 16px;">
+            <a href="{{ route('programacion') }}" class="card text-center shadow-lg orientacion-card"
+               style="background: #bbdefb; color: #0d47a1; text-decoration: none; border-radius: 16px;">
                 <div class="card-body d-flex flex-column align-items-center justify-content-center" style="height: 180px;">
                     <span style="font-size: 3em;">💻</span>
                     <span class="mt-2 font-weight-bold" style="font-size: 1.3em;">Programación</span>
@@ -12,7 +13,8 @@
             </a>
         </div>
         <div class="col-md-3 mb-4">
-            <a href="{{ route('maestro_mayor_de_obra') }}" class="card text-center shadow-lg orientacion-card" style="background: #c62828; color: #fff; text-decoration: none; border-radius: 16px;">
+            <a href="{{ route('maestro_mayor_de_obra') }}" class="card text-center shadow-lg orientacion-card"
+               style="background: #ffcdd2; color: #b71c1c; text-decoration: none; border-radius: 16px;">
                 <div class="card-body d-flex flex-column align-items-center justify-content-center" style="height: 180px;">
                     <span style="font-size: 3em;">🛠️</span>
                     <span class="mt-2 font-weight-bold" style="font-size: 1.3em;">MMO</span>
@@ -20,7 +22,8 @@
             </a>
         </div>
         <div class="col-md-3 mb-4">
-            <a href="{{ route('ciclo_basico') }}" class="card text-center shadow-lg orientacion-card" style="background: #ffd600; color: #333; text-decoration: none; border-radius: 16px;">
+            <a href="{{ route('ciclo_basico') }}" class="card text-center shadow-lg orientacion-card"
+               style="background: #fff9c4; color: #fbc02d; text-decoration: none; border-radius: 16px;">
                 <div class="card-body d-flex flex-column align-items-center justify-content-center" style="height: 180px;">
                     <span style="font-size: 3em;">📚</span>
                     <span class="mt-2 font-weight-bold" style="font-size: 1.3em;">Ciclo Básico</span>
@@ -28,7 +31,8 @@
             </a>
         </div>
         <div class="col-md-3 mb-4">
-            <a href="{{ route('turismo') }}" class="card text-center shadow-lg orientacion-card" style="background: #388e3c; color: #fff; text-decoration: none; border-radius: 16px;">
+            <a href="{{ route('turismo') }}" class="card text-center shadow-lg orientacion-card"
+               style="background: #c8e6c9; color: #1b5e20; text-decoration: none; border-radius: 16px;">
                 <div class="card-body d-flex flex-column align-items-center justify-content-center" style="height: 180px;">
                     <span style="font-size: 3em;">🚌</span>
                     <span class="mt-2 font-weight-bold" style="font-size: 1.3em;">Turismo</span>
