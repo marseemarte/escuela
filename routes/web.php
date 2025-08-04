@@ -55,9 +55,9 @@ Route::get('/orientaciones', [OrientacionesController::class, 'index'])->name('o
 Route::get('/materias', [MateriasController::class, 'index'])->name('materias.index');
 
 //orientaciones routes
-Route::view('/programacion', 'orientaciones.programacion')->name('programacion');
-Route::view('/construccion', 'orientaciones.maestro_mayor_de_obra')->name('maestro_mayor_de_obra');
-Route::view('/ciclo_basico', 'orientaciones.ciclo_basico')->name('ciclo_basico');
-Route::view('/turismo', 'orientaciones.turismo')->name('turismo');
+Route::view('/programacion', 'orientaciones.programacion.index')->name('programacion.index');
+Route::view('/mmo', 'orientaciones.mmo.index')->name('mmo.index');
+Route::view('/ciclo_basico', 'orientaciones.ciclo_basico.index')->name('ciclo_basico.index');
+Route::view('/turismo', 'orientaciones.turismo.index')->name('turismo.index');
 
 require __DIR__ . '/auth.php';

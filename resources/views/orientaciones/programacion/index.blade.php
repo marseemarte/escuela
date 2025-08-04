@@ -10,9 +10,7 @@
     </nav>
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1>Programación</h1>
-        <button type="button" class="btn btn-primary btn-sm mb-3" onclick="window.location.href='{{ route('orientaciones.create') }}'">
-            + Crear Materia
-        </button>   
+        
     </div>
     <i>Plan de estudio de la orientación de Programación</i>     
 
