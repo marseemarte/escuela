@@ -1,3 +1,3 @@
-<td class="px-2.5 py-3 md:px-6 md:py-3 w-fit">
+<td class="px-2.5 py-4 md:px-6">
     {{ $slot }}
 </td>

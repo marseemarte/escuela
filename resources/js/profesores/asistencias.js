@@ -34,3 +34,15 @@ $("button[data-dropdown-button-id]").on("click", function (e) {
         }
     });
 });
+$(".tab").on("click", function () {
+    $(".tab")
+        .removeClass("text-blue-600 bg-[#eeeded] border-blue-600 active")
+        .addClass("hover:text-blue-600 hover:bg-gray-100 border-transparent");
+    $(this)
+        .removeClass("hover:text-blue-600 hover:bg-gray-100 border-transparent")
+        .addClass("text-blue-600 bg-[#eeeded] border-blue-600 active");
+    const tabNumber = $(this).data("tab");
+
+    $(".tab-content").addClass("hidden");
+    $(`.tab-content[data-tab-content='${tabNumber}']`).removeClass("hidden");
+});

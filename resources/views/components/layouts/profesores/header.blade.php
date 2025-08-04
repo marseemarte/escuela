@@ -31,8 +31,8 @@
 
 @endphp
 
-<nav class="sticky top-0 flex bg-[#fcf8f8] w-full transition-all shadow-lg {{ $headerResponsive }}">
-    <div class="bg-[#565668] flex items-center h-full justify-between text-gray-300 p-4 {{ $sidebarHeaderResponsive }}"
+<nav class="sticky top-0 flex bg-[#fcf8f8] w-full transition-all {{ $headerResponsive }}">
+    <div class="bg-[#565668] flex items-center h-full justify-between text-gray-300 p-4  {{ $sidebarHeaderResponsive }}"
         id="sidebarHeader">
 
         <a href="{{ route('index') }}" class="text-2xl">Profesores</a>
@@ -45,16 +45,22 @@
             <h2>{{ $titulo }}</h2>
         </div>
     @else
-        <ul class="flex flex-wrap text-sm font-medium text-center h-full text-gray-500">
-            <li class="me-2">
+        <ul class="flex gap-x-2 text-sm font-medium text-center h-full items-end bg-transparent text-gray-500">
+            <li class="h-full">
                 <button
-                    class="h-full inline-block p-4 text-blue-600 bg-gray-100 rounded-t-lg active dark:bg-gray-800 dark:text-blue-500">Asistencias</button>
+                    class="tab h-full px-6 py-3 border-b-2 rounded-t-lg cursor-pointer transition-colors duration-150 font-semibold text-blue-600 bg-[#eeeded] border-blue-600 active"
+                    data-tab="0">
+                    Asistencias
+                </button>
             </li>
-            <li class="me-2">
-                <button class="h-full inline-block p-4 rounded-t-lg hover:text-gray-600 hover:bg-gray-50">Asistencias
-                    Totales</button>
+            <li class="h-full">
+                <button
+                    class="tab h-full px-6 py-3 border-b-2 rounded-t-lg cursor-pointer transition-colors duration-150 font-semibold hover:text-blue-600 hover:bg-gray-100 border-transparent"
+                    data-tab="1">
+                    Asistencias Totales
+                </button>
             </li>
         </ul>
     @endif
-
+    <div class="flex-1 h-full "></div>
 </nav>
