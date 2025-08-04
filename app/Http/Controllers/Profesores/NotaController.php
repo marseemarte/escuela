@@ -11,4 +11,14 @@ class NotaController extends Controller
     {
         return view('profesores.notas');
     }
+
+    public function materias()
+    {
+        return view('profesores.notasmaterias');
+    }
+    public function lista()
+    {
+        return view('profesores.notaslista');
+    }
+
 }
