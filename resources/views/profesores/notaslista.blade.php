@@ -1,3 +1,4 @@
+    
     <x-layouts.profesores.dashboard notas='true' titulo="Notas">
     <h1>Notas</h1>
     <h2 class="text-center">Informes 2025 de Practicas Profecionalizantes</h2>

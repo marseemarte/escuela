@@ -5,9 +5,14 @@
 
 <x-profesores.section-container>
     <div class="py-3.5 px-5 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <input type="text"
-            class="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg bg-gray-100 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Buscar Alumno…">
+
+        <x-profesores.input.text style="search" placeholder="Buscar Alumno" />
+
+        <x-profesores.dropdown.button id="0" defaultLabel="Seleccionar">
+            <x-profesores.dropdown.menu content="70% o mas" />
+            <x-profesores.dropdown.menu content="Menos de 70%" />
+        </x-profesores.dropdown.button>
+
         <div class="flex items-center space-x-3">
             <button type="button"
                 class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500">
