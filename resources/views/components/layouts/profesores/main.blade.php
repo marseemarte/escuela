@@ -19,6 +19,6 @@
 <div class="absolute top-0 h-full backdrop-brightness-50 md:backdrop-brightness-100 z-[2000] md:-z-0 md:hidden {{ $darkenMainResponsive }}"
     id="darkenMain">
 </div>
-<div class="main box-border md:transition-all bg-[#f3f3f3] p-7 {{ $mainResponsive }}" id="main">
+<div class="main box-border md:transition-all bg-[#eeeded] p-2 md:p-7 {{ $mainResponsive }}" id="main">
     {{ $slot }}
 </div>

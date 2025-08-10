@@ -88,9 +88,37 @@
             background: rgba(0,0,0,0.2);
             z-index: 999;
         }
+
+            .custom-select {
+            width: 100%;
+            max-width: 300px;
+            padding: 10px 14px;
+            font-size: 16px;
+            font-family: 'Inter', Arial, sans-serif;
+            color: #333;
+            background-color: #f9fafb;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            outline: none;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20fill%3D%22%234e73df%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2212%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205-5z%22/%3E%3C/svg%3E');
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 12px;
+        }
+
+        .custom-select:focus {
+            border-color: #4e73df;
+            box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.2);
+        }
+
     </style>
 </head>
 <body>
+
+    
     <button class="sidebar-toggle" id="sidebarToggle">&#9776;</button>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <div class="container-flex">
@@ -163,9 +191,25 @@
             <!-- End Sidebar -->
         </aside>
         <!-- Main Content Placeholder -->
+        
         <main class="main-content">
+           
+
             <h1 style="font-size: 24px; font-weight: 600; margin-bottom: 24px; text-align:center;">Informes 2025</h1>
             <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 24px; text-align:center; color:red;">Ingrese notas numericas</h2>
+            <div style="display: flex; justify-content: center; margin-bottom: 24px;">
+                <select class="custom-select">
+                    <option selected>Seleccione un periodo</option>
+                    <option value="0">Primer Informe</option>
+                    <option value="1">Primer Cuatrimestre</option>
+                    <option value="0">Segundo Informe</option>
+                    <option value="2">Segundo Cuatrimestre</option>
+                    <option value="0">Cierre</option>
+                    <option value="0">Diciembre</option>
+                    <option value="0">Febrero</option>
+                    <option value="0">Nota Final</option>
+                </select>
+            </div>
             <table style="width:100%; border-collapse:collapse; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.03); border-radius:8px; overflow:hidden;">
                 <thead style="background:#a6c5e4;">
                     <tr>

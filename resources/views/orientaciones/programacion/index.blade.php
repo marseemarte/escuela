@@ -31,6 +31,8 @@
         @endforeach
     </ul>
 
+    <link rel="stylesheet" href="//cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css" />
+
     <div class="tab-content" id="anioTabsContent">
         @foreach([4,5,6,7] as $anio)
         <div class="tab-pane fade {{ $anio == 4 ? 'show active' : '' }}" id="anio{{ $anio }}" role="tabpanel" aria-labelledby="tab-{{ $anio }}">
@@ -43,7 +45,7 @@
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table id="materiasTable{{ $anio }}" class="table table-hover table-striped mb-0">
+                                <table id="materiasTable{{ $anio }}" class="display">
                                     <thead>
                                         <tr>
                                             <th>Nombre</th>
@@ -82,7 +84,7 @@
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table id="talleresTable{{ $anio }}" class="table table-hover table-striped mb-0">
+                                <table id="talleresTable{{ $anio }}" class="display">
                                     <thead>
                                         <tr>
                                             <th>Nombre</th>

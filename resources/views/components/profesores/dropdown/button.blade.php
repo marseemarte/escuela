@@ -1,8 +1,8 @@
-<div class="relative {{ $width ?? 'w-35' }}">
+<div class="relative w-full">
     <button id="dropdown[{{ $id }}]" data-dropdown-button-id="{{ $id }}"
-        class="w-full h-11 inline-flex justify-center items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">
+        class="w-full inline-flex justify-center items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">
         <span class="truncate flex-1 text-center">{{ $defaultLabel ?? 'Seleccionar' }}</span>
-        <svg class="w-2.5 h-2.5 ml-3 flex-shrink-0" fill="none" viewBox="0 0 10 6">
+        <svg class="h-[0.8vw] w-[0.8vw] ml-3 flex-shrink-0" fill="none" viewBox="0 0 10 6">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="m1 1 4 4 4-4" />
         </svg>
