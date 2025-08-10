@@ -1,7 +1,7 @@
 function setDropdownColor(dropdownButton, option = false) {
     let texto;
     if (option == false) {
-        texto = dropdownButton.find("span").text();
+        texto = dropdownButton.find(".selectedOptionText").text();
     } else {
         texto = option.text();
     }
@@ -35,9 +35,6 @@ function setDropdownColor(dropdownButton, option = false) {
             break;
     }
 }
-$("button[data-dropdown-button-id]").each(function () {
-    setDropdownColor($(this));
-});
 
 $("button[data-dropdown-button-id]").on("click", function (e) {
     e.stopPropagation();
