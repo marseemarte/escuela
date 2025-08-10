@@ -63,8 +63,8 @@
                                                 <td>Base de Datos</td><td>Diseño y administración de bases de datos.</td>
                                             @endif
                                             <td>
-                                                <a href="#" class="btn btn-primary btn-sm">Ver</a>
-                                                <a href="#" class="btn btn-secondary btn-sm">Editar</a>
+                                                <!--<a href="#" class="btn btn-primary btn-sm">Ver</a>-->
+                                                <a href="{{ route('programacion.edit') }}" class="btn btn-secondary btn-sm">Editar</a>
                                                 <a href="#" class="btn btn-danger btn-sm">Eliminar</a>
                                             </td>
                                         </tr>
@@ -124,12 +124,54 @@
             [4, 5, 6, 7].forEach(anio => {
                 $('#materiasTable' + anio).DataTable({
                     language: {
-                        url: '//cdn.datatables.net/plug-ins/1.13.5/i18n/es-ES.json'
+                        "sProcessing":     "Procesando...",
+                        "sLengthMenu":     "Mostrar _MENU_ registros",
+                        "sZeroRecords":    "No se encontraron resultados",
+                        "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                        "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                        "sInfoPostFix":    "",
+                        "sSearch":         "Buscar:",
+                        "sUrl":            "",
+                        "sInfoThousands":  ",",
+                        "sLoadingRecords": "Cargando...",
+                        "oPaginate": {
+                            "sFirst":    "Primero",
+                            "sLast":     "Último",
+                            "sNext":     "Siguiente",
+                            "sPrevious": "Anterior"
+                        },
+                        "oAria": {
+                            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                        }
                     }
                 });
                 $('#talleresTable' + anio).DataTable({
                     language: {
-                        url: '//cdn.datatables.net/plug-ins/1.13.5/i18n/es-ES.json'
+                        "sProcessing":     "Procesando...",
+                        "sLengthMenu":     "Mostrar _MENU_ registros",
+                        "sZeroRecords":    "No se encontraron resultados",
+                        "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                        "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                        "sInfoPostFix":    "",
+                        "sSearch":         "Buscar:",
+                        "sUrl":            "",
+                        "sInfoThousands":  ",",
+                        "sLoadingRecords": "Cargando...",
+                        "oPaginate": {
+                            "sFirst":    "Primero",
+                            "sLast":     "Último",
+                            "sNext":     "Siguiente",
+                            "sPrevious": "Anterior"
+                        },
+                        "oAria": {
+                            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                        }
                     }
                 });
             });
