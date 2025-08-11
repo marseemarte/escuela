@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Cursos;
 use App\Http\Controllers\Controller;
 use App\Models\Cursos\Curso;
 
-use App\Models\Cursos\Orientaciones;
+use App\Models\Cursos\Orientacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -20,7 +20,7 @@ class CursoController extends Controller
     public function create()
     {
         $cursos = Curso::all();
-        $orientaciones = Orientaciones::all();
+        $orientaciones = Orientacion::all();
         return view('cursos.create', compact('cursos', 'orientaciones'));
     }
 
@@ -52,7 +52,7 @@ class CursoController extends Controller
 
     public function edit(Curso $curso)
     {
-        $orientaciones = Orientaciones::all();
+        $orientaciones = Orientacion::all();
         return view('cursos.edit', compact('curso', 'orientaciones'));
     }
 

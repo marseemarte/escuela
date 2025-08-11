@@ -8,7 +8,8 @@ use App\Http\Controllers\Profesores\TareaController;
 use App\Http\Controllers\Cursos\CursoController;
 use App\Http\Controllers\Materias\MateriasController;
 use App\Http\Controllers\Orientaciones\OrientacionesController;
-use App\Http\Controllers\Orientaciones\ProgramacionController;
+use App\Http\Controllers\RevistaController;
+use App\Http\Controllers\CupofController;
 use Illuminate\Support\Facades\Route;
 
 use Livewire\Volt\Volt;
@@ -42,19 +43,24 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/cursos', [CursoController::class, 'index'])->name('cursos.index');
+//Route::get('/cursos/{curso}', [CursoController::class, 'show'])->name('cursos.show');
 Route::get('/cursos/create', [CursoController::class, 'create'])->name('cursos.create');
 Route::post('/cursos', [CursoController::class, 'store'])->name('cursos.store');
 Route::get('/cursos/{curso}/edit', [CursoController::class, 'edit'])->name('cursos.edit');
 Route::put('/cursos/{curso}', [CursoController::class, 'update'])->name('cursos.update');
 Route::delete('/cursos/{curso}', [CursoController::class, 'destroy'])->name('cursos.destroy');
 
+// Materias routes
+Route::get('/materias', [MateriasController::class, 'index'])->name('materias.index');
 // Orientaciones routes
 Route::get('/orientaciones', [OrientacionesController::class, 'index'])->name('orientaciones.index');
+Route::get('/orientaciones/edit', [OrientacionesController::class, 'edit'])->name('orientaciones.edit');
+Route::get('/orientaciones/{id}', [OrientacionesController::class, 'show'])->name('orientaciones.show');
 
-// Materias routes (CRUD completo)
-Route::resource('materias', MateriasController::class);
+// Materias routes
+Route::get('/materias', [MateriasController::class, 'index'])->name('materias.index');
 
-// Orientaciones routes adicionales
+//orientaciones routes
 Route::get('/programacion', [ProgramacionController::class, 'index'])->name('programacion.index');
 Route::get('/programacion/edit', [ProgramacionController::class, 'edit'])->name('programacion.edit');
 Route::put('/programacion/{programacion}', [ProgramacionController::class, 'update'])->name('programacion.update');
@@ -63,4 +69,7 @@ Route::view('/mmo', 'orientaciones.mmo.index')->name('mmo.index');
 Route::view('/ciclo_basico', 'orientaciones.ciclo_basico.index')->name('ciclo_basico.index');
 Route::view('/turismo', 'orientaciones.turismo.index')->name('turismo.index');
 
+
 require __DIR__ . '/auth.php';
+
+Route::put('/materias/{materia}/cambiar-orientacion', [MateriasController::class, 'cambiarOrientacion'])->name('materias.cambiar_orientacion');

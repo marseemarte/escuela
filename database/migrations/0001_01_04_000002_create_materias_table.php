@@ -12,10 +12,13 @@ return new class extends Migration
             $table->id();
             $table->string('nombre', 70);
             $table->string('abreviatura', 15);
-            $table->string('estado', 1)->default('H');
+            $table->char('estado', 1)->default('H');
             $table->string('resumen', 50);
-            $table->boolean('activo')->default(true); // Agregado para deshabilitar
             $table->timestamps();
+            
+            // Índices para mejorar el rendimiento
+            $table->index(['orientacion_id', 'anio', 'tipo']);
+            $table->index('curso_id');
         });
     }
 

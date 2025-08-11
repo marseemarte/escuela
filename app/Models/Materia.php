@@ -4,25 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Cursos\Orientacion;
+use App\Models\Cursos\Curso;
 
 class Materia extends Model
 {
-    use HasFactory;
-
-    protected $table = 'materias';
-
-    protected $fillable = [
-        'nombre',
-        'abreviatura',
-        'estado',
-        'resumen',
-        'activo',
-    ];
-
-    protected static function booted()
-    {
-        static::addGlobalScope('activo', function ($query) {
-            $query->where('activo', 1);
-        });
-    }
+    //
 }
