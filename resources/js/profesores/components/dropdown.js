@@ -6,9 +6,14 @@ $("button[data-dropdown-button-id]").on("click", function (e) {
     const $options = $dropdown.find("button");
 
     $options.on("click", function () {
-        console.log($dropdownButton.text());
-        const texto = $(this).text();
-        $dropdownButton.find("span").text(texto);
+        const optionText = $(this).text();
+        const optionId = $(this).data("option-id");
+        const optionValue = $(this)
+            .next(`span[data-option-value-id="${optionId}"]`)
+            .text();
+
+        $dropdownButton.find(".selectedOptionText").text(optionText);
+        $dropdownButton.find(".selectedOptionValue").text(optionValue);
         $dropdown.addClass("hidden");
     });
     // Cerrar otros dropdowns

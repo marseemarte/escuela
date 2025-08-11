@@ -8,7 +8,6 @@ use App\Http\Controllers\Profesores\TareaController;
 use App\Http\Controllers\Cursos\CursoController;
 use App\Http\Controllers\Materias\MateriasController;
 use App\Http\Controllers\Orientaciones\OrientacionesController;
-use App\Http\Controllers\Orientaciones\ProgramacionController;
 use Illuminate\Support\Facades\Route;
 
 use Livewire\Volt\Volt;
@@ -54,7 +53,6 @@ Route::get('/materias', [MateriasController::class, 'index'])->name('materias.in
 Route::get('/orientaciones', [OrientacionesController::class, 'index'])->name('orientaciones.index');
 Route::get('/orientaciones/edit', [OrientacionesController::class, 'edit'])->name('orientaciones.edit');
 Route::get('/orientaciones/{id}', [OrientacionesController::class, 'show'])->name('orientaciones.show');
-
 
 
 require __DIR__ . '/auth.php';
