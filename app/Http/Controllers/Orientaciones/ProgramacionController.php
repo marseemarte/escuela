@@ -3,28 +3,37 @@
 namespace App\Http\Controllers\Orientaciones;
 
 use App\Http\Controllers\Controller;
-use App\Models\Programacion;
 use Illuminate\Http\Request;
 
 class ProgramacionController extends Controller
 {
     public function index()
     {
-        // Aquí puedes obtener las orientaciones desde el modelo y pasarlas a la vista
-        $programacion = []; // Reemplaza esto con la lógica para obtener las orientaciones
-
-        return view('orientaciones.programacion.index', compact('programacion'));
+        return view('orientaciones.programacion.index');
     }
+
     public function edit()
     {
-        $programacion = Programacion::all();
-        return view('orientaciones.programacion.edit', compact('programacion'));
+        // Datos de ejemplo para la vista de edición
+        $programacion = (object) [
+            'id' => 1,
+            'division' => 'A',
+            'ano' => 4,
+            'turno' => 'Mañana'
+        ];
+        
+        $orientaciones = [
+            (object) ['id' => 1, 'nombre' => 'Programación'],
+            (object) ['id' => 2, 'nombre' => 'MMO'],
+            (object) ['id' => 3, 'nombre' => 'Turismo']
+        ];
+
+        return view('orientaciones.programacion.edit', compact('programacion', 'orientaciones'));
     }
 
     public function update(Request $request, $id)
     {
-        $programacion = Programacion::findOrFail($id);
-        $programacion->update($request->all());
+        // Aquí iría la lógica para actualizar en la base de datos
         return redirect()->route('programacion.index')->with('success', 'Plan de estudio actualizado correctamente');
     }
 }
