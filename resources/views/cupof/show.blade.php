@@ -108,7 +108,7 @@
                                 <td>{{ $profesor->f_desde ? \Carbon\Carbon::parse($profesor->f_desde)->format('d/m/Y') : 'N/A' }}</td>
                                 <td>{{ $profesor->f_hasta ? \Carbon\Carbon::parse($profesor->f_hasta)->format('d/m/Y') : 'N/A' }}</td>
                                 <td>
-                                    <a href="#" class="btn btn-warning btn-sm">Editar</a>
+                                    <a href="{{ route('cupof.editar-profesor', [$cupo->cupof, $profesor->id]) }}" class="btn btn-warning btn-sm">Editar</a>
                                     <form action="{{ route('cupof.eliminar-profesor', [$cupo->cupof, $profesor->id]) }}" 
                                           method="POST" style="display:inline;" 
                                           onsubmit="return confirm('¿Estás seguro de que quieres eliminar este profesor del cupof?')">

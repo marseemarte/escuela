@@ -236,21 +236,102 @@ class CupofController extends Controller
         }
     }
 
-    public function eliminarProfesor($cupof, $profesorId)
+    public function editarProfesor($cupof, $profesorId)
     {
+        $cupo = DB::table('cupof')->where('cupof', $cupof)->first();
+        
+        if (!$cupo) {
+            return redirect()->route('cupof.index')->with('error', 'Cupof no encontrado.');
+        }
+
+        // Obtener los datos actuales del profesor en la revista
+        $profesorRevista = DB::table('revista')
+            ->join('tipousuario', 'revista.id_tipousuario', '=', 'tipousuario.id')
+            ->join('persona', 'tipousuario.id_persona', '=', 'persona.id')
+            ->join('tipopersona', 'tipousuario.id_tipopersona', '=', 'tipopersona.id')
+            ->where('revista.cupof', $cupof)
+            ->where('persona.id', $profesorId)
+            ->select(
+                'revista.id as revista_id',
+                'revista.situacion',
+                'revista.fd as f_desde',
+                'revista.fh as f_hasta',
+                'revista.secuencia',
+                'persona.id as profesor_id',
+                'persona.dni',
+                'persona.nombre',
+                'persona.apellido',
+                'tipopersona.tipo as tipo_usuario'
+            )
+            ->first();
+
+        if (!$profesorRevista) {
+            return redirect()->route('cupof.show', $cupof)->with('error', 'Profesor no encontrado en este cupof.');
+        }
+
+        return view('cupof.editar-profesor', compact('cupo', 'profesorRevista'));
+    }
+
+    public function updateProfesor(Request $request, $cupof, $profesorId)
+    {
+        $request->validate([
+            'situacion' => 'required|string|max:50',
+            'f_desde' => 'required|date',
+            'f_hasta' => 'nullable|date|after_or_equal:f_desde'
+        ]);
+
         // Buscar el registro en revista que corresponda al profesor
         $revista = DB::table('revista')
             ->join('tipousuario', 'revista.id_tipousuario', '=', 'tipousuario.id')
             ->where('revista.cupof', $cupof)
             ->where('tipousuario.id_persona', $profesorId)
+            ->select('revista.id')
             ->first();
 
-        if ($revista) {
-            DB::table('revista')
-                ->where('id', $revista->id)
-                ->delete();
+        if (!$revista) {
+            return redirect()->route('cupof.show', $cupof)->with('error', 'Profesor no encontrado en este cupof.');
         }
 
-        return redirect()->route('cupof.show', $cupof)->with('success', 'Profesor eliminado del cupof exitosamente.');
+        try {
+            DB::table('revista')
+                ->where('id', $revista->id)
+                ->update([
+                    'situacion' => $request->situacion,
+                    'fd' => $request->f_desde,
+                    'fh' => $request->f_hasta
+                ]);
+
+            return redirect()->route('cupof.show', $cupof)->with('success', 'Datos del profesor actualizados exitosamente.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error al actualizar profesor: ' . $e->getMessage());
+        }
+    }
+
+    public function eliminarProfesor($cupof, $profesorId)
+    {
+        try {
+            // Primero obtener el id_tipousuario del profesor
+            $tipousuario = DB::table('tipousuario')
+                ->where('id_persona', $profesorId)
+                ->first();
+
+            if (!$tipousuario) {
+                return redirect()->route('cupof.show', $cupof)->with('error', 'Profesor no encontrado.');
+            }
+
+            // Eliminar directamente de la tabla revista usando cupof y id_tipousuario
+            $deleted = DB::table('revista')
+                ->where('cupof', $cupof)
+                ->where('id_tipousuario', $tipousuario->id)
+                ->delete();
+                
+            if ($deleted > 0) {
+                return redirect()->route('cupof.show', $cupof)->with('success', 'Profesor eliminado del cupof exitosamente.');
+            } else {
+                return redirect()->route('cupof.show', $cupof)->with('error', 'Profesor no encontrado en este cupof o ya fue eliminado.');
+            }
+        } catch (\Exception $e) {
+            return redirect()->route('cupof.show', $cupof)->with('error', 'Error al eliminar profesor: ' . $e->getMessage());
+        }
     }
 }
