@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('nombre');
             $table->string('titulo');
             $table->timestamps();
-            
             // Índice para mejorar el rendimiento
             $table->index('nombre');
         });

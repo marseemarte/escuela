@@ -92,3 +92,5 @@ Route::get('/revista/{cupof}', [RevistaController::class, 'index'])->name('revis
 
 
 require __DIR__ . '/auth.php';
+
+Route::put('/materias/{materia}/cambiar-orientacion', [MateriasController::class, 'cambiarOrientacion'])->name('materias.cambiar_orientacion');
