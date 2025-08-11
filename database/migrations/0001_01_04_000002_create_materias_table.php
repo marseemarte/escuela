@@ -12,8 +12,19 @@ return new class extends Migration {
             $table->string('nombre', 70);
             $table->string('abreviatura', 15);
             $table->char('estado', 1)->default('H');
-            $table->string('resumen', 50);
+            $table->text('resumen');
+            $table->enum('tipo', ['materia', 'taller'])->default('materia');
+            $table->integer('anio');
+            
+            // Claves foráneas
+            $table->foreignId('orientacion_id')->constrained('orientaciones')->onDelete('cascade');
+            $table->foreignId('curso_id')->constrained('cursos')->onDelete('cascade');
+            
             $table->timestamps();
+            
+            // Índices para mejorar el rendimiento
+            $table->index(['orientacion_id', 'anio', 'tipo']);
+            $table->index('curso_id');
         });
     }
 

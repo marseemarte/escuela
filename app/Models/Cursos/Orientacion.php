@@ -9,9 +9,20 @@ class Orientacion extends Model
     protected $table = 'orientaciones';
     protected $fillable = [
         'nombre',
-        'descripcion',
+        'titulo',
     ];
 
+    /**
+     * Obtiene las materias de esta orientación
+     */
+    public function materias()
+    {
+        return $this->hasMany(Materia::class, 'orientacion_id');
+    }
+
+    /**
+     * Obtiene los cursos de esta orientación
+     */
     public function cursos()
     {
         return $this->hasMany(Curso::class);
