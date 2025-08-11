@@ -51,10 +51,10 @@ Route::delete('/cursos/{curso}', [CursoController::class, 'destroy'])->name('cur
 // Orientaciones routes
 Route::get('/orientaciones', [OrientacionesController::class, 'index'])->name('orientaciones.index');
 
-// Materias routes
-Route::get('/materias', [MateriasController::class, 'index'])->name('materias.index');
+// Materias routes (CRUD completo)
+Route::resource('materias', MateriasController::class);
 
-//orientaciones routes
+// Orientaciones routes adicionales
 Route::get('/programacion', [ProgramacionController::class, 'index'])->name('programacion.index');
 Route::get('/programacion/edit', [ProgramacionController::class, 'edit'])->name('programacion.edit');
 Route::put('/programacion/{programacion}', [ProgramacionController::class, 'update'])->name('programacion.update');
@@ -62,6 +62,5 @@ Route::put('/programacion/{programacion}', [ProgramacionController::class, 'upda
 Route::view('/mmo', 'orientaciones.mmo.index')->name('mmo.index');
 Route::view('/ciclo_basico', 'orientaciones.ciclo_basico.index')->name('ciclo_basico.index');
 Route::view('/turismo', 'orientaciones.turismo.index')->name('turismo.index');
-
 
 require __DIR__ . '/auth.php';
