@@ -335,7 +335,7 @@
                                 <li class="">
                                     <a href="{{ route('cursos.index') }}">
                                         <span class="pcoded-micon"><i class="feather icon-book"></i></span>
-                                        <span class="pcoded-mtext">Cursos</span>
+                      <span class="pcoded-mtext">Cursos</span>
                                     </a>
                                 </li>
                                 <li class="">
