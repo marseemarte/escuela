@@ -13,5 +13,6 @@
     </x-profesores.tab>
 
     @vite('resources/js/profesores/components/dropdown.js')
+    @vite('resources/js/profesores/components/table/search.js')
     @vite('resources/js/profesores/asistencias.js')
 </x-layouts.profesores.dashboard>
