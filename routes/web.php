@@ -5,6 +5,7 @@ use App\Http\Controllers\Profesores\AsistenciaController;
 use App\Http\Controllers\Profesores\NotaController;
 use App\Http\Controllers\Profesores\ProfesorController;
 use App\Http\Controllers\Profesores\TareaController;
+use App\Http\Controllers\Profesores\HorariosController;
 use App\Http\Controllers\Cursos\CursoController;
 use App\Http\Controllers\Materias\MateriasController;
 use App\Http\Controllers\Orientaciones\OrientacionesController;
@@ -28,6 +29,7 @@ Route::prefix('profesores')->group(function () {
     Route::apiResource('asistencias', AsistenciaController::class);
     Route::apiResource('tareas', TareaController::class);
     Route::apiResource('alumnos', AlumnoController::class);
+    Route::apiResource('horarios', HorariosController::class);
 });
 
 Route::view('dashboard', 'dashboard')

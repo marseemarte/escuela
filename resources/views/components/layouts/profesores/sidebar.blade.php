@@ -59,6 +59,13 @@
                     <span class="pl-3">Alumnos</span>
                 </a>
             </li>
+            <li class="navbar-item w-full border-l-3 mb-1 border-[#4d4d61] {{ $sidebarItemsResponsive }}  {{ $horarios == 'true' ? 'activo bg-[#626277] border-amber-400' : 'transition hover:bg-[#626277] hover:border-amber-400' }}"
+                id="horarios">
+                <a href="/profesores/horarios" class="flex items-center h-full">
+                    <i class="{{ $horarios == 'true' ? 'pl-8' : 'pl-4' }} fa-solid fa-user-group"></i>
+                    <span class="pl-3">horarios</span>
+                </a>
+            </li>
         </ul>
     </nav>
 </div>

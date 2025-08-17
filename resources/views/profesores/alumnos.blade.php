@@ -1,5 +1,5 @@
 {{-- resources/views/alumnos/index.blade.php --}}
-<x-layouts.profesores.dashboard alumnos="true" titulo="Alumnos">
+<x-layouts.profesores.dashboard alumnos titulo="Alumnos">
     <!-- Título de la sección -->
     <h1 class="text-2xl font-semibold mb-4">Alumnos</h1>
     <p class="mb-6 text-gray-600">Busca y filtra tus alumnos por cualquier dato y revisa su asistencia.</p>

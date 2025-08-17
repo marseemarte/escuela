@@ -11,6 +11,7 @@
     $tareas = isset($tareas) ? $tareas : 'false';
     $alumnos = isset($alumnos) ? $alumnos : 'false';
     $notas = isset($notas) ? $notas : 'false';
+    $horarios = isset($horarios) ? $horarios : 'false';
 
     $titulo = isset($titulo) ? $titulo : 'Indefinido';
 @endphp
@@ -20,7 +21,7 @@
     <x-layouts.profesores.header :titulo='$titulo' />
     <div class="flex justify-end">
         <x-layouts.profesores.sidebar :inicio='$inicio' :asistencias='$asistencias' :tareas='$tareas' :alumnos='$alumnos'
-            :notas='$notas' />
+            :notas='$notas' :horarios='$horarios' />
         <x-layouts.profesores.main>
             {{ $slot }}
         </x-layouts.profesores.main>

@@ -1,4 +1,4 @@
-<x-layouts.profesores.dashboard asistencias='true'>
+<x-layouts.profesores.dashboard asistencias>
 
     <x-profesores.tab id="0" mainTab>
 
