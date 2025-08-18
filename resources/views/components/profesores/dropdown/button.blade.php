@@ -18,7 +18,7 @@
     }
 @endphp
 <div class="relative w-full">
-    <button id="dropdown[{{ $id }}]" data-dropdown-button-id="{{ $id }}"
+    <button data-dropdown-button-id="{{ $id }}"
         class="w-full inline-flex justify-center items-center text-white focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 {{ setButtonColor($defaultLabel ?? 'Seleccionar') }}">
 
         <span class="selectedOptionText truncate flex-1 text-center"
