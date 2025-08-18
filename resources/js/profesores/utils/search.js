@@ -20,6 +20,7 @@ function debounce(func, delay) {
         timeoutId = setTimeout(() => func.apply(this, args), delay);
     };
 }
+
 function searchHandler(searchBarId, data) {
     const searchBar = $(`[data-search-bar-id="${searchBarId}"]`);
     const searchItems = searchBar.find("[data-search-item]");
@@ -30,6 +31,7 @@ function searchHandler(searchBarId, data) {
     });
     console.log("searchHandler");
 }
+
 const data = [
     {
         id: 1,

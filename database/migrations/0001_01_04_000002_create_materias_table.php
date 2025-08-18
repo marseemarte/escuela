@@ -14,11 +14,14 @@ return new class extends Migration
             $table->string('abreviatura', 15);
             $table->char('estado', 1)->default('H');
             $table->string('resumen', 50);
+            $table->boolean('activo')->default(true);
+            $table->foreignId('id_orientacion')->constrained('orientaciones')->onDelete('cascade');
+            $table->foreignId('id_curso')->constrained('cursos')->onDelete('cascade');
             $table->timestamps();
-            
+
             // Índices para mejorar el rendimiento
-            $table->index(['orientacion_id', 'anio', 'tipo']);
-            $table->index('curso_id');
+            //$table->index(['orientacion_id', 'anio', 'tipo']);
+            //$table->index('curso_id');
         });
     }
 
