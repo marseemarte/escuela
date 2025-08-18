@@ -18,10 +18,6 @@ return new class extends Migration
             $table->foreignId('id_orientacion')->constrained('orientaciones')->onDelete('cascade');
             $table->foreignId('id_curso')->constrained('cursos')->onDelete('cascade');
             $table->timestamps();
-
-            // Índices para mejorar el rendimiento
-            //$table->index(['orientacion_id', 'anio', 'tipo']);
-            //$table->index('curso_id');
         });
     }
 
