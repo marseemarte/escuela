@@ -1,4 +1,4 @@
-<x-layouts.profesores.dashboard asistencias='true'>
+<x-layouts.profesores.dashboard asistencias>
 
     <x-profesores.tab id="0" mainTab>
 
@@ -13,5 +13,6 @@
     </x-profesores.tab>
 
     @vite('resources/js/profesores/components/dropdown.js')
+    @vite('resources/js/profesores/utils/search.js')
     @vite('resources/js/profesores/asistencias.js')
 </x-layouts.profesores.dashboard>
