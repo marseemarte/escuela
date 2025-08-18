@@ -4,7 +4,7 @@
 
 <x-profesores.section-container>
     <x-profesores.search-bar.container id="0">
-        <x-profesores.input.text style="search" placeholder="Buscar Alumno" data-search-item="true" />
+        <x-profesores.input.text style="search" placeholder="Buscar Alumno" :searchName="'nombre,apellido'" searchItem />
 
         @php
             $dropdownContent = [
@@ -14,7 +14,7 @@
                 'Todos' => ['id' => 3, 'label' => 'Todos', 'value' => 'todos'],
             ];
         @endphp
-        <x-profesores.dropdown.button id="0" defaultLabel="Seleccionar" data-search-item="true">
+        <x-profesores.dropdown.button id="0" defaultLabel="Seleccionar" :searchName="['asistencia', 'valor']" searchItem>
             @foreach ($dropdownContent as $option)
                 <x-profesores.dropdown.menu content="{{ $option['label'] }}" id="{{ $option['id'] }}"
                     value="{{ $option['value'] }}" />

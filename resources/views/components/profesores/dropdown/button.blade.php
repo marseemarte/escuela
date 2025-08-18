@@ -20,9 +20,19 @@
 <div class="relative w-full">
     <button id="dropdown[{{ $id }}]" data-dropdown-button-id="{{ $id }}"
         class="w-full inline-flex justify-center items-center text-white focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 {{ setButtonColor($defaultLabel ?? 'Seleccionar') }}">
-        <span class="selectedOptionText truncate flex-1 text-center">{{ $defaultLabel ?? 'Seleccionar' }}</span>
+
+        <span class="selectedOptionText truncate flex-1 text-center"
+            data-search-item="@if ($searchItem ?? false) true @else false @endif"
+            @isset($searchName) data-search-name="{{ $searchName[0] }}" @endisset>
+            {{ $defaultLabel ?? 'Seleccionar' }}
+        </span>
+
         <span class="selectedOptionValue hidden"
-            data-search-item="{{ $searchItem ?? 'false' ? 'true' : 'false' }}">{{ $defaultSelectedValue ?? 'null' }}</span>
+            data-search-item="@if ($searchItem ?? false) true @else false @endif"
+            @isset($searchName) data-search-name="{{ $searchName[1] }}" @endisset>
+            {{ $defaultSelectedValue ?? 'null' }}
+        </span>
+
         <svg class="h-[0.8vw] w-[0.8vw] ml-3 flex-shrink-0" fill="none" viewBox="0 0 10 6">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="m1 1 4 4 4-4" />
