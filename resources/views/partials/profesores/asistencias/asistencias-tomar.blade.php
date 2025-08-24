@@ -3,18 +3,18 @@
 <p class="mb-6 text-gray-600">Asistencias de hoy materia X 7°C 709</p>
 
 <x-profesores.section-container>
-    <x-profesores.search-bar.container id="0">
-        <x-profesores.input.text style="search" placeholder="Buscar Alumno" :searchName="'nombre,apellido'" searchItem />
+    <x-profesores.search-bar.container id="tomarAsistencias">
+        <x-profesores.input.text style="search" placeholder="Buscar Alumno" :searchName="'fullName'" />
 
         @php
             $dropdownContent = [
                 'Presente' => ['id' => 0, 'label' => 'Presente', 'value' => 'presente'],
                 'Ausente' => ['id' => 1, 'label' => 'Ausente', 'value' => 'ausente'],
                 'Justificado' => ['id' => 2, 'label' => 'Justificado', 'value' => 'justificado'],
-                'Todos' => ['id' => 3, 'label' => 'Todos', 'value' => 'todos'],
+                'Todos' => ['id' => 3, 'label' => 'Todos', 'value' => ''],
             ];
         @endphp
-        <x-profesores.dropdown.button id="0" defaultLabel="Seleccionar" :searchName="['asistencia', 'valor']" searchItem>
+        <x-profesores.dropdown.button id="0" defaultLabel="Seleccionar" :searchName="'valor'">
             @foreach ($dropdownContent as $option)
                 <x-profesores.dropdown.menu content="{{ $option['label'] }}" id="{{ $option['id'] }}"
                     value="{{ $option['value'] }}" />

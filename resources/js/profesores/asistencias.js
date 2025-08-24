@@ -1,3 +1,33 @@
+import { SearchBuilder } from "./utils/search.js";
+
+const data = [
+    {
+        id: 1,
+        nombre: "Juan",
+        apellido: "Pérez",
+        valor: "justificado",
+    },
+    {
+        id: 2,
+        nombre: "María",
+        apellido: "González",
+        valor: "ausente",
+    },
+    {
+        id: 3,
+        nombre: "María",
+        apellido: "González",
+        valor: "presente",
+    },
+];
+const searchBarId = "tomarAsistencias";
+
+new SearchBuilder(searchBarId, data)
+    .onComplete((results) => {
+        console.log("Resultados de la búsqueda:", results);
+    })
+    .initialize();
+
 function setDropdownColor(dropdownButton, option = false) {
     let texto;
     if (option == false) {
