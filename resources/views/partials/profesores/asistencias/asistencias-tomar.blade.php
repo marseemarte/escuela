@@ -46,83 +46,52 @@
         </x-profesores.table.thead>
 
         <x-profesores.table.tbody>
-            <x-profesores.table.tr>
-
-                <x-profesores.table.td>
-                    1
-                </x-profesores.table.td>
-                <x-profesores.table.td>
-                    Aaron
-                </x-profesores.table.td>
-                <x-profesores.table.td>
-                    Pro
-                </x-profesores.table.td>
-                <x-profesores.table.td>
-
-                    <div class="w-full flex justify-center">
-                        <x-profesores.dropdown.button id="1" defaultLabel="Presente"
-                            defaultSelectedValue="presente">
-                            @foreach (array_slice($dropdownContent, 0, 3) as $option)
-                                <x-profesores.dropdown.menu content="{{ $option['label'] }}" id="{{ $option['id'] }}"
-                                    value="{{ $option['value'] }}" />
-                            @endforeach
-                        </x-profesores.dropdown.button>
-                    </div>
-
-                </x-profesores.table.td>
-
-            </x-profesores.table.tr>
-
-            <x-profesores.table.tr>
-
-                <x-profesores.table.td>
-                    2
-                </x-profesores.table.td>
-                <x-profesores.table.td>
-                    Lautaro
-                </x-profesores.table.td>
-                <x-profesores.table.td>
-                    Potron
-                </x-profesores.table.td>
-                <x-profesores.table.td>
-
-                    <div class="w-full flex justify-center">
-                        <x-profesores.dropdown.button id="2" defaultLabel="Presente"
-                            defaultSelectedValue="presente">
-                            @foreach (array_slice($dropdownContent, 0, 3) as $option)
-                                <x-profesores.dropdown.menu content="{{ $option['label'] }}" id="{{ $option['id'] }}"
-                                    value="{{ $option['value'] }}" />
-                            @endforeach
-                        </x-profesores.dropdown.button>
-                    </div>
-
-                </x-profesores.table.td>
-
-            </x-profesores.table.tr>
-            <x-profesores.table.tr bottom>
-                <x-profesores.table.td>
-                    3
-                </x-profesores.table.td>
-                <x-profesores.table.td>
-                    Roberto
-                </x-profesores.table.td>
-                <x-profesores.table.td>
-                    Casas
-                </x-profesores.table.td>
-                <x-profesores.table.td>
-
-                    <div class="w-full flex justify-center">
-                        <x-profesores.dropdown.button id="3" defaultLabel="Presente"
-                            defaultSelectedValue="presente">
-                            @foreach (array_slice($dropdownContent, 0, 3) as $option)
-                                <x-profesores.dropdown.menu content="{{ $option['label'] }}" id="{{ $option['id'] }}"
-                                    value="{{ $option['value'] }}" />
-                            @endforeach
-                        </x-profesores.dropdown.button>
-                    </div>
-
-                </x-profesores.table.td>
-            </x-profesores.table.tr>
+            @php
+                $alumnos = [
+                    [
+                        'id' => 1,
+                        'nombre' => 'Juan',
+                        'apellido' => 'Pérez',
+                        'valor' => 'justificado',
+                    ],
+                    [
+                        'id' => 2,
+                        'nombre' => 'María',
+                        'apellido' => 'González',
+                        'valor' => 'ausente',
+                    ],
+                    [
+                        'id' => 3,
+                        'nombre' => 'Marta',
+                        'apellido' => 'Ortega',
+                        'valor' => 'presente',
+                    ],
+                ];
+            @endphp
+            @foreach ($alumnos as $alumno)
+                <x-profesores.table.tr :bottom="$loop->last">
+                    <x-profesores.table.td>
+                        {{ $alumno['id'] }}
+                    </x-profesores.table.td>
+                    <x-profesores.table.td>
+                        {{ $alumno['nombre'] }}
+                    </x-profesores.table.td>
+                    <x-profesores.table.td>
+                        {{ $alumno['apellido'] }}
+                    </x-profesores.table.td>
+                    <x-profesores.table.td>
+                        <div class="w-full flex justify-center">
+                            <x-profesores.dropdown.button id="{{ $alumno['id'] }}" defaultLabel="Presente"
+                                defaultSelectedValue="presente">
+                                @foreach (array_slice($dropdownContent, 0, 3) as $option)
+                                    <x-profesores.dropdown.menu content="{{ $option['label'] }}"
+                                        id="{{ $option['id'] }}" value="{{ $option['value'] }}" />
+                                @endforeach
+                            </x-profesores.dropdown.button>
+                        </div>
+                    </x-profesores.table.td>
+                </x-profesores.table.tr>
+            @endforeach
         </x-profesores.table.tbody>
     </x-profesores.table>
 </x-profesores.section-container>

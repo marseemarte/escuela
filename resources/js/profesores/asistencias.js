@@ -15,8 +15,8 @@ const data = [
     },
     {
         id: 3,
-        nombre: "María",
-        apellido: "González",
+        nombre: "Marta",
+        apellido: "Ortega",
         valor: "presente",
     },
 ];
