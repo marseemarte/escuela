@@ -14,7 +14,7 @@
                 'Todos' => ['id' => 3, 'label' => 'Todos', 'value' => ''],
             ];
         @endphp
-        <x-profesores.dropdown.button id="0" defaultLabel="Seleccionar" :searchName="'valor'">
+        <x-profesores.dropdown.button id="searchAsistenciasDropdown" defaultLabel="Seleccionar" :searchName="'valor'">
             @foreach ($dropdownContent as $option)
                 <x-profesores.dropdown.menu content="{{ $option['label'] }}" id="{{ $option['id'] }}"
                     value="{{ $option['value'] }}" />
@@ -27,7 +27,7 @@
             </button>
         </div>
     </x-profesores.search-bar.container>
-    <x-profesores.table>
+    <x-profesores.table searchId="tomarAsistencias">
         <x-profesores.table.thead>
 
             <x-profesores.table.th>
@@ -47,6 +47,7 @@
 
         <x-profesores.table.tbody>
             @php
+                $index = 1;
                 $alumnos = [
                     [
                         'id' => 1,
@@ -71,7 +72,7 @@
             @foreach ($alumnos as $alumno)
                 <x-profesores.table.tr :bottom="$loop->last">
                     <x-profesores.table.td>
-                        {{ $alumno['id'] }}
+                        {{ $index }}
                     </x-profesores.table.td>
                     <x-profesores.table.td>
                         {{ $alumno['nombre'] }}
@@ -81,8 +82,9 @@
                     </x-profesores.table.td>
                     <x-profesores.table.td>
                         <div class="w-full flex justify-center">
-                            <x-profesores.dropdown.button id="{{ $alumno['id'] }}" defaultLabel="Presente"
-                                defaultSelectedValue="presente">
+                            <x-profesores.dropdown.button id="{{ $alumno['id'] }}"
+                                defaultLabel="{{ ucfirst(empty($alumno['valor']) ? 'Presente' : $alumno['valor']) }}"
+                                defaultSelectedValue="{{ empty($alumno['valor']) ? 'presente' : $alumno['valor'] }}">
                                 @foreach (array_slice($dropdownContent, 0, 3) as $option)
                                     <x-profesores.dropdown.menu content="{{ $option['label'] }}"
                                         id="{{ $option['id'] }}" value="{{ $option['value'] }}" />
@@ -91,6 +93,9 @@
                         </div>
                     </x-profesores.table.td>
                 </x-profesores.table.tr>
+                @php
+                    $index++;
+                @endphp
             @endforeach
         </x-profesores.table.tbody>
     </x-profesores.table>

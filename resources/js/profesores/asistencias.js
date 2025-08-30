@@ -1,6 +1,7 @@
 import { SearchBuilder } from "./utils/search.js";
+import { updateData } from "./utils/helpers.js";
 
-const data = [
+let data = [
     {
         id: 1,
         nombre: "Juan",
@@ -21,8 +22,82 @@ const data = [
     },
 ];
 const searchBarId = "tomarAsistencias";
+const createTableRow = (
+    id,
+    nombre,
+    apellido,
+    valorSeleccionado,
+    textoSeleccionado
+) => {
+    return `
+        <tr class="bg-white border-b border-gray-200">
+            <td class="px-2.5 py-4 md:px-6">
+                ${id}
+            </td>
+            <td class="px-2.5 py-4 md:px-6">
+                ${nombre}
+            </td>
+            <td class="px-2.5 py-4 md:px-6">
+                ${apellido}
+            </td>
+            <td class="px-2.5 py-4 md:px-6">
+                <div class="w-full flex justify-center">
+                    <div class="relative w-full">
+                        <button data-dropdown-button-id="${id}" class="w-full inline-flex justify-center items-center text-white focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 bg-gray-600 hover:bg-gray-700 focus:ring-gray-300">
+                            <span class="selectedOptionText truncate flex-1 text-center">
+                                ${textoSeleccionado}
+                            </span>
+                            <span class="selectedOptionValue hidden">
+                                ${valorSeleccionado}
+                            </span>
+                            <svg class="h-[0.8vw] w-[0.8vw] ml-3 flex-shrink-0" fill="none" viewBox="0 0 10 6">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"></path>
+                            </svg>
+                        </button>
+                        <!-- Dropdown menu -->
+                        <div data-dropdown-id="${id}" class="hidden absolute top-full left-0 mt-2 w-full bg-white divide-y divide-gray-100 rounded-lg shadow-lg border border-gray-200 z-10">
+                            <ul class="py-2 text-sm text-gray-700">
+                                <li>
+                                    <button class="block px-4 py-2 hover:bg-gray-100 w-full cursor-pointer" data-option-id="0">Presente</button>
+                                    <span class="optionValue hidden" data-option-value-id="0">presente</span>
+                                </li>
+                                <li>
+                                    <button class="block px-4 py-2 hover:bg-gray-100 w-full cursor-pointer" data-option-id="1">Ausente</button>
+                                    <span class="optionValue hidden" data-option-value-id="1">ausente</span>
+                                </li>
+                                <li>
+                                    <button class="block px-4 py-2 hover:bg-gray-100 w-full cursor-pointer" data-option-id="2">Justificado</button>
+                                    <span class="optionValue hidden" data-option-value-id="2">justificado</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    `;
+};
 
-new SearchBuilder(searchBarId, data)
+function updateAsistenciasTable(data) {
+    const tbody = $("table[data-search='tomarAsistencias'] tbody");
+
+    tbody.empty();
+    data.forEach((element) => {
+        const [primera, ...resto] = element.valor;
+        const textoSeleccionado = primera.toUpperCase() + resto.join("");
+        tbody.append(
+            createTableRow(
+                element.id,
+                element.nombre,
+                element.apellido,
+                element.valor,
+                element.textoSeleccionado
+            )
+        );
+    });
+}
+
+const searchAsistencias = new SearchBuilder(searchBarId, data)
     .onComplete((results) => {
         console.log("Resultados de la búsqueda:", results);
     })
@@ -73,8 +148,33 @@ $("button[data-dropdown-button-id]").on("click", function (e) {
     const dropdown = $('[data-dropdown-id="' + dataId + '"]').not("button");
     const options = dropdown.find("button");
 
+    function unbindEvents(element = null) {
+        switch (element) {
+            case "options":
+                options.off("click");
+                return;
+            case "dropdown":
+                dropdown.off("click");
+                return;
+            default:
+                $(document).off("click");
+                options.off("click");
+                dropdown.off("click");
+                return;
+        }
+    }
+    if (dropdown.hasClass("hidden")) {
+        unbindEvents();
+    }
     options.on("click", function () {
+        const optionId = $(this).data("option-id");
+        const optionValue = $(this)
+            .next(`span[data-option-value-id="${optionId}"]`)
+            .text();
         setDropdownColor(dropdownButton, $(this));
+
+        data = updateData(data, dataId, optionValue, "asistencias");
+        unbindEvents();
     });
 });
 $(".tab").on("click", function () {

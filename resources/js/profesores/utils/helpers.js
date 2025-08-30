@@ -36,5 +36,20 @@ function transformData(data) {
         estado: item.asistencia,
     }));
 }
+function updateData(data, id, newValue, ruta = "asistencias") {
+    if (ruta == "asistencias") {
+        return data.map((item) => {
+            if (item.id == id) {
+                return { ...item, valor: newValue };
+            }
+            return item;
+        });
+    }
+    return data.map((item) => {
+        if (item.id == id) {
+            return item;
+        }
+    });
+}
 
-export { updateText, debounce, renameProperty, transformData };
+export { updateText, debounce, renameProperty, transformData, updateData };
