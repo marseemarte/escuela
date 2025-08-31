@@ -1,5 +1,6 @@
-import { SearchBuilder } from "./utils/search.js";
-import { updateData } from "./utils/helpers.js";
+import { SearchBuilder } from "./utils/search";
+import { updateData } from "./utils/helpers";
+import setupDropdowns from "./components/dropdown";
 
 let data = [
     {
@@ -22,6 +23,14 @@ let data = [
     },
 ];
 const searchBarId = "tomarAsistencias";
+
+const searchAsistencias = new SearchBuilder(searchBarId, data)
+    .onComplete((results) => {
+        console.log("Resultados de la búsqueda:", results);
+        updateAsistenciasTable(results);
+    })
+    .initialize();
+
 const createTableRow = (
     id,
     nombre,
@@ -44,12 +53,8 @@ const createTableRow = (
                 <div class="w-full flex justify-center">
                     <div class="relative w-full">
                         <button data-dropdown-button-id="${id}" class="w-full inline-flex justify-center items-center text-white focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 bg-gray-600 hover:bg-gray-700 focus:ring-gray-300">
-                            <span class="selectedOptionText truncate flex-1 text-center">
-                                ${textoSeleccionado}
-                            </span>
-                            <span class="selectedOptionValue hidden">
-                                ${valorSeleccionado}
-                            </span>
+                            <span class="selectedOptionText truncate flex-1 text-center">${textoSeleccionado}</span>
+                            <span class="selectedOptionValue hidden">${valorSeleccionado}</span>
                             <svg class="h-[0.8vw] w-[0.8vw] ml-3 flex-shrink-0" fill="none" viewBox="0 0 10 6">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"></path>
                             </svg>
@@ -78,31 +83,6 @@ const createTableRow = (
     `;
 };
 
-function updateAsistenciasTable(data) {
-    const tbody = $("table[data-search='tomarAsistencias'] tbody");
-
-    tbody.empty();
-    data.forEach((element) => {
-        const [primera, ...resto] = element.valor;
-        const textoSeleccionado = primera.toUpperCase() + resto.join("");
-        tbody.append(
-            createTableRow(
-                element.id,
-                element.nombre,
-                element.apellido,
-                element.valor,
-                element.textoSeleccionado
-            )
-        );
-    });
-}
-
-const searchAsistencias = new SearchBuilder(searchBarId, data)
-    .onComplete((results) => {
-        console.log("Resultados de la búsqueda:", results);
-    })
-    .initialize();
-
 function setDropdownColor(dropdownButton, option = false) {
     let texto;
     if (option == false) {
@@ -118,6 +98,7 @@ function setDropdownColor(dropdownButton, option = false) {
         "bg-gray-600 hover:bg-gray-700 focus:ring-gray-300";
     const todosButton = "bg-green-500 hover:bg-green-600 focus:ring-green-400";
     const defaultButton = "bg-gray-400 hover:bg-gray-500 focus:ring-gray-300";
+
     dropdownButton.removeClass(
         `${presenteButton} ${ausenteButton} ${justificadoButton} ${todosButton} ${defaultButton}`
     );
@@ -141,42 +122,60 @@ function setDropdownColor(dropdownButton, option = false) {
     }
 }
 
-$("button[data-dropdown-button-id]").on("click", function (e) {
-    e.stopPropagation();
-    const dataId = $(this).data("dropdown-button-id");
-    const dropdownButton = $(this);
-    const dropdown = $('[data-dropdown-id="' + dataId + '"]').not("button");
-    const options = dropdown.find("button");
+function setupDropdownsAsistencias(parent = document) {
+    const container = $(parent);
+    setupDropdowns(parent);
+    container.off("click.dropdown-asistencias");
 
-    function unbindEvents(element = null) {
-        switch (element) {
-            case "options":
-                options.off("click");
-                return;
-            case "dropdown":
-                dropdown.off("click");
-                return;
-            default:
-                $(document).off("click");
-                options.off("click");
-                dropdown.off("click");
-                return;
+    // Opciones dropdown
+    container.on(
+        "click.dropdown-asistencias",
+        "[data-dropdown-id] button[data-option-id]",
+        function (e) {
+            e.stopPropagation();
+            const optionButton = $(this);
+            const optionId = optionButton.data("option-id");
+            const optionValue = optionButton
+                .next(`span[data-option-value-id="${optionId}"]`)
+                .text();
+
+            const dropdown = optionButton.closest("[data-dropdown-id]");
+            const dropdownId = dropdown.data("dropdown-id");
+
+            // Actualizar data
+            data = updateData(data, dropdownId, optionValue, "asistencias");
+
+            searchAsistencias.updateData(data);
+            setDropdownColor($(`[data-dropdown-button-id='${dropdownId}']`));
+
+            console.log(`data actualizada: (${optionValue}) id ${dropdownId}`);
+            console.log(data);
         }
-    }
-    if (dropdown.hasClass("hidden")) {
-        unbindEvents();
-    }
-    options.on("click", function () {
-        const optionId = $(this).data("option-id");
-        const optionValue = $(this)
-            .next(`span[data-option-value-id="${optionId}"]`)
-            .text();
-        setDropdownColor(dropdownButton, $(this));
+    );
+}
+// Inicializar
+setupDropdownsAsistencias();
 
-        data = updateData(data, dataId, optionValue, "asistencias");
-        unbindEvents();
+function updateAsistenciasTable(data) {
+    const tbody = $("table[data-search-id='tomarAsistencias'] tbody");
+
+    tbody.empty();
+    data.forEach((element) => {
+        const [primera, ...resto] = element.valor;
+        const textoSeleccionado = primera.toUpperCase() + resto.join("");
+        tbody.append(
+            createTableRow(
+                element.id,
+                element.nombre,
+                element.apellido,
+                element.valor,
+                textoSeleccionado
+            )
+        );
+        setDropdownColor($(`[data-dropdown-button-id='${element.id}']`));
     });
-});
+}
+
 $(".tab").on("click", function () {
     $(".tab")
         .removeClass("text-blue-600 bg-[#eeeded] border-blue-600 active")

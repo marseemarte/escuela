@@ -1,68 +1,82 @@
 import { updateText } from "../utils/helpers";
-$("button[data-dropdown-button-id]").on("click", function (e) {
-    e.stopPropagation();
-    const dataId = $(this).data("dropdown-button-id");
-    const dropdownButton = $(this);
-    const dropdown = $('[data-dropdown-id="' + dataId + '"]').not("button");
-    const options = dropdown.find("button");
+export default function setupDropdowns(parent = document) {
+    const container = $(parent);
 
-    function unbindEvents(element = null) {
-        switch (element) {
-            case "document":
-                $(document).off("click");
-                return;
-            case "options":
-                options.off("click");
-                return;
-            case "dropdown":
-                dropdown.off("click");
-                return;
-            default:
-                $(document).off("click");
-                options.off("click");
-                dropdown.off("click");
-                return;
+    // Remover event handlers existentes para evitar duplicación
+    container.off("click.dropdown");
+
+    container.on(
+        "click.dropdown",
+        "button[data-dropdown-button-id]",
+        function (e) {
+            e.stopPropagation();
+            const dataId = $(this).data("dropdown-button-id");
+            const dropdown = $('[data-dropdown-id="' + dataId + '"]').not(
+                "button"
+            );
+
+            // Cerrar otros dropdowns
+            $("[data-dropdown-id]")
+                .not("button")
+                .not(dropdown)
+                .addClass("hidden");
+
+            // Toggle el dropdown actual
+            dropdown.toggleClass("hidden");
+
+            console.log(
+                `Dropdown toggled in ${
+                    parent === document ? "document" : parent
+                }`
+            );
         }
-    }
-    // Cerrar otros dropdowns
-    $("[data-dropdown-id]").not("button").not(dropdown).addClass("hidden");
+    );
 
-    // Toggle el dropdown actual
-    if (dropdown.hasClass("hidden")) {
-        unbindEvents();
-    }
-    dropdown.toggleClass("hidden");
+    container.on(
+        "click.dropdown",
+        "[data-dropdown-id] button[data-option-id]",
+        function (e) {
+            e.stopPropagation();
+            const optionButton = $(this);
+            const optionText = optionButton.text();
+            const optionId = optionButton.data("option-id");
+            const optionValue = optionButton
+                .next(`span[data-option-value-id="${optionId}"]`)
+                .text();
 
-    options.on("click", function () {
-        const optionText = $(this).text();
-        const optionId = $(this).data("option-id");
-        const optionValue = $(this)
-            .next(`span[data-option-value-id="${optionId}"]`)
-            .text();
-        dropdownButton.find(".selectedOptionText").text(optionText);
-        updateText(dropdownButton.find(".selectedOptionValue"), optionValue);
-        dropdown.addClass("hidden");
+            const dropdown = optionButton.closest("[data-dropdown-id]");
+            const dropdownId = dropdown.data("dropdown-id");
+            const dropdownButton = $(
+                `button[data-dropdown-button-id="${dropdownId}"]`
+            );
 
-        // Desactivar eventos para no crearlos infinitamente
-        unbindEvents();
+            // Actualizar texto y valor
+            dropdownButton.find(".selectedOptionText").text(optionText);
+            updateText(
+                dropdownButton.find(".selectedOptionValue"),
+                optionValue
+            );
 
-        //debugging
-        console.log("Option clicked");
-    });
+            dropdown.addClass("hidden");
 
-    dropdown.on("click", function (e) {
+            console.log(
+                `Option clicked in ${parent === document ? "document" : parent}`
+            );
+        }
+    );
+
+    container.on("click.dropdown", "[data-dropdown-id]", function (e) {
         e.stopPropagation();
-
-        //debugging
         console.log("Dropdown clicked and not closed");
     });
-    // Cerrar dropdown al hacer clic fuera
-    $(document).on("click", function () {
-        dropdown.addClass("hidden");
-        // Desactivar eventos para no crearlos infinitamente
-        unbindEvents();
 
-        //debugging
-        console.log("Document clicked, dropdown closed");
-    });
-});
+    // Setup global click handler solo una vez
+    if (!$(document).data("dropdown-global-setup")) {
+        $(document).on("click.dropdown-global", function () {
+            $("[data-dropdown-id]").not("button").addClass("hidden");
+            console.log("Document clicked, dropdowns closed");
+        });
+
+        $(document).data("dropdown-global-setup", true);
+    }
+}
