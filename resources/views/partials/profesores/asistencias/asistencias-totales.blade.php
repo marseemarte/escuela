@@ -8,7 +8,7 @@
 
         <x-profesores.input.text style="search" placeholder="Buscar Alumno" />
 
-        <x-profesores.dropdown.button id="0" defaultLabel="Seleccionar">
+        <x-profesores.dropdown.button id="asistenciasTotales" defaultLabel="Seleccionar">
             <x-profesores.dropdown.menu content="70% o mas" />
             <x-profesores.dropdown.menu content="Menos de 70%" />
         </x-profesores.dropdown.button>

@@ -11,6 +11,7 @@ use App\Http\Controllers\Materias\MateriasController;
 use App\Http\Controllers\Orientaciones\OrientacionesController;
 use App\Http\Controllers\RevistaController;
 use App\Http\Controllers\CupofController;
+use App\Http\Controllers\Orientaciones\ProgramacionController;
 use Illuminate\Support\Facades\Route;
 
 use Livewire\Volt\Volt;
