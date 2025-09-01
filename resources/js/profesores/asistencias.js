@@ -156,6 +156,21 @@ function setupDropdownsAsistencias(parent = document) {
 // Inicializar
 setupDropdownsAsistencias();
 
+// Botones rápidos: P, A, J
+$(document).on("click", ".quick-set-btn", function () {
+    const tipo = $(this).data("tipo");
+    let valor = "presente";
+    if (tipo === "a") {
+        valor = "ausente";
+    } else if (tipo === "j") {
+        valor = "justificado";
+    }
+    // Actualizar todos los registros
+    data = data.map((item) => ({ ...item, valor: valor }));
+    searchAsistencias.updateData(data);
+    updateAsistenciasTable(data);
+});
+
 function updateAsistenciasTable(data) {
     const tbody = $("table[data-search-id='tomarAsistencias'] tbody");
 

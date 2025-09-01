@@ -1,3 +1,3 @@
-<td class="px-2.5 py-4 md:px-6">
+<td class="whitespace-nowrap px-2 py-3 text-xs md:text-sm">
     {{ $slot }}
 </td>
