@@ -29,12 +29,12 @@
                     <td>{{ $materia->resumen }}</td>
                     <td>
                         <a href="{{ route('materias.edit', $materia) }}" class="btn btn-sm btn-warning">Editar</a>
-
+{{-- 
                         <form action="{{ route('materias.destroy', $materia) }}" method="POST" style="display:inline-block" onsubmit="return confirm('¿Seguro que querés eliminar esta materia?');">
                             @csrf
                             @method('DELETE')
                             <button class="btn btn-sm btn-danger" type="submit">Eliminar</button>
-                        </form>
+                        </form> --}}
                     </td>
                 </tr>
             @empty
