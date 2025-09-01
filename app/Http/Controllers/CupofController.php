@@ -223,8 +223,8 @@ class CupofController extends Controller
 
             DB::table('revista')->insert([
                 'cupof' => $cupof,
-                'fd' => $request->f_desde, // Fecha desde
-                'fh' => $request->f_hasta, // Fecha hasta
+                'fd' => $request->f_desde, // fecha desde
+                'fh' => $request->f_hasta ?: null, 
                 'id_tipousuario' => $tipousuario->id,
                 'secuencia' => $nuevaSecuencia,
                 'situacion' => $request->situacion
@@ -298,7 +298,7 @@ class CupofController extends Controller
                 ->update([
                     'situacion' => $request->situacion,
                     'fd' => $request->f_desde,
-                    'fh' => $request->f_hasta
+                    'fh' => $request->f_hasta ?: null
                 ]);
 
             return redirect()->route('cupof.show', $cupof)->with('success', 'Datos del profesor actualizados exitosamente.');

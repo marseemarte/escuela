@@ -71,7 +71,24 @@ Route::put('/programacion/{programacion}', [ProgramacionController::class, 'upda
 Route::view('/mmo', 'orientaciones.mmo.index')->name('mmo.index');
 Route::view('/ciclo_basico', 'orientaciones.ciclo_basico.index')->name('ciclo_basico.index');
 Route::view('/turismo', 'orientaciones.turismo.index')->name('turismo.index');
+Route::get('/cupof', [CupofController::class, 'index'])->name('cupof.index');
+Route::get('/cupof/create', [CupofController::class, 'create'])->name('cupof.create');
+Route::post('/cupof', [CupofController::class, 'store'])->name('cupof.store');
+Route::get('/cupof/{cupof}', [CupofController::class, 'show'])->name('cupof.show');
+Route::get('/cupof/{cupof}/edit', [CupofController::class, 'edit'])->name('cupof.edit');
+Route::put('/cupof/{cupof}', [CupofController::class, 'update'])->name('cupof.update');
+Route::delete('/cupof/{cupof}', [CupofController::class, 'destroy'])->name('cupof.destroy');
 
+// Rutas para gestionar profesores en cupof
+Route::get('/cupof/{cupof}/agregar-profesor', [CupofController::class, 'agregarProfesor'])->name('cupof.agregar-profesor');
+Route::post('/cupof/{cupof}/profesor', [CupofController::class, 'storeProfesor'])->name('cupof.store-profesor');
+Route::get('/cupof/{cupof}/profesor/{profesorId}/editar', [CupofController::class, 'editarProfesor'])->name('cupof.editar-profesor');
+Route::put('/cupof/{cupof}/profesor/{profesorId}', [CupofController::class, 'updateProfesor'])->name('cupof.update-profesor');
+Route::delete('/cupof/{cupof}/profesor/{profesorId}', [CupofController::class, 'eliminarProfesor'])->name('cupof.eliminar-profesor');
+
+// Revista routes (mantener compatibilidad)
+Route::get('/revista', [RevistaController::class, 'listarCupofs'])->name('revista.listar');
+Route::get('/revista/{cupof}', [RevistaController::class, 'index'])->name('revista.index');
 
 require __DIR__ . '/auth.php';
 
