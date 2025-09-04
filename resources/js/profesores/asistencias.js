@@ -2,7 +2,7 @@ import { SearchBuilder } from "./utils/search";
 import { updateData } from "./utils/helpers";
 import setupDropdowns from "./components/dropdown";
 
-let data = [
+const baseData = [
     {
         id: 1,
         nombre: "Juan",
@@ -22,6 +22,8 @@ let data = [
         valor: "presente",
     },
 ];
+let data = baseData;
+
 const searchBarId = "tomarAsistencias";
 
 const searchAsistencias = new SearchBuilder(searchBarId, data)
