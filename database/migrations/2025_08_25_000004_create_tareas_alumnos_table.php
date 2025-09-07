@@ -9,15 +9,12 @@ return new class extends Migration {
     {
         Schema::create('tareas_alumnos', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_tarea');
-            $table->unsignedBigInteger('id_asignacionesalumnos');
+            $table->foreignId('id_tarea')->constrained('tareas')->onDelete('cascade');
+            $table->foreignId('id_asignacionesalumnos')->constrained('asignacionesalumnos')->onDelete('cascade');
             $table->date('fecha');
             $table->string('nombre_archivo', 150);
             $table->tinyInteger('borrado_fisico')->default(0);
             $table->timestamps();
-
-            $table->foreign('id_tarea')->references('id')->on('tareas')->onDelete('cascade');
-            $table->foreign('id_asignacionesalumnos')->references('id')->on('asignacionesalumnos')->onDelete('cascade');
         });
     }
 

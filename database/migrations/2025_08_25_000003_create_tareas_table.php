@@ -16,10 +16,10 @@ return new class extends Migration {
             $table->string('tipo', 150);
             $table->date('fecha_subida');
             $table->date('fecha_entrega');
-            $table->unsignedBigInteger('id_revista');
-            $table->timestamps();
 
-            $table->foreign('id_revista')->references('id')->on('revistas')->onDelete('cascade');
+            $table->foreignId('id_revista')->constrained('revista')->onDelete('cascade');
+
+            $table->timestamps();
         });
     }
 

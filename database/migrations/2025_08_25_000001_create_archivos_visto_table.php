@@ -9,15 +9,13 @@ return new class extends Migration {
     {
         Schema::create('archivos_visto', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_archivo');
-            $table->unsignedBigInteger('id_asignacionesalumnos');
+            $table->foreignId('id_archivo')->constrained('archivos')->onDelete('cascade');
+            $table->foreignId('id_asignacionesalumnos')->constrained('asignacionesalumnos')->onDelete('cascade');
+
             $table->boolean('visto');
             $table->string('tipo', 1);
             $table->date('fecha');
             $table->timestamps();
-
-            $table->foreign('id_archivo')->references('id')->on('archivos')->onDelete('cascade');
-            $table->foreign('id_asignacionesalumnos')->references('id')->on('asignacionesalumnos')->onDelete('cascade');
         });
     }
 

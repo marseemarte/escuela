@@ -9,7 +9,7 @@ return new class extends Migration {
     {
         Schema::create('inasistenciasalumnos', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_asignacionesalumnos');
+            $table->foreignId('id_asignacionesalumnos')->constrained('asignacionesalumnos')->onDelete('cascade');
             $table->integer('cupof');
             $table->date('fecha');
             $table->string('turno', 1);
@@ -17,8 +17,6 @@ return new class extends Migration {
             $table->string('justificado', 1);
             $table->integer('dni_personal');
             $table->timestamps();
-
-            $table->foreign('id_asignacionesalumnos')->references('id')->on('asignacionesalumnos')->onDelete('cascade');
         });
     }
 
