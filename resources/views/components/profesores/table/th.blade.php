@@ -1,3 +1,3 @@
-<th class="whitespace-nowrap px-2 py-3 text-xs md:text-sm">
+<th {{ $attributes->except('class') }} class="whitespace-nowrap px-2 py-3 md:table-cell {{ $attributes->get('class') }}">
     {{ $slot }}
 </th>

@@ -41,23 +41,23 @@ const createTableRow = (
     textoSeleccionado
 ) => {
     return `
-        <tr class="bg-white border-b border-gray-200">
-            <td class="px-2.5 py-4 md:px-6">
+        <tr class="bg-white border-b border-gray-200 min-h-[52px] h-auto align-middle w-full md:w-auto ">
+            <td class="whitespace-nowrap px-2 py-3 md:table-cell w-1/12 md:w-auto">
                 ${id}
             </td>
-            <td class="px-2.5 py-4 md:px-6">
+            <td class="whitespace-nowrap px-2 py-3 md:table-cell w-3/12 md:w-auto">
                 ${nombre}
             </td>
-            <td class="px-2.5 py-4 md:px-6">
+            <td class="whitespace-nowrap px-2 py-3 md:table-cell w-3/12 md:w-auto">
                 ${apellido}
             </td>
-            <td class="px-2.5 py-4 md:px-6">
+            <td class="whitespace-nowrap px-2 py-3 md:table-cell w-5/12 md:w-auto md:px-4">
                 <div class="w-full flex justify-center">
                     <div class="relative w-full">
-                        <button data-dropdown-button-id="${id}" class="w-full inline-flex justify-center items-center text-white focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 bg-gray-600 hover:bg-gray-700 focus:ring-gray-300">
+                        <button data-dropdown-button-id="${id}" class="w-full inline-flex justify-center items-center text-white focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 bg-gray-600 hover:bg-gray-700 focus:ring-gray-300 ">
                             <span class="selectedOptionText truncate flex-1 text-center">${textoSeleccionado}</span>
                             <span class="selectedOptionValue hidden">${valorSeleccionado}</span>
-                            <svg class="h-[0.8vw] w-[0.8vw] ml-3 flex-shrink-0" fill="none" viewBox="0 0 10 6">
+                            <svg class="h-3.5 w-3.5 md:h-[0.8vw] md:w-[0.8vw] ml-3 flex-shrink-0 transition-all duration-200" fill="none" viewBox="0 0 10 6">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"></path>
                             </svg>
                         </button>

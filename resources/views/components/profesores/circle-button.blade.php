@@ -14,7 +14,7 @@
 @endphp
 
 <button type="button"
-    class="w-8 h-8 flex items-center justify-center rounded-full text-white font-bold focus:ring-2 {{ $selectedColor }} {{ $extraClasses }}"
+    class="w-10 h-10 md:w-8 md:h-8 flex items-center justify-center rounded-full text-white font-bold focus:ring-2 {{ $selectedColor }} {{ $extraClasses }} text-base md:text-sm lg:text-base transition-all duration-200"
     {{ $attributes }}>
     {{ $label }}
 </button>
