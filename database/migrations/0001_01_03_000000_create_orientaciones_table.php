@@ -12,12 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('orientaciones', function (Blueprint $table) {
-            $table->id();
-            $table->string('nombre');
-            $table->string('titulo');
-            $table->string('color', 7)->default('#6B9D7C');
+            $table->id(); // ID para cada orientación
+            $table->string('nombre'); // Nombre de la orientación (ej: "Ciencias Naturales", "Humanidades", "Economía")
+            $table->string('titulo'); // Título que otorga la orientación al graduarse
+            $table->string('color', 7)->default('#6B9D7C'); // Color hex para identificación visual en interfaces
             $table->timestamps();
-            // Índice para mejorar el rendimiento
+
+            // Índice para mejorar el rendimiento en búsquedas por nombre
             $table->index('nombre');
             $table->softDeletes();
         });

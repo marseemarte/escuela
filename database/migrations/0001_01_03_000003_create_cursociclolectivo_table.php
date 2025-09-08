@@ -12,10 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('cursociclolectivo', function (Blueprint $table) {
-            $table->id();
-            $table->string('estado', 1);
+            $table->id(); // ID para cada curso en un ciclo lectivo específico
+            $table->string('estado', 1); // Estado del curso (A=Activo, I=Inactivo, C=Cerrado)
+            // Relación con curso - vincula el curso base con el año lectivo
             $table->foreignId('id_cursos')->constrained('cursos')->onDelete('cascade');
-            $table->year('ciclolectivo');
+            $table->year('ciclolectivo'); // Año lectivo específico (2024, 2025, etc.)
             $table->timestamps();
         });
     }

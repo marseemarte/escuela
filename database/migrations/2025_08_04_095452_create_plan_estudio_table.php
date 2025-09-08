@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('plan_estudio', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // ID para cada plan de estudio
+            // Aquí se pueden agregar campos específicos para planes de estudio
+            // como: nombre_plan, año_implementacion, orientacion_id, etc.
             $table->timestamps();
         });
     }
