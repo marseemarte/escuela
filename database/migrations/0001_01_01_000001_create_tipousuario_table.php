@@ -12,8 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tipousuario', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // ID para cada asignación de tipo
+            // Relación con persona - una persona puede tener múltiples roles (ej: docente y padre)
             $table->foreignId('id_persona')->constrained('persona')->onDelete('cascade');
+            // Relación con tipo de persona - define el rol específico (estudiante, docente, etc.)
             $table->foreignId('id_tipopersona')->constrained('tipopersona')->onDelete('cascade');
             $table->timestamps();
         });

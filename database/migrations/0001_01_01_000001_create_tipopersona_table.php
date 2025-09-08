@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tipopersona', function (Blueprint $table) {
-            $table->id();
-            $table->string('tipo', 30);
+            $table->id(); // ID para cada tipo de persona
+            $table->string('tipo', 30); // Descripción del tipo (ej: "Estudiante", "Docente", "Administrativo", "Padre/Tutor")
             $table->timestamps();
         });
     }
