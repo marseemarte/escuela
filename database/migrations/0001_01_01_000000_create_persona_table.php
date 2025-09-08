@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('persona', function (Blueprint $table) {
             $table->id();
-            $table->integer('dni');
+            $table->integer('dni')->unique(); // Mejorado: DNI debe ser único
             $table->string('apellido', 50);
             $table->string('nombre', 50);
             $table->date('fechan');
@@ -22,12 +22,16 @@ return new class extends Migration
             $table->integer('id_localidad');
             // Cuando se agregue provincias usar la linea de abajo y borrar la de arriba
             //$table->foreignId('id_localidad')->constrained('localidades')->onDelete('cascade');
-            $table->integer('pass');
+            $table->string('pass'); // Mejorado: password como string hash
             $table->string('telefono', 40);
             $table->string('mail', 191)->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
+
+            // Índices mejorados
+            $table->index(['apellido', 'nombre']);
+            $table->index('fechan');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

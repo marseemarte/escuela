@@ -15,9 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->string('titulo');
+            $table->string('color', 7)->default('#6B9D7C');
             $table->timestamps();
             // Índice para mejorar el rendimiento
             $table->index('nombre');
+            $table->softDeletes();
         });
     }
 

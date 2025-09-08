@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('cursociclolectivo', function (Blueprint $table) {
             $table->id();
-            $table->string('estado');
-            $table->integer('ciclolectivo');
+            $table->string('estado', 1);
             $table->foreignId('id_cursos')->constrained('cursos')->onDelete('cascade');
+            $table->year('ciclolectivo');
             $table->timestamps();
         });
     }

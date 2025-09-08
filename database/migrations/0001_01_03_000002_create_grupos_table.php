@@ -13,9 +13,13 @@ return new class extends Migration
     {
         Schema::create('grupos', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
+            $table->integer('nombre');
             $table->foreignId('id_cursos')->constrained('cursos')->onDelete('cascade');
             $table->timestamps();
+
+            // Mejorado: Constraint único para evitar grupos duplicados por curso
+            $table->unique(['nombre', 'id_cursos']);
+            $table->index('nombre');
         });
     }
 

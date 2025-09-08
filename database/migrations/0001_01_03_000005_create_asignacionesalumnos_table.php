@@ -16,8 +16,15 @@ return new class extends Migration
             $table->foreignId('id_cursosciclolectivo')->constrained('cursociclolectivo')->onDelete('cascade');
             $table->foreignId('id_tipousuario')->constrained('tipousuario')->onDelete('cascade');
             $table->foreignId('id_grupos')->constrained('grupos')->onDelete('cascade');
-            $table->string('estado', 1);
+            $table->string('estado', 1)->default('A'); // Mejorado: valor por defecto
             $table->timestamps();
+
+            // Mejorado: Constraint único para evitar asignaciones duplicadas
+            $table->unique(['id_cursosciclolectivo', 'id_tipousuario', 'id_grupos'], 'unique_asignacion');
+
+            // Índices para mejorar consultas
+            $table->index(['estado']);
+            $table->index(['id_cursosciclolectivo', 'estado']);
         });
     }
 

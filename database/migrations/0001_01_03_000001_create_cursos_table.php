@@ -13,14 +13,17 @@ return new class extends Migration
     {
         Schema::create('cursos', function (Blueprint $table) {
             $table->id();
-            $table->string('division');
-            $table->integer('ano');
-            $table->string('turno');
+            $table->string('division', 1);
+            $table->tinyInteger('ano');
+            $table->string('turno', 1);
             $table->timestamps();
 
             // Índices para mejorar el rendimiento
             $table->index(['ano', 'division']);
             $table->index('turno');
+
+            // Mejorado: Constraint único para evitar duplicados
+            $table->unique(['division', 'ano', 'turno']);
         });
     }
 
