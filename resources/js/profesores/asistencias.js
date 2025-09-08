@@ -2,7 +2,7 @@ import { SearchBuilder } from "./utils/search";
 import { updateData } from "./utils/helpers";
 import setupDropdowns from "./components/dropdown";
 
-const baseData = [
+const baseDataTomar = [
     {
         id: 1,
         nombre: "Juan",
@@ -22,18 +22,70 @@ const baseData = [
         valor: "presente",
     },
 ];
-let data = baseData;
+let dataTomar = baseDataTomar;
 
-const searchBarId = "tomarAsistencias";
+const baseDataTotal = [
+    {
+        id: 1,
+        nombre: "Juan",
+        apellido: "Pérez",
+        valor: "75%",
+    },
+    {
+        id: 2,
+        nombre: "María",
+        apellido: "González",
+        valor: "40%",
+    },
+    {
+        id: 3,
+        nombre: "Marta",
+        apellido: "Ortega",
+        valor: "60%",
+    },
+];
+let dataTotal = baseDataTotal;
 
-const searchAsistencias = new SearchBuilder(searchBarId, data)
+const searchBarIdTomar = "tomarAsistencias";
+const searchBarIdTotal = "totalAsistencias";
+
+const searchAsistenciasTomar = new SearchBuilder(searchBarIdTomar, dataTomar)
     .onComplete((results) => {
-        console.log("Resultados de la búsqueda:", results);
+        console.log("Resultados de la búsqueda tomar:", results);
         updateAsistenciasTable(results);
     })
     .initialize();
 
-const createTableRow = (
+const searchAsistenciasTotal = new SearchBuilder(searchBarIdTotal, dataTotal)
+    .onComplete((results) => {
+        console.log("Resultados de la búsqueda total:", results);
+        updateAsistenciasTable(results, false);
+    })
+    .initialize();
+
+const createTableRowTotal = (id, nombre, apellido, porcentaje) => {
+    const colorClass = porcentaje >= "70%" ? "text-green-600" : "text-red-600";
+    return `
+        <tr class="bg-white border-b border-gray-200 min-h-[52px] h-auto align-middle w-full md:w-auto">
+            <td class="whitespace-nowrap px-2 py-3 md:table-cell w-1/10 md:w-auto">
+                ${id}
+            </td>
+            <td class="whitespace-nowrap px-2 py-3 md:table-cell w-3/10 md:w-auto">
+                ${nombre}
+            </td>
+            <td class="whitespace-nowrap px-2 py-3 md:table-cell w-3/10 md:w-auto">
+                ${apellido}
+            </td>
+            <td class="whitespace-nowrap px-2 py-3 md:table-cell w-3/10 md:w-auto">
+                <span class="font-semibold ${colorClass}">
+                    ${porcentaje}
+                </span>
+            </td>
+        </tr>
+    `;
+};
+
+const createTableRowTomar = (
     id,
     nombre,
     apellido,
@@ -85,12 +137,11 @@ const createTableRow = (
     `;
 };
 
-function setDropdownColor(dropdownButton, option = false) {
-    let texto;
-    if (option == false) {
-        texto = dropdownButton.find(".selectedOptionText").text();
-    } else {
-        texto = option.text();
+function setDropdownColor(dropdownButton, valorSeleccionado = null) {
+    let valor = valorSeleccionado;
+    if (!valor) {
+        // Si no se pasa el valor, intentar obtenerlo del span hidden
+        valor = dropdownButton.find(".selectedOptionValue").text();
     }
 
     const presenteButton = "bg-blue-700 hover:bg-blue-800 focus:ring-blue-300";
@@ -98,25 +149,32 @@ function setDropdownColor(dropdownButton, option = false) {
         "bg-yellow-700 hover:bg-yellow-800 focus:ring-yellow-300";
     const justificadoButton =
         "bg-gray-600 hover:bg-gray-700 focus:ring-gray-300";
+    const aprobadoButton =
+        "bg-green-500 hover:bg-green-600 focus:ring-green-400";
+    const desaprobadoButton = "bg-red-500 hover:bg-red-600 focus:ring-red-400";
     const todosButton = "bg-green-500 hover:bg-green-600 focus:ring-green-400";
     const defaultButton = "bg-gray-400 hover:bg-gray-500 focus:ring-gray-300";
 
+    // Remover todas las clases de color
     dropdownButton.removeClass(
-        `${presenteButton} ${ausenteButton} ${justificadoButton} ${todosButton} ${defaultButton}`
+        "bg-blue-700 hover:bg-blue-800 focus:ring-blue-300 bg-yellow-700 hover:bg-yellow-800 focus:ring-yellow-300 bg-gray-600 hover:bg-gray-700 focus:ring-gray-300 bg-green-500 hover:bg-green-600 focus:ring-green-400 bg-red-500 hover:bg-red-600 focus:ring-red-400 bg-gray-400 hover:bg-gray-500 focus:ring-gray-300"
     );
 
-    switch (texto) {
-        case "Presente":
+    switch (valor) {
+        case "presente":
             dropdownButton.addClass(presenteButton);
             break;
-        case "Ausente":
+        case "ausente":
             dropdownButton.addClass(ausenteButton);
             break;
-        case "Justificado":
+        case "justificado":
             dropdownButton.addClass(justificadoButton);
             break;
-        case "Todos":
-            dropdownButton.addClass(todosButton);
+        case "aprobado":
+            dropdownButton.addClass(aprobadoButton);
+            break;
+        case "desaprobado":
+            dropdownButton.addClass(desaprobadoButton);
             break;
         default:
             dropdownButton.addClass(defaultButton);
@@ -145,13 +203,18 @@ function setupDropdownsAsistencias(parent = document) {
             const dropdownId = dropdown.data("dropdown-id");
 
             // Actualizar data
-            data = updateData(data, dropdownId, optionValue, "asistencias");
+            dataTomar = updateData(
+                dataTomar,
+                dropdownId,
+                optionValue,
+                "asistencias"
+            );
 
-            searchAsistencias.updateData(data);
+            searchAsistenciasTomar.updateData(dataTomar);
             setDropdownColor($(`[data-dropdown-button-id='${dropdownId}']`));
 
             console.log(`data actualizada: (${optionValue}) id ${dropdownId}`);
-            console.log(data);
+            console.log(dataTomar);
         }
     );
 }
@@ -168,12 +231,29 @@ $(document).on("click", ".quick-set-btn", function () {
         valor = "justificado";
     }
     // Actualizar todos los registros
-    data = data.map((item) => ({ ...item, valor: valor }));
-    searchAsistencias.updateData(data);
-    updateAsistenciasTable(data);
+    dataTomar = dataTomar.map((item) => ({ ...item, valor: valor }));
+    searchAsistenciasTomar.updateData(dataTomar);
+    updateAsistenciasTable(dataTomar);
 });
 
-function updateAsistenciasTable(data) {
+function updateAsistenciasTable(data, asistenciaTomar = true) {
+    if (!asistenciaTomar) {
+        const tbody = $("table[data-search-id='totalAsistencias'] tbody");
+
+        tbody.empty();
+        data.forEach((element) => {
+            // Para asistencias totales, mostrar el porcentaje directamente
+            tbody.append(
+                createTableRowTotal(
+                    element.id,
+                    element.nombre,
+                    element.apellido,
+                    element.valor
+                )
+            );
+        });
+        return;
+    }
     const tbody = $("table[data-search-id='tomarAsistencias'] tbody");
 
     tbody.empty();
@@ -181,7 +261,7 @@ function updateAsistenciasTable(data) {
         const [primera, ...resto] = element.valor;
         const textoSeleccionado = primera.toUpperCase() + resto.join("");
         tbody.append(
-            createTableRow(
+            createTableRowTomar(
                 element.id,
                 element.nombre,
                 element.apellido,
@@ -189,7 +269,13 @@ function updateAsistenciasTable(data) {
                 textoSeleccionado
             )
         );
-        setDropdownColor($(`[data-dropdown-button-id='${element.id}']`));
+        // Usar setTimeout para asegurar que el DOM esté actualizado antes de aplicar colores
+        setTimeout(() => {
+            setDropdownColor(
+                $(`[data-dropdown-button-id='${element.id}']`),
+                element.valor
+            );
+        }, 0);
     });
 }
 

@@ -7,15 +7,15 @@
         <x-profesores.input.text style="search" placeholder="Buscar Alumno" :searchName="'fullName'" />
 
         @php
-            $dropdownContent = [
+            $dropdownAsistenciasTomarContent = [
                 'Presente' => ['id' => 0, 'label' => 'Presente', 'value' => 'presente'],
                 'Ausente' => ['id' => 1, 'label' => 'Ausente', 'value' => 'ausente'],
                 'Justificado' => ['id' => 2, 'label' => 'Justificado', 'value' => 'justificado'],
                 'Todos' => ['id' => 3, 'label' => 'Todos', 'value' => ''],
             ];
         @endphp
-        <x-profesores.dropdown.button id="searchAsistenciasDropdown" defaultLabel="Seleccionar" :searchName="'valor'">
-            @foreach ($dropdownContent as $option)
+        <x-profesores.dropdown.button id="searchAsistenciasTomarDropdown" defaultLabel="Seleccionar" :searchName="'valor'">
+            @foreach ($dropdownAsistenciasTomarContent as $option)
                 <x-profesores.dropdown.menu content="{{ $option['label'] }}" id="{{ $option['id'] }}"
                     value="{{ $option['value'] }}" />
             @endforeach
@@ -76,7 +76,7 @@
                             <x-profesores.dropdown.button id="{{ $alumno['id'] }}"
                                 defaultLabel="{{ ucfirst(empty($alumno['valor']) ? 'Presente' : $alumno['valor']) }}"
                                 defaultSelectedValue="{{ empty($alumno['valor']) ? 'presente' : $alumno['valor'] }}">
-                                @foreach (array_slice($dropdownContent, 0, 3) as $option)
+                                @foreach (array_slice($dropdownAsistenciasTomarContent, 0, 3) as $option)
                                     <x-profesores.dropdown.menu content="{{ $option['label'] }}"
                                         id="{{ $option['id'] }}" value="{{ $option['value'] }}" />
                                 @endforeach
