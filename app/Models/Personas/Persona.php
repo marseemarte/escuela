@@ -57,7 +57,7 @@ class Persona extends Authenticatable
 
     public function tiposUsuario(): HasMany
     {
-        return $this->hasMany(\App\Models\TipoUsuario::class, 'id_persona');
+        return $this->hasMany(TipoUsuario::class, 'id_persona');
     }
 
     // Scopes y Accessors
