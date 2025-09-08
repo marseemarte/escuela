@@ -25,6 +25,22 @@ class OrientacionesController extends Controller
         return view('orientaciones.show', compact('materias', 'orientacion', 'materiasDisponibles', 'allMaterias'));
     }
 
+    public function create()
+    {
+        return view('orientaciones.create');
+        
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'titulo' => 'required|string|max:255',
+            'color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
+        ]);
+        $orientacion = Orientacion::create($request->all());
+        return redirect()->route('orientaciones.index')->with('success', 'Orientación creada correctamente.');
+    }
     /**
      * Obtener todas las materias disponibles
      */

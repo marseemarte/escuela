@@ -15,8 +15,8 @@ return new class extends Migration
             $table->char('estado', 1)->default('H');
             $table->string('resumen', 50);
             $table->boolean('activo')->default(true);
-            $table->foreignId('id_orientacion')->constrained('orientaciones')->onDelete('cascade');
-            $table->foreignId('id_curso')->constrained('cursos')->onDelete('cascade');
+            $table->foreignId('orientacion_id')->constrained('orientaciones')->onDelete('cascade');
+            $table->foreignId('curso_id')->constrained('cursos')->onDelete('cascade');
             $table->timestamps();
         });
     }

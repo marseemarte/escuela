@@ -10,6 +10,7 @@ class Orientacion extends Model
     protected $fillable = [
         'nombre',
         'titulo',
+        'color',
     ];
 
     /**

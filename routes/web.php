@@ -11,7 +11,6 @@ use App\Http\Controllers\Materias\MateriasController;
 use App\Http\Controllers\Orientaciones\OrientacionesController;
 use App\Http\Controllers\RevistaController;
 use App\Http\Controllers\CupofController;
-use App\Http\Controllers\Orientaciones\ProgramacionController;
 use Illuminate\Support\Facades\Route;
 
 use Livewire\Volt\Volt;
@@ -46,7 +45,6 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/cursos', [CursoController::class, 'index'])->name('cursos.index');
-//Route::get('/cursos/{curso}', [CursoController::class, 'show'])->name('cursos.show');
 Route::get('/cursos/create', [CursoController::class, 'create'])->name('cursos.create');
 Route::post('/cursos', [CursoController::class, 'store'])->name('cursos.store');
 Route::get('/cursos/{curso}/edit', [CursoController::class, 'edit'])->name('cursos.edit');
@@ -56,9 +54,13 @@ Route::delete('/cursos/{curso}', [CursoController::class, 'destroy'])->name('cur
 // Materias routes
 Route::get('/materias', [MateriasController::class, 'index'])->name('materias.index');
 // Orientaciones routes
+Route::resource('orientaciones', OrientacionesController::class);
 Route::get('/orientaciones', [OrientacionesController::class, 'index'])->name('orientaciones.index');
 Route::get('/orientaciones/edit', [OrientacionesController::class, 'edit'])->name('orientaciones.edit');
 Route::get('/orientaciones/{id}', [OrientacionesController::class, 'show'])->name('orientaciones.show');
+Route::get('/orientaciones/create', [OrientacionesController::class, 'create'])->name('orientaciones.create');
+Route::post('/orientaciones', [OrientacionesController::class, 'store'])->name('orientaciones.store');
+
 
 // Materias routes
 Route::get('/materias', [MateriasController::class, 'index'])->name('materias.index');
