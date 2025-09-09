@@ -11,4 +11,10 @@ class TareaController extends Controller
     {
         return view('profesores.tareas');
     }
+    public function corregir()
+    {
+        return view('profesores.corregir');
+    }
 }
+
+?>

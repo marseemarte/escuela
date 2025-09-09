@@ -31,8 +31,7 @@
             {{ $defaultSelectedValue ?? '' }}
         </span>
 
-        <svg class="h-3.5 w-3.5 md:h-[0.8vw] md:w-[0.8vw] ml-3 flex-shrink-0 transition-all duration-200" fill="none"
-            viewBox="0 0 10 6">
+        <svg class="h-3.5 w-3.5 ml-3 flex-shrink-0 transition-all duration-200" fill="none" viewBox="0 0 10 6">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="m1 1 4 4 4-4" />
         </svg>

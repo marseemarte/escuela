@@ -2,6 +2,7 @@
 
 namespace App\Models\Cursos;
 
+use App\Models\Materia;
 use Illuminate\Database\Eloquent\Model;
 
 class Orientacion extends Model
@@ -13,17 +14,12 @@ class Orientacion extends Model
         'color',
     ];
 
-    /**
-     * Obtiene las materias de esta orientación
-     */
+    // Relaciones
     public function materias()
     {
         return $this->hasMany(Materia::class, 'orientacion_id');
     }
 
-    /**
-     * Obtiene los cursos de esta orientación
-     */
     public function cursos()
     {
         return $this->hasMany(Curso::class);
