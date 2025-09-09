@@ -20,6 +20,8 @@ Route::get('/', function () {
 })->name('home');
 
 Route::prefix('profesores')->group(function () {
+    Route::get('tareas/corregir', [TareaController::class, 'corregir'])
+        ->name('profesores.tareas.corregir');
     Route::apiResource('/', ProfesorController::class);
 
     Route::apiResource('notas', NotaController::class);
