@@ -15,8 +15,6 @@ return new class extends Migration
             $table->char('estado', 1)->default('H'); // Estado de la materia (H=Habilitada, D=Deshabilitada)
             $table->string('resumen', 50); // Descripción breve de la materia
 
-            $table->string('estado', 1)->default('A'); // Estado de la materia (A=Activo, I=Inactivo)
-
             $table->timestamps();
         });
     }

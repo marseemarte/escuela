@@ -12,7 +12,7 @@ return new class extends Migration {
 
             // Relaciones
             $table->foreignId('id_asignacionesalumnos')->constrained('asignacionesalumnos')->onDelete('cascade');
-            $table->foreignId('cupof')->constrained('cupof')->onDelete('cascade');
+            $table->foreignId('cupof')->constrained('cupof', 'cupof')->onDelete('cascade');
             // CUPOF de la materia donde ocurrió la inasistencia
 
             $table->date('fecha'); // Fecha específica de la inasistencia
