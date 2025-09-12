@@ -4,6 +4,7 @@ namespace App\Models\Cursos;
 
 use App\Models\Materia;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Orientacion extends Model
 {
@@ -15,12 +16,12 @@ class Orientacion extends Model
     ];
 
     // Relaciones
-    public function materias()
+    public function materias(): HasMany
     {
         return $this->hasMany(Materia::class, 'orientacion_id');
     }
 
-    public function cursos()
+    public function cursos(): HasMany
     {
         return $this->hasMany(Curso::class);
     }

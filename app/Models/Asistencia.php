@@ -27,6 +27,7 @@ class Asistencia extends Model
 
     protected $fillable = [
         'id_asignacionesalumnos',
+        'cupof',
         'fecha',
         'turno',
         'estado',
@@ -43,12 +44,20 @@ class Asistencia extends Model
         'fecha' => 'date',
         'dni_personal' => 'integer',
         'id_asignacionesalumnos' => 'integer',
+        'cupof' => 'integer',
     ];
 
     public function asignacionAlumno(): BelongsTo
     {
         return $this->belongsTo(AsignacionAlumno::class, 'id_asignacionesalumnos');
     }
+    public function cupof(): BelongsTo
+    {
+        return $this->belongsTo(Cupof::class, 'cupof', 'cupof');
+    }
+
+
+    // Scopes y Accessors
 
     public function scopePorFecha($query, $fecha)
     {

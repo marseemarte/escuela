@@ -13,9 +13,9 @@ class CursoCicloLectivo extends Model
     protected $table = 'cursociclolectivo';
 
     protected $fillable = [
-        'estado',
-        'ciclolectivo',
         'id_cursos',
+        'ciclolectivo',
+        'estado',
     ];
 
     protected $casts = [

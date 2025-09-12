@@ -5,6 +5,7 @@ namespace App\Models\Personas;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class TipoUsuario extends Model
 {
@@ -26,9 +27,9 @@ class TipoUsuario extends Model
         return $this->belongsTo(TipoPersona::class, 'id_tipopersona');
     }
 
-    public function asignaciones(): HasMany
+    public function asignaciones(): HasOne
     {
-        return $this->hasMany(AsignacionAlumno::class, 'id_tipousuario');
+        return $this->hasOne(AsignacionAlumno::class, 'id_tipousuario');
     }
 
     //Scopes y Accessors

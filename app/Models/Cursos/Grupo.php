@@ -2,6 +2,7 @@
 
 namespace App\Models\Cursos;
 
+use App\Models\Cupof;
 use App\Models\Personas\AsignacionAlumno;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,6 +21,11 @@ class Grupo extends Model
     public function curso(): BelongsTo
     {
         return $this->belongsTo(Curso::class, 'id_cursos');
+    }
+
+    public function cupof(): HasMany
+    {
+        return $this->hasMany(Cupof::class, 'id_grupos');
     }
 
     public function asignaciones(): HasMany

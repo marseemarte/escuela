@@ -2,6 +2,7 @@
 
 namespace App\Models\Cursos;
 
+use App\Models\Cupof;
 use App\Models\Cursos\CursoCicloLectivo;
 use App\Models\Cursos\Grupo;
 use App\Models\Materia;
@@ -16,6 +17,7 @@ class Curso extends Model
         'division',
         'ano',
         'turno',
+        'estado',
     ];
 
     protected $casts = [
@@ -23,6 +25,7 @@ class Curso extends Model
     ];
 
 
+    // Relaciones
     public function ciclosLectivos(): HasMany
     {
         return $this->hasMany(CursoCicloLectivo::class, 'id_cursos');
@@ -31,10 +34,13 @@ class Curso extends Model
     {
         return $this->hasMany(Materia::class);
     }
-
     public function grupos(): HasMany
     {
         return $this->hasMany(Grupo::class, 'id_cursos');
+    }
+    public function cupof(): HasMany
+    {
+        return $this->hasMany(Cupof::class, 'id_cursos');
     }
 
     // Scopes y Accessors
