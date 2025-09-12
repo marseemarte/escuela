@@ -13,10 +13,13 @@ return new class extends Migration
     {
         Schema::create('cursociclolectivo', function (Blueprint $table) {
             $table->id(); // ID para cada curso en un ciclo lectivo específico
-            $table->string('estado', 1); // Estado del curso (A=Activo, I=Inactivo, C=Cerrado)
-            // Relación con curso - vincula el curso base con el año lectivo
+
+            // Relaciones
             $table->foreignId('id_cursos')->constrained('cursos')->onDelete('cascade');
+
             $table->year('ciclolectivo'); // Año lectivo específico (2024, 2025, etc.)
+            $table->string('estado', 1)->default('A'); // Estado del curso (A=Activo, I=Inactivo, C=Cerrado)
+
             $table->timestamps();
         });
     }

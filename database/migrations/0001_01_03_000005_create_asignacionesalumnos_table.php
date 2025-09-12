@@ -13,19 +13,20 @@ return new class extends Migration
     {
         Schema::create('asignacionesalumnos', function (Blueprint $table) {
             $table->id(); // ID para cada asignación de alumno
-            // Relación con curso en ciclo lectivo específico
+
+            // Relaciones
             $table->foreignId('id_cursosciclolectivo')->constrained('cursociclolectivo')->onDelete('cascade');
-            // Relación con tipo de usuario (alumno específico)
             $table->foreignId('id_tipousuario')->constrained('tipousuario')->onDelete('cascade');
-            // Relación con grupo específico dentro del curso
             $table->foreignId('id_grupos')->constrained('grupos')->onDelete('cascade');
+
             $table->string('estado', 1)->default('A'); // Estado de la asignación (A=Activo, I=Inactivo, B=Baja)
+
             $table->timestamps();
 
-            // Constraint único para evitar asignaciones duplicadas del mismo alumno
+            // Constraint unico para evitar asignaciones duplicadas del mismo alumno
             $table->unique(['id_cursosciclolectivo', 'id_tipousuario', 'id_grupos'], 'unique_asignacion');
 
-            // Índices para mejorar consultas frecuentes
+            // Indices para mejorar consultas frecuentes
             $table->index(['estado']); // Filtros por estado de asignación
             $table->index(['id_cursosciclolectivo', 'estado']); // Consultas por curso y estado
         });

@@ -17,6 +17,8 @@ return new class extends Migration
             $table->char('turno', 1); // Turno al que pertenece (M=Mañana, T=Tarde, N=Noche)
             $table->time('hd'); // Hora de inicio del bloque (hora desde)
             $table->time('hh'); // Hora de finalización del bloque (hora hasta)
+            $table->boolean('activo')->default(true); // Si el bloque horario está activo en el sistema
+
             $table->timestamps();
         });
     }

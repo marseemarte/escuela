@@ -9,9 +9,12 @@ return new class extends Migration {
     {
         Schema::create('inasistenciasalumnos', function (Blueprint $table) {
             $table->id(); // ID para cada registro de asistencia
-            // Relación con asignación de alumno - quién tuvo la inasistencia
+
+            // Relaciones
             $table->foreignId('id_asignacionesalumnos')->constrained('asignacionesalumnos')->onDelete('cascade');
-            $table->integer('cupof'); // CUPOF de la materia donde ocurrió la inasistencia
+            $table->foreignId('cupof')->constrained('cupof')->onDelete('cascade');
+            // CUPOF de la materia donde ocurrió la inasistencia
+
             $table->date('fecha'); // Fecha específica de la inasistencia
             $table->string('turno', 1); // Turno donde ocurrió (M=Mañana, T=Tarde, N=Noche)
             $table->string('estado', 1)->default('A'); // Estado de la inasistencia (A=Ausente, P=Presente, T=Tardanza)

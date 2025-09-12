@@ -16,6 +16,9 @@ return new class extends Migration
             $table->string('division', 1); // División del curso (A, B, C, etc.) para diferenciar paralelos
             $table->tinyInteger('ano'); // Año del curso (1, 2, 3, 4, 5, 6) según el nivel educativo
             $table->string('turno', 1); // Turno de clases (M=Mañana, T=Tarde, N=Noche)
+
+            $table->string('estado', 1)->default('A'); // Estado del curso (A=Activo, I=Inactivo, C=Cerrado)
+
             $table->timestamps();
 
             // Índices para mejorar el rendimiento en consultas frecuentes

@@ -30,4 +30,17 @@ class TipoUsuario extends Model
     {
         return $this->hasMany(AsignacionAlumno::class, 'id_tipousuario');
     }
+
+    //Scopes y Accessors
+
+    public function scopePorTipo($query, $tipo)
+    {
+        return $query->whereHas('tipoPersona', function ($q) use ($tipo) {
+            $q->where('tipo', $tipo);
+        });
+    }
+    public function scopePorPersona($query, $idPersona)
+    {
+        return $query->where('id_persona', $idPersona);
+    }
 }

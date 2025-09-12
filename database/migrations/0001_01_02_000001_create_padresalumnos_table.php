@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('padresalumnos', function (Blueprint $table) {
             $table->id(); // ID para cada relación padre-alumno
-            // Relación con el alumno - referencia a la persona que es estudiante
+            // Relaciones
             $table->foreignId('id_personaalumno')->constrained('persona')->onDelete('cascade');
-            // Relación con el padre/tutor - puede ser null si no tiene tutor asignado
             $table->foreignId('id_personatutor')->nullable()->constrained('persona')->onDelete('cascade');
-            // Tipo de parentesco entre el tutor y el alumno
             $table->foreignId('id_parentesco')->constrained('parentesco')->onDelete('cascade');
+
+            $table->string('estado', 1)->default('A'); // Estado de la relación (A=Activo, I=Inactivo)
+
             $table->timestamps();
         });
     }

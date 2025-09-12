@@ -14,8 +14,11 @@ return new class extends Migration
         Schema::create('grupos', function (Blueprint $table) {
             $table->id(); // ID para cada grupo
             $table->integer('nombre'); // Número del grupo (1, 2, 3, etc.) para subdividir cursos grandes
-            // Relación con curso - cada grupo pertenece a un curso específico
+            // Relaciones
             $table->foreignId('id_cursos')->constrained('cursos')->onDelete('cascade');
+
+            $table->string('estado', 1)->default('A'); // Estado del grupo (A=Activo, I=Inactivo)
+
             $table->timestamps();
 
             // Constraint único para evitar grupos duplicados dentro del mismo curso

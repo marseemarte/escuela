@@ -21,6 +21,7 @@ class Programacion extends Model
         'horas_anuales'
     ];
 
+    // Scopes y Accessors
     public function materias()
     {
         return $this->where('tipo', 'materia');

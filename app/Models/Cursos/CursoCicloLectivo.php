@@ -18,9 +18,6 @@ class CursoCicloLectivo extends Model
         'id_cursos',
     ];
 
-    /**
-     * The attributes that should be cast.
-     */
     protected $casts = [
         'ciclolectivo' => 'integer',
         'id_cursos' => 'integer',

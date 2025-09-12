@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('tipopersona', function (Blueprint $table) {
             $table->id(); // ID para cada tipo de persona
             $table->string('tipo', 30); // Descripción del tipo (ej: "Estudiante", "Docente", "Administrativo", "Padre/Tutor")
+
+            $table->string('estado', 1)->default('A'); // Estado del tipo de persona (A=Activo, I=Inactivo)
+
             $table->timestamps();
         });
     }

@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('televisor', 50); // Especificaciones del televisor/monitor disponible
             $table->string('pizarron', 50); // Tipo de pizarrón (tradicional, digital, magnético)
             $table->string('ubicacion', 50); // Ubicación específica dentro del edificio
+            $table->boolean('activo')->default(true); // Si el salón está activo en el sistema
+
             $table->timestamps();
         });
     }

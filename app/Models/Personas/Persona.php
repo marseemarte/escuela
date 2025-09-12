@@ -2,6 +2,7 @@
 
 namespace App\Models\Personas;
 
+use Database\Factories\PersonaFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -14,7 +15,7 @@ class Persona extends Authenticatable
 
     protected static function newFactory()
     {
-        return \Database\Factories\PersonaFactory::new();
+        return PersonaFactory::new();
     }
 
     protected $table = 'persona';
@@ -35,7 +36,7 @@ class Persona extends Authenticatable
     protected $casts = [
         'fechan' => 'date',
         'email_verified_at' => 'datetime',
-        'pass' => 'hashed', // Mejorado: usar hashing apropiado
+        'pass' => 'hashed', // Hashing para contraseñas
         'dni' => 'integer',
         'id_localidad' => 'integer',
     ];
@@ -45,16 +46,7 @@ class Persona extends Authenticatable
         'remember_token',
     ];
 
-    public function getAuthPassword()
-    {
-        return $this->pass;
-    }
-
-    public function getEmailForPasswordReset()
-    {
-        return $this->mail;
-    }
-
+    // Relaciones
     public function tiposUsuario(): HasMany
     {
         return $this->hasMany(TipoUsuario::class, 'id_persona');
@@ -72,6 +64,11 @@ class Persona extends Authenticatable
             ->explode(' ')
             ->map(fn(string $name) => Str::of($name)->substr(0, 1))
             ->implode('');
+    }
+
+    public function getDniFormattedAttribute()
+    {
+        return number_format($this->dni, 0, '', '.');
     }
 
     public function getNameAttribute()
@@ -92,6 +89,16 @@ class Persona extends Authenticatable
     public function getPasswordAttribute()
     {
         return $this->pass;
+    }
+
+    public function getAuthPassword()
+    {
+        return $this->pass;
+    }
+
+    public function getEmailForPasswordReset()
+    {
+        return $this->mail;
     }
 
     public function setPasswordAttribute($value)

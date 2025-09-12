@@ -26,6 +26,9 @@ return new class extends Migration
             $table->string('telefono', 40); // Número de teléfono
             $table->string('mail', 191)->unique(); // Email
             $table->timestamp('email_verified_at')->nullable(); // Fecha de verificación del email
+
+            $table->string('estado', 1)->default('A'); // Estado de la persona (A=Activo, I=Inactivo)
+
             $table->rememberToken(); // Token para "recordar sesión" en login
             $table->timestamps();
 

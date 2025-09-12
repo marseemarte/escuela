@@ -10,12 +10,14 @@ return new class extends Migration {
         Schema::create('horarios', function (Blueprint $table) {
             $table->id(); // ID para cada horario asignado
             $table->string('dia', 3); // Día de la semana (LUN, MAR, MIE, JUE, VIE, SAB)
-            // Relación con bloque horario específico
+
+            // Relaciones
             $table->foreignId('id_horas')->constrained('horas')->onDelete('cascade');
-            // Relación con salón donde se dicta la clase
             $table->foreignId('id_salones')->constrained('salones')->onDelete('cascade');
-            // Relación con CUPOF (materia-curso-grupo específico)
             $table->foreignId('cupof')->constrained('cupof', 'cupof')->onDelete('cascade');
+
+            $table->string('estado', 1)->default('A'); // Estado del horario (A=Activo, I=Inactivo, S=Suspensión temporal)
+
             $table->timestamps(); // created_at y updated_at para auditoría de horarios
         });
     }

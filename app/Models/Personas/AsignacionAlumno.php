@@ -21,9 +21,6 @@ class AsignacionAlumno extends Model
         'estado',
     ];
 
-    /**
-     * The attributes default values.
-     */
     protected $attributes = [
         'estado' => 'A', // Activo por defecto
     ];
@@ -66,8 +63,30 @@ class AsignacionAlumno extends Model
         return $query->where('estado', 'I');
     }
 
+
+    public function scopeDeGrupo($query, $grupoId)
+    {
+        return $query->where('id_grupos', $grupoId);
+    }
+
+    public function scopeDeCurso($query, $cursoCicloId)
+    {
+        return $query->where('id_cursosciclolectivo', $cursoCicloId);
+    }
+
+    public function scopeDeTipoUsuario($query, $tipoUsuarioId)
+    {
+        return $query->where('id_tipousuario', $tipoUsuarioId);
+    }
+
+
     public function getEsActivoAttribute()
     {
         return $this->estado === 'A';
+    }
+
+    public function getTipoUsuarioIdAttribute()
+    {
+        return $this->tipoUsuario ? $this->tipoUsuario->id : null;
     }
 }

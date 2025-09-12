@@ -21,18 +21,12 @@ class Asistencia extends Model
     // Constantes para turnos
     const TURNO_MANANA = 'M';
     const TURNO_TARDE = 'T';
+    const TURNO_NOCHE = 'N';
 
-    /**
-     * The table associated with the model.
-     */
     protected $table = 'inasistenciasalumnos';
 
-    /**
-     * The attributes that are mass assignable.
-     */
     protected $fillable = [
         'id_asignacionesalumnos',
-        'cupof',
         'fecha',
         'turno',
         'estado',
@@ -40,20 +34,13 @@ class Asistencia extends Model
         'dni_personal',
     ];
 
-    /**
-     * The attributes default values.
-     */
     protected $attributes = [
         'estado' => 'A', // Ausente por defecto
         'justificado' => '0', // No justificado por defecto
     ];
 
-    /**
-     * The attributes that should be cast.
-     */
     protected $casts = [
         'fecha' => 'date',
-        'cupof' => 'integer',
         'dni_personal' => 'integer',
         'id_asignacionesalumnos' => 'integer',
     ];
@@ -100,7 +87,7 @@ class Asistencia extends Model
             'A' => 'Ausente',
             'T' => 'Tardanza',
             'J' => 'Justificado',
-            default => 'No definido'
+            default => "No definido"
         };
     }
 }

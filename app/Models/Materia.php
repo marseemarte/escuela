@@ -24,41 +24,28 @@ class Materia extends Model
         'anio' => 'integer',
     ];
 
-    /**
-     * Obtiene la orientación a la que pertenece la materia
-     */
+    // Relaciones
     public function orientacion(): BelongsTo
     {
         return $this->belongsTo(Orientacion::class);
     }
 
-    /**
-     * Obtiene el curso al que pertenece la materia
-     */
     public function curso(): BelongsTo
     {
         return $this->belongsTo(Curso::class);
     }
 
-    /**
-     * Scope para filtrar por orientación
-     */
+    // Scopes y Accessors
     public function scopePorOrientacion($query, $orientacionId)
     {
         return $query->where('orientacion_id', $orientacionId);
     }
 
-    /**
-     * Scope para filtrar por año
-     */
     public function scopePorAnio($query, $anio)
     {
         return $query->where('anio', $anio);
     }
 
-    /**
-     * Scope para filtrar por tipo
-     */
     public function scopePorTipo($query, $tipo)
     {
         return $query->where('tipo', $tipo);
