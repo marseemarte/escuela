@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Materia extends Model
 {
@@ -12,7 +13,11 @@ class Materia extends Model
         'estado',
         'resumen',
     ];
-
+    // Relaciones
+    public function cupof(): HasMany
+    {
+        return $this->hasMany(Cupof::class, 'id_materias');
+    }
     // Scopes y Accessors
     public function scopeHabilitadas($query)
     {
