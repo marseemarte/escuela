@@ -9,26 +9,36 @@
             <li class="breadcrumb-item active"><a href="#">Orientaciones</a></li>
         </ol>
     </nav>
-    <h1 class="mb-4">Planes de Estudio</h1>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mb-4">Planes de Estudio</h1>    
+        <a href="{{ route('orientaciones.create') }}" class="btn btn-primary btn-sm mb-3 f-w-600">+ Crear Orientación</a>
+    </div>
+    
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <!--<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>-->
+        </div>
+    @endif
+    
     <div class="text-center">
         <div class="row">
             @foreach($orientaciones as $orientacion)
-                <div class="col-md-3 mb-4">
-                    <a href="{{ route('orientaciones.show', $orientacion->id) }}"
-                       class="card text-center shadow-lg orientacion-card"
-                       style="background:
-                            {{ $orientacion->id == 1 ? 'rgb(89, 114, 151)' : 
-                               ($orientacion->id == 2 ? '#6B9D7C' : 
-                               ($orientacion->id == 3 ? '#C46464' :
-                               ($orientacion->id == 4 ? 'rgb(228, 189, 71)' : 'rgb(255, 166, 0)'))) }};
-                            color: #fff; text-decoration: none; border-radius: 16px;">
-                        <div class="card-body d-flex flex-column align-items-center justify-content-center" style="height: 180px;">
-                            <img src="{{ asset('paper/img/' . strtolower(str_replace(' ', '_', $orientacion->nombre)) . '.png') }}"
-                                 alt="{{ $orientacion->nombre }}" style="width: 100px; height: 100px;">
-                            <span class="mt-2 font-weight-bold" style="font-size: 1.3em;">{{ $orientacion->nombre }}</span>
-                        </div>
-                    </a>
-                </div>
+                @if($orientacion->id != 5)
+                    <div class="col-md-3 mb-4">
+                        <a href="{{ route('orientaciones.show', $orientacion->id) }}"
+                           class="card text-center shadow-lg orientacion-card"
+                           style="background: {{ $orientacion->color ?? '#6B9D7C' }};
+                                color: #fff; text-decoration: none; border-radius: 16px;">
+                            <div class="card-body d-flex flex-column align-items-center justify-content-center" style="height: 180px;">
+                                <img src="{{ asset('paper/img/' . strtolower(str_replace(' ', '_', $orientacion->nombre)) . '.png') }}"
+                                     alt="{{ $orientacion->nombre }}" style="width: 100px; height: 100px;">
+                                <span class="mt-2 font-weight-bold" style="font-size: 1.3em;">{{ $orientacion->nombre }}</span>
+                                <span style="font-size: 0.9em;">{{ $orientacion->titulo }}</span>
+                            </div>
+                        </a>
+                    </div>
+                @endif
             @endforeach
         </div>
     </div>

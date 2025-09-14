@@ -18,8 +18,9 @@
     }
 @endphp
 <div class="relative w-full">
-    <button data-dropdown-button-id="{{ $id }}"
-        class="w-full inline-flex justify-center items-center text-white focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 {{ setButtonColor($defaultLabel ?? 'Seleccionar') }}">
+    <button {{ $attributes->except(['class', 'id', 'defaultLabel', 'defaultSelectedValue', 'searchName']) }}
+        data-dropdown-button-id="{{ $id }}"
+        class="w-full inline-flex justify-center items-center text-white focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 {{ setButtonColor($defaultLabel ?? 'Seleccionar') }} {{ $attributes->get('class') }}">
 
         <span class="selectedOptionText truncate flex-1 text-center">
             {{ $defaultLabel ?? 'Seleccionar' }}
@@ -30,7 +31,7 @@
             {{ $defaultSelectedValue ?? '' }}
         </span>
 
-        <svg class="h-[0.8vw] w-[0.8vw] ml-3 flex-shrink-0" fill="none" viewBox="0 0 10 6">
+        <svg class="h-3.5 w-3.5 ml-3 flex-shrink-0 transition-all duration-200" fill="none" viewBox="0 0 10 6">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="m1 1 4 4 4-4" />
         </svg>

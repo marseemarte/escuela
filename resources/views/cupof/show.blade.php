@@ -93,12 +93,25 @@
                             <th>Situación</th>
                             <th>F. Desde</th>
                             <th>F. Hasta</th>
+                            <th>Activo</th> <!-- NUEVA COLUMNA -->
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
+                        @php
+                            // Filtrar los profesores sin fecha hasta
+                            $activos = $profesores->filter(function($profesor) {
+                                return empty($profesor->f_hasta) || $profesor->f_hasta == '0000-00-00';
+                            });
+
+                            // Obtener el profesor activo (el de fecha desde más nueva)
+                            $profesorActivoId = null;
+                            if ($activos->count() > 0) {
+                                $profesorActivoId = $activos->sortByDesc('f_desde')->first()->id ?? null;
+                            }
+                        @endphp
                         @forelse($profesores as $profesor)
-                            <tr>
+                            <tr @if($profesor->id == $profesorActivoId) class="table-success" @endif>
                                 <td>{{ $profesor->secuencia }}</td>
                                 <td>{{ $profesor->dni }}</td>
                                 <td>{{ $profesor->nombre }}</td>
@@ -106,7 +119,12 @@
                                 <td>{{ $profesor->tipo_usuario }}</td>
                                 <td>{{ $profesor->situacion }}</td>
                                 <td>{{ $profesor->f_desde ? \Carbon\Carbon::parse($profesor->f_desde)->format('d/m/Y') : 'N/A' }}</td>
-                                <td>{{ $profesor->f_hasta ? \Carbon\Carbon::parse($profesor->f_hasta)->format('d/m/Y') : 'N/A' }}</td>
+                                <td>{{ $profesor->f_hasta && $profesor->f_hasta != '0000-00-00' ? \Carbon\Carbon::parse($profesor->f_hasta)->format('d/m/Y') : 'N/A' }}</td>
+                                <td>
+                                    @if($profesor->id == $profesorActivoId)
+                                        <span class="badge bg-success">Activo</span>
+                                    @endif
+                                </td>
                                 <td>
                                     <a href="{{ route('cupof.editar-profesor', [$cupo->cupof, $profesor->id]) }}" class="btn btn-warning btn-sm">Editar</a>
                                     <form action="{{ route('cupof.eliminar-profesor', [$cupo->cupof, $profesor->id]) }}" 
@@ -120,7 +138,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center">
+                                <td colspan="10" class="text-center">
                                     No hay profesores asociados a este cupof.
                                 </td>
                             </tr>

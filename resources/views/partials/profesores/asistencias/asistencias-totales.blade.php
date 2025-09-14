@@ -4,88 +4,68 @@
 <p class="mb-6 text-gray-600">Asistencias Totales de la Materia X 7°C 709</p>
 
 <x-profesores.section-container>
-    <div class="py-3.5 px-5 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+    <x-profesores.search-bar.container id="totalAsistencias">
 
-        <x-profesores.input.text style="search" placeholder="Buscar Alumno" />
+        <x-profesores.input.text style="search" placeholder="Buscar Alumno" :searchName="'fullName'" />
 
-        <x-profesores.dropdown.button id="asistenciasTotales" defaultLabel="Seleccionar">
-            <x-profesores.dropdown.menu content="70% o mas" />
-            <x-profesores.dropdown.menu content="Menos de 70%" />
-        </x-profesores.dropdown.button>
-
-        <div class="flex items-center space-x-3">
+        <div class="col-span-1 md:col-span-1 lg:col-span-3 flex items-center justify-center md:justify-start">
             <button type="button"
-                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500">
+                class="px-4 py-2 w-full md:w-auto text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500">
                 Buscar
             </button>
         </div>
-    </div>
-    <x-profesores.table>
+    </x-profesores.search-bar.container>
+    <x-profesores.table searchId="totalAsistencias">
         <x-profesores.table.thead>
-
-            <x-profesores.table.th>
-                #
-            </x-profesores.table.th>
-            <x-profesores.table.th>
-                Nombre
-            </x-profesores.table.th>
-            <x-profesores.table.th>
-                Apellido
-            </x-profesores.table.th>
-            <x-profesores.table.th>
-                Asistencias
-            </x-profesores.table.th>
-
+            <x-profesores.table.th class="w-1/10 text-xs md:text-sm">#</x-profesores.table.th>
+            <x-profesores.table.th class="w-3/10 text-xs md:text-sm">Nombre</x-profesores.table.th>
+            <x-profesores.table.th class="w-3/10 text-xs md:text-sm">Apellido</x-profesores.table.th>
+            <x-profesores.table.th class="w-3/10 text-xs md:text-sm">Asistencias</x-profesores.table.th>
         </x-profesores.table.thead>
 
         <x-profesores.table.tbody>
-            <x-profesores.table.tr>
-
-                <x-profesores.table.td>
-                    1
-                </x-profesores.table.td>
-                <x-profesores.table.td>
-                    Aaron
-                </x-profesores.table.td>
-                <x-profesores.table.td>
-                    Pro
-                </x-profesores.table.td>
-                <x-profesores.table.td>
-                    70%
-                </x-profesores.table.td>
-
-            </x-profesores.table.tr>
-
-            <x-profesores.table.tr>
-
-                <x-profesores.table.td>
-                    2
-                </x-profesores.table.td>
-                <x-profesores.table.td>
-                    Lautaro
-                </x-profesores.table.td>
-                <x-profesores.table.td>
-                    Potron
-                </x-profesores.table.td>
-                <x-profesores.table.td>
-                    40%
-                </x-profesores.table.td>
-
-            </x-profesores.table.tr>
-            <x-profesores.table.tr bottom>
-                <x-profesores.table.td>
-                    3
-                </x-profesores.table.td>
-                <x-profesores.table.td>
-                    Roberto
-                </x-profesores.table.td>
-                <x-profesores.table.td>
-                    Casas
-                </x-profesores.table.td>
-                <x-profesores.table.td>
-                    95%
-                </x-profesores.table.td>
-            </x-profesores.table.tr>
+            @php
+                $index = 1;
+                $alumnos = [
+                    [
+                        'id' => 1,
+                        'nombre' => 'Aaron',
+                        'apellido' => 'Pro',
+                        'asistencias' => '70%',
+                        'valor' => 'aprobado',
+                    ],
+                    [
+                        'id' => 2,
+                        'nombre' => 'Lautaro',
+                        'apellido' => 'Potron',
+                        'asistencias' => '40%',
+                        'valor' => 'desaprobado',
+                    ],
+                    [
+                        'id' => 3,
+                        'nombre' => 'Roberto',
+                        'apellido' => 'Casas',
+                        'asistencias' => '95%',
+                        'valor' => 'aprobado',
+                    ],
+                ];
+            @endphp
+            @foreach ($alumnos as $alumno)
+                <x-profesores.table.tr :bottom="$loop->last">
+                    <x-profesores.table.td class="w-1/10 md:w-auto">{{ $index }}</x-profesores.table.td>
+                    <x-profesores.table.td class="w-3/10 md:w-auto">{{ $alumno['nombre'] }}</x-profesores.table.td>
+                    <x-profesores.table.td class="w-3/10 md:w-auto">{{ $alumno['apellido'] }}</x-profesores.table.td>
+                    <x-profesores.table.td class="w-3/10 md:w-auto">
+                        <span
+                            class="font-semibold {{ $alumno['asistencias'] >= '70%' ? 'text-green-600' : 'text-red-600' }}">
+                            {{ $alumno['asistencias'] }}
+                        </span>
+                    </x-profesores.table.td>
+                </x-profesores.table.tr>
+                @php
+                    $index++;
+                @endphp
+            @endforeach
         </x-profesores.table.tbody>
     </x-profesores.table>
 </x-profesores.section-container>

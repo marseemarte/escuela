@@ -12,10 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('padresalumnos', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // ID para cada relación padre-alumno
+            // Relaciones
             $table->foreignId('id_personaalumno')->constrained('persona')->onDelete('cascade');
             $table->foreignId('id_personatutor')->nullable()->constrained('persona')->onDelete('cascade');
             $table->foreignId('id_parentesco')->constrained('parentesco')->onDelete('cascade');
+
+            $table->string('estado', 1)->default('A'); // Estado de la relación (A=Activo, I=Inactivo)
+
             $table->timestamps();
         });
     }

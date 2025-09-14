@@ -8,18 +8,19 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('tareas', function (Blueprint $table) {
-            $table->id();
-            $table->string('titulo', 150);
-            $table->mediumText('descripcion');
-            $table->integer('tamanio');
-            $table->string('nombre_archivo', 255);
-            $table->string('tipo', 150);
-            $table->date('fecha_subida');
-            $table->date('fecha_entrega');
-            $table->unsignedBigInteger('id_revista');
-            $table->timestamps();
+            $table->id(); // ID para cada tarea asignada
+            $table->string('titulo', 150); // Título descriptivo de la tarea
+            $table->mediumText('descripcion'); // Descripción detallada de lo que debe hacer el estudiante
+            $table->integer('tamanio'); // Tamaño máximo permitido para archivos de entrega (en bytes)
+            $table->string('nombre_archivo', 255); // Nombre del archivo de consigna si lo hay
+            $table->string('tipo', 150); // Tipo de archivo permitido para entrega
+            $table->date('fecha_subida'); // Fecha en que el docente publicó la tarea
+            $table->date('fecha_entrega'); // Fecha límite para entregar la tarea
 
-            $table->foreign('id_revista')->references('id')->on('revistas')->onDelete('cascade');
+            // Relación con revista - define qué docente asignó la tarea
+            $table->foreignId('id_revista')->constrained('revista')->onDelete('cascade');
+
+            $table->timestamps();
         });
     }
 

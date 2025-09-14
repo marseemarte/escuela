@@ -12,9 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tipousuario', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // ID para cada asignación de tipo
+
+            // Relaciones
             $table->foreignId('id_persona')->constrained('persona')->onDelete('cascade');
             $table->foreignId('id_tipopersona')->constrained('tipopersona')->onDelete('cascade');
+
+            $table->string('estado', 1)->default('A'); // Estado del tipo de usuario (A=Activo, I=Inactivo)
+
             $table->timestamps();
         });
     }

@@ -12,9 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('ciclo_superior', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // ID para cada configuración de ciclo superior
+            // Relaciones
             $table->foreignId('id_cursos')->constrained('cursos')->onDelete('cascade');
             $table->foreignId('id_orientaciones')->constrained('orientaciones')->onDelete('cascade');
+
+            $table->string('estado', 1)->default('A'); // Estado de la configuración (A=Activo, I=Inactivo)
+
             $table->timestamps();
         });
     }

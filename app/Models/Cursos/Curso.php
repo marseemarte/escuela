@@ -2,6 +2,9 @@
 
 namespace App\Models\Cursos;
 
+use App\Models\Cupof;
+use App\Models\Cursos\CursoCicloLectivo;
+use App\Models\Cursos\Grupo;
 use App\Models\Materia;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,44 +12,54 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Curso extends Model
 {
     protected $table = 'cursos';
-    
+
     protected $fillable = [
         'division',
         'ano',
         'turno',
+        'estado',
     ];
 
     protected $casts = [
         'ano' => 'integer',
     ];
 
-    /**
-     * Obtiene las materias de este curso
-     */
+
+    // Relaciones
+    public function ciclosLectivos(): HasMany
+    {
+        return $this->hasMany(CursoCicloLectivo::class, 'id_cursos');
+    }
     public function materias(): HasMany
     {
         return $this->hasMany(Materia::class);
     }
+    public function grupos(): HasMany
+    {
+        return $this->hasMany(Grupo::class, 'id_cursos');
+    }
+    public function cupof(): HasMany
+    {
+        return $this->hasMany(Cupof::class, 'id_cursos');
+    }
 
-    /**
-     * Scope para filtrar por año
-     */
-    public function scopePorAnio($query, $ano)
+    // Scopes y Accessors
+
+    public function scopePorAno($query, $ano)
     {
         return $query->where('ano', $ano);
     }
 
-    /**
-     * Scope para filtrar por turno
-     */
     public function scopePorTurno($query, $turno)
     {
         return $query->where('turno', $turno);
     }
 
-    /**
-     * Scope para filtrar por división
-     */
+    public function getNombreCompletoAttribute()
+    {
+        return "{$this->ano}° {$this->division} - {$this->turno}";
+    }
+
     public function scopePorDivision($query, $division)
     {
         return $query->where('division', $division);

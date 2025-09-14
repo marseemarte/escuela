@@ -15,6 +15,22 @@
         <h1>Agregar Profesor al Cupof {{ $cupo->cupof }}</h1>
     </div>
 
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0">Información del Cupof</h5>
@@ -51,8 +67,7 @@
                             <label for="situacion" class="form-label">Situación *</label>
                             <select class="form-select situacion-soft @error('situacion') is-invalid @enderror" id="situacion" name="situacion" required>
                                 <option value="">Seleccione la situación</option>
-                                <option value="Activo" {{ old('situacion') == 'Activo' ? 'selected' : '' }}>Activo</option>
-                                <option value="Inactivo" {{ old('situacion') == 'Inactivo' ? 'selected' : '' }}>Inactivo</option>
+                               
                                 <option value="Titular" {{ old('situacion') == 'Titular' ? 'selected' : '' }}>Titular</option>
                                 <option value="Suplente" {{ old('situacion') == 'Suplente' ? 'selected' : '' }}>Suplente</option>
                                 <option value="Provisional" {{ old('situacion') == 'Provisional' ? 'selected' : '' }}>Provisional</option>

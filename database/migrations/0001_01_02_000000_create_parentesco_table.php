@@ -8,8 +8,10 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('parentesco', function (Blueprint $table) {
-            $table->id();
-            $table->string('parentesco', 30);
+            $table->id(); // ID para cada tipo de parentesco
+            $table->string('parentesco', 30); // Tipo de relación familiar (ej: "Padre", "Madre", "Tutor", "Abuelo", "Hermano")
+
+            $table->string('estado', 1)->default('A'); // Estado del parentesco (A=Activo, I=Inactivo)
             $table->timestamps();
         });
     }

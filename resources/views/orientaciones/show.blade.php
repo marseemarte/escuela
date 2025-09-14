@@ -15,11 +15,15 @@
     <i>Plan de estudio de la orientación de {{ $orientacion->nombre }}</i>
 
     <ul class="nav nav-tabs justify-content-center mb-4 border-0" id="anioTabs" role="tablist">
-        @foreach ([4, 5, 6, 7] as $anio)
+        @php
+            $anios = $orientacion->id == 4 ? [1, 2, 3] : [4, 5, 6, 7];
+
+        @endphp
+        @foreach ($anios as $anio)
             <li class="nav-item">
-                <a class="nav-link {{ $anio == 4 ? 'active' : '' }}" id="tab-{{ $anio }}" data-toggle="tab"
+                <a class="nav-link {{ $anio == ($orientacion->id == 4 ? 1 : 4) ? 'active' : '' }}" id="tab-{{ $anio }}" data-toggle="tab"
                     href="#anio{{ $anio }}" role="tab" aria-controls="anio{{ $anio }}"
-                    aria-selected="{{ $anio == 4 ? 'true' : 'false' }}" style="font-size:1.2rem; font-weight:500;">
+                    aria-selected="{{ $anio == ($orientacion->id == 4 ? 1 : 4) ? 'true' : 'false' }}" style="font-size:1.2rem; font-weight:500;">
                     {{ $anio }}° Año
                 </a>
             </li>
@@ -62,8 +66,8 @@
     </style>
 
     <div class="tab-content" id="anioTabsContent">
-        @foreach ([4, 5, 6, 7] as $anio)
-            <div class="tab-pane fade {{ $anio == 4 ? 'show active' : '' }}" id="anio{{ $anio }}" role="tabpanel"
+        @foreach ($anios as $anio)
+            <div class="tab-pane fade {{ $anio == ($orientacion->id == 4 ? 1 : 4) ? 'show active' : '' }}" id="anio{{ $anio }}" role="tabpanel"
                 aria-labelledby="tab-{{ $anio }}">
                 <div class="row">
                     <!-- Materias -->
@@ -92,8 +96,8 @@
                                         </thead>
                                         <tbody>
                                             @foreach ($materias->filter(function ($materia) use ($anio) {
-            return $materia->anio == $anio && $materia->tipo == 'materia';
-        }) as $materia)
+                                                return $materia->anio == $anio && $materia->tipo == 'materia';
+                                            }) as $materia)
                                                 <tr>
                                                     <td>{{ $materia->nombre }}</td>
                                                     <td>{{ $materia->resumen }}</td>
@@ -208,10 +212,16 @@
                         <label for="filterAnio">Filtrar por año:</label>
                         <select class="form-control" id="filterAnio">
                             <option value="">Todos los años</option>
-                            <option value="4">4° Año</option>
-                            <option value="5">5° Año</option>
-                            <option value="6">6° Año</option>
-                            <option value="7">7° Año</option>
+                            @if($orientacion->id == 4)
+                                <option value="1">1° Año</option>
+                                <option value="2">2° Año</option>
+                                <option value="3">3° Año</option>
+                            @elseif($orientacion->id == 1 || $orientacion->id == 2 || $orientacion->id == 3)
+                                <option value="4">4° Año</option>
+                                <option value="5">5° Año</option>
+                                <option value="6">6° Año</option>
+                                <option value="7">7° Año</option>
+                            @endif
                         </select>
                     </div>
 
@@ -228,7 +238,11 @@
                             </thead>
                             <tbody>
                                 @foreach ($allMaterias as $materia)
-                                    <tr>
+                                    <tr
+                                        class="materia-row"
+                                        data-orientacion="{{ $materia->orientacion_id }}"
+                                        data-anio="{{ $materia->anio }}"
+                                    >
                                         <td>{{ $materia->nombre }}</td>
                                         <td>{{ $materia->resumen }}</td>
                                         <td>{{ $materia->orientacion->nombre ?? 'Sin clasificar' }}</td>
@@ -273,7 +287,10 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Inicializar DataTables
-            [4, 5, 6, 7].forEach(anio => {
+            @php
+                $anios = $orientacion->id == 4 ? [1, 2, 3] : [4, 5, 6, 7];
+            @endphp
+            @json($anios).forEach(anio => {
                 $('#materiasTable' + anio).DataTable({
                     language: {
                         "sProcessing": "Procesando...",
@@ -338,15 +355,43 @@
     </script>
     <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Cuando se abre el modal, setea los valores de orientacion y año en los formularios
     $('#materiasModal').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget);
         var orientacionId = button.data('orientacion-id');
         var anio = button.data('anio');
-        // Setea los valores en todos los formularios del modal
         $(this).find('.input-orientacion-id').val(orientacionId);
         $(this).find('.input-anio').val(anio);
     });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function filtrarMaterias() {
+        let texto = document.getElementById('searchMateria').value.toLowerCase();
+        let orientacion = document.getElementById('filterOrientacion').value;
+        let anio = document.getElementById('filterAnio').value;
+
+        document.querySelectorAll('#materiasSearchTable .materia-row').forEach(function(row) {
+            let nombre = row.children[0].textContent.toLowerCase();
+            let resumen = row.children[1].textContent.toLowerCase();
+            let rowOrientacion = row.getAttribute('data-orientacion');
+            let rowAnio = row.getAttribute('data-anio');
+
+            let coincideTexto = nombre.includes(texto) || resumen.includes(texto) || texto === '';
+            let coincideOrientacion = (orientacion === '' || rowOrientacion === orientacion);
+            let coincideAnio = (anio === '' || rowAnio === anio);
+
+            if (coincideTexto && coincideOrientacion && coincideAnio) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    document.getElementById('searchMateria').addEventListener('input', filtrarMaterias);
+    document.getElementById('filterOrientacion').addEventListener('change', filtrarMaterias);
+    document.getElementById('filterAnio').addEventListener('change', filtrarMaterias);
 });
 </script>
 @endsection

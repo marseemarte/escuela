@@ -12,11 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('horas', function (Blueprint $table) {
-            $table->id();
-            $table->string('nombre', 15);
-            $table->char('turno', 1);
-            $table->time('hd');
-            $table->time('hh');
+            $table->id(); // ID para cada bloque horario
+            $table->string('nombre', 15); // Nombre descriptivo del horario (ej: "1ra hora", "2da hora", "Recreo")
+            $table->char('turno', 1); // Turno al que pertenece (M=Mañana, T=Tarde, N=Noche)
+            $table->time('hd'); // Hora de inicio del bloque (hora desde)
+            $table->time('hh'); // Hora de finalización del bloque (hora hasta)
+            $table->boolean('activo')->default(true); // Si el bloque horario está activo en el sistema
+
             $table->timestamps();
         });
     }
