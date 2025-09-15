@@ -40,27 +40,9 @@
             <i class="fa-solid fa-bars hover:bg-[#6c6c81] rounded-xl {{ $sidebarHeaderCloseButtonResponsive }}"></i>
         </button>
     </div>
-    @if ($titulo !== 'Indefinido')
-        <div class="h-full flex items-center text-[19px] text-gray-900 p-4">
-            <h2>{{ $titulo }}</h2>
-        </div>
-    @else
-        <ul class="flex gap-x-2 text-sm font-medium text-center h-full items-end bg-transparent text-gray-500">
-            <li class="h-full">
-                <button
-                    class="tab h-full px-6 py-3 border-b-2 rounded-t-lg cursor-pointer transition-colors duration-150 font-semibold text-blue-600 bg-[#eeeded] border-blue-600 active"
-                    data-tab="0">
-                    Asistencias
-                </button>
-            </li>
-            <li class="h-full">
-                <button
-                    class="tab h-full px-6 py-3 border-b-2 rounded-t-lg cursor-pointer transition-colors duration-150 font-semibold hover:text-blue-600 hover:bg-gray-100 border-transparent"
-                    data-tab="1">
-                    Asistencias Totales
-                </button>
-            </li>
-        </ul>
-    @endif
+    <div class="h-full flex items-center text-[19px] text-gray-900 p-4">
+        <h2>{{ $titulo }}</h2>
+    </div>
+
     <div class="flex-1 h-full "></div>
 </nav>

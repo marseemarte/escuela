@@ -56,7 +56,8 @@
                             <i class="feather icon-menu"></i>
                         </a>
                         <a href="{{ route('dashboard') }}">
-                            <img class="img-fluid" src="{{ asset('libraries/assets/images/log_nomb.png') }}" alt="Logo">
+                            <img class="img-fluid" src="{{ asset('libraries/assets/images/log_nomb.png') }}"
+                                alt="Logo">
                         </a>
                         <a class="mobile-options">
                             <i class="feather icon-more-horizontal"></i>
@@ -150,35 +151,30 @@
                                     <div class="dropdown-toggle" data-toggle="dropdown">
                                         <img src="libraries\assets\images\avatar-4.jpg" class="img-radius"
                                             alt="User-Profile-Image">
-                                        <span>John Doe</span>
+                                        <span>{{ Auth::check() ? Auth::user()->nombre_completo : 'Usuario' }}</span>
                                         <i class="feather icon-chevron-down"></i>
                                     </div>
                                     <ul class="show-notification profile-notification dropdown-menu"
                                         data-dropdown-in="fadeIn" data-dropdown-out="fadeOut">
                                         <li>
-                                            <a href="#!">
-                                                <i class="feather icon-settings"></i> Settings
+                                            <a href="{{ route('settings.profile') }}">
+                                                <i class="feather icon-settings"></i> Configuración
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="user-profile.htm">
-                                                <i class="feather icon-user"></i> Profile
+                                            <a href="{{ route('settings.profile') }}">
+                                                <i class="feather icon-user"></i> Perfil
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="email-inbox.htm">
-                                                <i class="feather icon-mail"></i> My Messages
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="auth-lock-screen.htm">
-                                                <i class="feather icon-lock"></i> Lock Screen
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="auth-normal-sign-in.htm">
-                                                <i class="feather icon-log-out"></i> Logout
-                                            </a>
+                                            <form method="POST" action="{{ route('logout') }}"
+                                                style="display: inline;">
+                                                @csrf
+                                                <button type="submit"
+                                                    style="background: none; border: none; color: inherit; cursor: pointer; width: 100%; text-align: left; padding: 0;">
+                                                    <i class="feather icon-log-out"></i> Cerrar Sesión
+                                                </button>
+                                            </form>
                                         </li>
                                     </ul>
 
@@ -332,10 +328,18 @@
                                         <span class="pcoded-mtext">Inicio</span>
                                     </a>
                                 </li>
+                                @auth
+                                    <li class="">
+                                        <a href="{{ route('asistencias.index') }}">
+                                            <span class="pcoded-micon"><i class="feather icon-check-square"></i></span>
+                                            <span class="pcoded-mtext">Asistencias</span>
+                                        </a>
+                                    </li>
+                                @endauth
                                 <li class="">
                                     <a href="{{ route('cursos.index') }}">
                                         <span class="pcoded-micon"><i class="feather icon-book"></i></span>
-                      <span class="pcoded-mtext">Cursos</span>
+                                        <span class="pcoded-mtext">Cursos</span>
                                     </a>
                                 </li>
                                 <li class="">
@@ -344,7 +348,7 @@
                                         <span class="pcoded-mtext">Orientaciones</span>
                                     </a>
                                 </li>
-                                                                <li class="">
+                                <li class="">
                                     <a href="{{ route('materias.index') }}">
                                         <span class="pcoded-micon"><i class="feather icon-clipboard"></i></span>
                                         <span class="pcoded-mtext">Materias</span>
@@ -386,7 +390,9 @@
     <script src="{{ asset('libraries/bower_components/modernizr/js/css-scrollbars.js') }}"></script>
     <script src="{{ asset('libraries/bower_components/i18next/js/i18next.min.js') }}"></script>
     <script src="{{ asset('libraries/bower_components/i18next-xhr-backend/js/i18nextXHRBackend.min.js') }}"></script>
-    <script src="{{ asset('libraries/bower_components/i18next-browser-languagedetector/js/i18nextBrowserLanguageDetector.min.js') }}"></script>
+    <script
+        src="{{ asset('libraries/bower_components/i18next-browser-languagedetector/js/i18nextBrowserLanguageDetector.min.js') }}">
+    </script>
     <script src="{{ asset('libraries/bower_components/jquery-i18next/js/jquery-i18next.min.js') }}"></script>
     <script src="{{ asset('libraries/assets/js/pcoded.min.js') }}"></script>
     <script src="{{ asset('libraries/assets/js/vartical-layout.min.js') }}"></script>
@@ -418,12 +424,12 @@
                 }
             });
         });
-    var timezoneOffset = -3 * 60; // Buenos Aires is UTC-3
-    var currentDate = new Date();
-    var utcDate = new Date(currentDate.getTime() + (currentDate.getTimezoneOffset() * 60000));
-    var localDate = new Date(utcDate.getTime() + (timezoneOffset * 60000));
-    document.write("<script>var currentTime = '" + localDate.toISOString().slice(0, 19).replace('T', ' ') + "';</" + "script>");
-
+        var timezoneOffset = -3 * 60; // Buenos Aires is UTC-3
+        var currentDate = new Date();
+        var utcDate = new Date(currentDate.getTime() + (currentDate.getTimezoneOffset() * 60000));
+        var localDate = new Date(utcDate.getTime() + (timezoneOffset * 60000));
+        document.write("<script>var currentTime = '" + localDate.toISOString().slice(0, 19).replace('T', ' ') + "';</" +
+            "script>");
     </script>
 
 </body>

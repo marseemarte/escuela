@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 class Persona extends Authenticatable
 {
@@ -30,7 +31,7 @@ class Persona extends Authenticatable
         'id_localidad',
         'pass',
         'telefono',
-        'mail',
+        'mail', // Agregar mail a fillable
     ];
 
     protected $casts = [
@@ -96,6 +97,21 @@ class Persona extends Authenticatable
         return $this->pass;
     }
 
+    public function getAuthIdentifier()
+    {
+        return $this->mail;
+    }
+
+    public function getAuthIdentifierName()
+    {
+        return 'mail'; // Usar 'mail' en lugar de 'email'
+    }
+
+    public function getAuthPasswordName()
+    {
+        return 'pass'; // Usar 'pass' en lugar de 'password'
+    }
+
     public function getEmailForPasswordReset()
     {
         return $this->mail;
@@ -104,5 +120,10 @@ class Persona extends Authenticatable
     public function setPasswordAttribute($value)
     {
         $this->attributes['pass'] = $value;
+    }
+
+    public function setPassAttribute($value)
+    {
+        $this->attributes['pass'] = Hash::make($value);
     }
 }
