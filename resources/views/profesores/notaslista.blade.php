@@ -1,7 +1,7 @@
     <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
     <x-layouts.profesores.dashboard notas titulo="Notas">
      <!--  <h1><a class="text-blue-600 select-text " href="{{route('profesores.notas.materias')}}">Materias</a>/Lista</h1> -->
-        <h2 class="text-center">Informes 2025 de Practicas Profecionalizantes</h2>
+        <h2 class="text-center">Informes 2025 de {{ request('materia') }}</h2>
         <h2 class="text-center mb-6">7°C</h2>
         <div class="relative shadow-md bg-white mt-5 w-full rounded-t-md border-t-4 border-gray-50">
             <table class="w-full text-sm text-left rtl:text-right text-gray-500">
