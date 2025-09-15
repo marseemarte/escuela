@@ -20,7 +20,7 @@ class AsistenciaController extends Controller
         // Verificar si el usuario es profesor
         $usuario = Auth::user();
 
-        if ($usuario && method_exists($usuario, 'isProfesor') && $usuario->isProfesor()) {
+        if ($usuario instanceof Persona && $usuario->isProfesor()) {
             // Lógica para profesores
             $materias = DB::table('cupof')
                 ->join('materias', 'cupof.id_materias', '=', 'materias.id')

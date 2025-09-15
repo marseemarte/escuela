@@ -31,9 +31,11 @@ Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->
         ->name('profesores.tareas.corregir');
     Route::apiResource('/', ProfesorController::class);
 
-    Route::apiResource('notas', NotaController::class);
-    Route::post('notas/materias', [NotaController::class, 'materias'])->name('profesores.notas.materias');
-    Route::get('notas/materias/lista', [NotaController::class, 'lista'])->name('profesores.notas.materias.lista');
+    // Rutas específicas de notas (similar a asistencias)
+    Route::get('notas', [NotaController::class, 'index'])->name('profesores.notas.index');
+    Route::get('notas/cargar/{cupof}', [NotaController::class, 'cargar'])->name('profesores.notas.cargar');
+    Route::get('notas/totales/{cupof}', [NotaController::class, 'totales'])->name('profesores.notas.totales');
+    Route::post('notas/guardar', [NotaController::class, 'guardarNotas'])->name('profesores.notas.guardar');
 
     // Rutas específicas de asistencias (sin apiResource completo)
     Route::get('asistencias', [AsistenciaController::class, 'index'])->name('profesores.asistencias.index');
@@ -116,6 +118,9 @@ Route::view('/turismo', 'orientaciones.turismo.index')->name('turismo.index');
 
 // Ruta temporal para testing de totales (sin middleware)
 Route::get('/test/totales/{cupof}', [App\Http\Controllers\Profesores\AsistenciaController::class, 'totales'])->name('test.totales');
+
+// Ruta temporal para testing de notas (sin middleware)
+Route::get('/test/notas/cargar/{cupof}', [App\Http\Controllers\Profesores\NotaController::class, 'cargar'])->name('test.notas.cargar');
 
 // Ruta de prueba temporal para verificar CSRF
 Route::post('test-csrf', function () {
