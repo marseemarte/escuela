@@ -9,43 +9,6 @@
         + Subir nueva tarea
     </button>
 
-    <!-- Tabla de tareas -->
-    <div class="overflow-x-auto shadow-md sm:rounded-lg mt-3">
-        <table class="w-full text-sm text-center text-gray-600 table-fixed">
-            <thead class="bg-gray-50 text-gray-700 uppercase text-xs">
-                <tr>
-                    <th class="px-6 py-3 w-1/5">Nombre</th>
-                    <th class="px-6 py-3 w-1/5">Curso</th>
-                    <th class="px-6 py-3 w-1/5">Archivo</th>
-                    <th class="px-6 py-3 w-1/5">Fecha de entrega</th>
-                    <th class="px-6 py-3 w-1/5">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="bg-white border-b hover:bg-gray-50">
-                    <td class="px-6 py-4 font-medium text-gray-900">Ejercicio de Matematica</td>
-                    <td class="px-6 py-4">2°A</td>
-                    <td><a href="#" class="text-blue-600 hover:underline">Ver Archivo</a></td>
-                    <td class="px-6 py-4">—</td>
-                    <td class="text-center">
-                        <button class="btn btn-sm btn-outline-info me-2 text-green-600 hover:underline seguimientoBtn">Seguimiento</button>
-                        <button class="btn btn-sm btn-outline-danger text-red-600 hover:underline">Eliminar</button>
-                    </td>
-                </tr>
-                <tr class="bg-white border-b hover:bg-gray-50">
-                    <td class="px-6 py-4 font-medium text-gray-900">Revolucion Francesa</td>
-                    <td class="px-6 py-4">3°B</td>
-                    <td><a href="#" class="text-blue-600 hover:underline">Ver Archivo</a></td>
-                    <td class="px-6 py-4">—</td>
-                    <td class="text-center">
-                        <button class="btn btn-sm btn-outline-info me-2 text-green-600 hover:underline seguimientoBtn">Seguimiento</button>
-                        <button class="btn btn-sm btn-outline-danger text-red-600 hover:underline">Eliminar</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
     <!-- Modal para subir tareas--> 
     <div id="tareaModal" class="fixed inset-0 z-50 backdrop-blur bg-black/50 hidden items-center justify-center overflow-auto">
       <div id="tareaModalContent" 
@@ -126,6 +89,43 @@
           </form>
         </div>
       </div>
+    </div>
+
+    <!-- Tabla de tareas -->
+    <div class="overflow-x-auto shadow-md sm:rounded-lg mt-3">
+        <table class="w-full text-sm text-center text-gray-600 table-fixed">
+            <thead class="bg-gray-50 text-gray-700 uppercase text-xs">
+                <tr>
+                    <th class="px-6 py-3 w-1/5">Nombre</th>
+                    <th class="px-6 py-3 w-1/5">Curso</th>
+                    <th class="px-6 py-3 w-1/5">Archivo</th>
+                    <th class="px-6 py-3 w-1/5">Fecha de entrega</th>
+                    <th class="px-6 py-3 w-1/5">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="bg-white border-b hover:bg-gray-50">
+                    <td class="px-6 py-4 font-medium text-gray-900">Ejercicio de Matematica</td>
+                    <td class="px-6 py-4">2°A</td>
+                    <td><a href="#" class="text-blue-600 hover:underline">Ver Archivo</a></td>
+                    <td class="px-6 py-4">—</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-info me-2 text-green-600 hover:underline seguimientoBtn">Seguimiento</button>
+                        <button class="btn btn-sm btn-outline-danger text-red-600 hover:underline">Eliminar</button>
+                    </td>
+                </tr>
+                <tr class="bg-white border-b hover:bg-gray-50">
+                    <td class="px-6 py-4 font-medium text-gray-900">Revolucion Francesa</td>
+                    <td class="px-6 py-4">3°B</td>
+                    <td><a href="#" class="text-blue-600 hover:underline">Ver Archivo</a></td>
+                    <td class="px-6 py-4">—</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-info me-2 text-green-600 hover:underline seguimientoBtn">Seguimiento</button>
+                        <button class="btn btn-sm btn-outline-danger text-red-600 hover:underline">Eliminar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     <!-- Modal de seguimiento -->
