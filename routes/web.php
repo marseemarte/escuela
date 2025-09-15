@@ -30,7 +30,7 @@ Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->
     Route::get('notas/materias/lista', [NotaController::class, 'lista'])->name('profesores.notas.materias.lista');
 
     // Rutas específicas de asistencias (sin apiResource completo)
-    Route::get('asistencias', [AsistenciaController::class, 'materias'])->name('profesores.asistencias.index');
+    Route::get('asistencias', [AsistenciaController::class, 'index'])->name('profesores.asistencias.index');
     Route::get('asistencias/tomar/{cupof}', [AsistenciaController::class, 'tomar'])->name('profesores.asistencias.tomar');
     Route::get('asistencias/totales/{cupof}', [AsistenciaController::class, 'totales'])->name('profesores.asistencias.totales');
     Route::get('asistencias/alumnos/{cupof}', [AsistenciaController::class, 'obtenerAlumnos'])->name('profesores.asistencias.alumnos');
@@ -102,3 +102,6 @@ Route::get('/revista/{cupof}', [RevistaController::class, 'index'])->name('revis
 Route::view('/mmo', 'orientaciones.mmo.index')->name('mmo.index');
 Route::view('/ciclo_basico', 'orientaciones.ciclo_basico.index')->name('ciclo_basico.index');
 Route::view('/turismo', 'orientaciones.turismo.index')->name('turismo.index');
+
+// Ruta temporal para testing de totales (sin middleware)
+Route::get('/test/totales/{cupof}', [App\Http\Controllers\Profesores\AsistenciaController::class, 'totales'])->name('test.totales');

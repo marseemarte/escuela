@@ -106,10 +106,13 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-center">
                                         <label class="inline-flex items-center">
-                                            <input type="checkbox" id="justificado_{{ $alumno->asignacion_id }}"
-                                                class="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
-                                                {{ $alumno->justificado === '1' ? 'checked' : '' }}>
-                                            <span class="ml-2 text-sm text-gray-700">Justificado</span>
+                                            <input type="checkbox"
+                                                id="justificado_desktop_{{ $alumno->asignacion_id }}"
+                                                data-asignacion="{{ $alumno->asignacion_id }}"
+                                                class="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out checkbox-justificado"
+                                                {{ $alumno->justificado === '1' ? 'checked' : '' }}
+                                                {{ $alumno->estado_asistencia === 'P' ? 'disabled' : '' }}>
+                                            <span class="ml-2 text-sm {{ $alumno->estado_asistencia === 'P' ? 'text-gray-400' : 'text-gray-700' }}">Justificado</span>
                                         </label>
                                     </td>
                                 </tr>
@@ -175,10 +178,12 @@
                                 {{-- Checkbox justificado --}}
                                 <div class="flex items-center justify-center">
                                     <label class="inline-flex items-center">
-                                        <input type="checkbox" id="justificado_{{ $alumno->asignacion_id }}"
-                                            class="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
-                                            {{ $alumno->justificado === '1' ? 'checked' : '' }}>
-                                        <span class="ml-2 text-sm text-gray-700">Justificado</span>
+                                        <input type="checkbox" id="justificado_mobile_{{ $alumno->asignacion_id }}"
+                                            data-asignacion="{{ $alumno->asignacion_id }}"
+                                            class="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out checkbox-justificado"
+                                            {{ $alumno->justificado === '1' ? 'checked' : '' }}
+                                            {{ $alumno->estado_asistencia === 'P' ? 'disabled' : '' }}>
+                                        <span class="ml-2 text-sm {{ $alumno->estado_asistencia === 'P' ? 'text-gray-400' : 'text-gray-700' }}">Justificado</span>
                                     </label>
                                 </div>
                             </div>
@@ -234,55 +239,33 @@
         function marcarTodos(estado) {
             console.log('Ejecutando marcarTodos con estado:', estado);
 
-            // Estrategia: marcar solo los radios visibles para evitar conflictos
-            // Desktop: buscar en .hidden.md:block
-            // Mobile: buscar en .md:hidden
+            // Marcar radios en vista desktop
+            const radiosDesktop = document.querySelectorAll(
+                `input[type="radio"][value="${estado}"][name*="asistencia_"]:not([name*="mobile"])`);
+            console.log('Radios desktop encontrados:', radiosDesktop.length);
 
-            // Determinar qué vista está activa
-            const isDesktopView = window.innerWidth >= 768; // md breakpoint
-            console.log('Vista detectada:', isDesktopView ? 'Desktop' : 'Mobile');
+            radiosDesktop.forEach((radio, index) => {
+                radio.checked = true;
+                console.log(`Marcado radio desktop ${index + 1}:`, radio.name);
+            });
 
-            if (isDesktopView) {
-                // Vista desktop - marcar solo radios desktop
-                const radiosDesktop = document.querySelectorAll(
-                    `.hidden.md\\:block input[type="radio"][value="${estado}"]`);
-                console.log('Radios desktop encontrados:', radiosDesktop.length);
+            // Marcar radios en vista mobile
+            const radiosMobile = document.querySelectorAll(
+                `input[type="radio"][value="${estado}"][name*="asistencia_mobile_"]`);
+            console.log('Radios mobile encontrados:', radiosMobile.length);
 
-                radiosDesktop.forEach((radio, index) => {
-                    radio.checked = true;
-                    console.log(`Marcado radio desktop ${index + 1}:`, radio.name);
+            radiosMobile.forEach((radio, index) => {
+                radio.checked = true;
+                console.log(`Marcado radio mobile ${index + 1}:`, radio.name);
 
-                    // Disparar evento change
-                    radio.dispatchEvent(new Event('change', {
-                        bubbles: true
-                    }));
-                });
-            } else {
-                // Vista mobile - marcar solo radios mobile y actualizar visual
-                const radiosMobile = document.querySelectorAll(`.md\\:hidden input[type="radio"][value="${estado}"]`);
-                console.log('Radios mobile encontrados:', radiosMobile.length);
-
-                radiosMobile.forEach((radio, index) => {
-                    radio.checked = true;
-                    console.log(`Marcado radio mobile ${index + 1}:`, radio.name);
-
-                    // Actualizar visual del card mobile
-                    updateMobileCardVisual(radio);
-
-                    // Disparar evento change
-                    radio.dispatchEvent(new Event('change', {
-                        bubbles: true
-                    }));
-                });
-            }
+                // Actualizar visual del card mobile
+                updateMobileCardVisual(radio);
+            });
 
             console.log('marcarTodos completado');
         }
 
-        // Función para verificar si hay asistencias existentes
-        function verificarAsistenciasExistentes() {
-            // Función eliminada - no mostrar mensaje de asistencias cargadas
-        } // Función para actualizar el visual de los cards móviles
+        // Función para actualizar el visual de los cards móviles
         function updateMobileCardVisual(radio) {
             const label = radio.closest('label');
             if (label) {
@@ -311,28 +294,73 @@
         // Función para guardar asistencias
         async function guardarAsistencias() {
             const asistencias = [];
-            const filas = document.querySelectorAll('[data-asignacion]');
 
-            filas.forEach(elemento => {
-                const asignacionId = elemento.dataset.asignacion;
+            // SOLUCION: Procesar solo los elementos únicos por asignacion_id
+            // En lugar de procesar todos los [data-asignacion], vamos a obtener IDs únicos
+            const todosLosElementos = document.querySelectorAll('[data-asignacion]');
+            const asignacionesUnicas = new Set();
 
-                // Buscar radio marcado en desktop o mobile
-                let estadoRadio = elemento.querySelector(`input[name="asistencia_${asignacionId}"]:checked`);
+            // Extraer IDs únicos de asignación
+            todosLosElementos.forEach(elemento => {
+                asignacionesUnicas.add(elemento.dataset.asignacion);
+            });
+
+            console.log('🔍 DEBUG CHECKBOXES - Iniciando recolección de datos');
+            console.log('Total de elementos encontrados:', todosLosElementos.length);
+            console.log('Asignaciones únicas:', asignacionesUnicas.size);
+            console.log('IDs únicos:', Array.from(asignacionesUnicas));
+
+            // Procesar cada asignación única
+            Array.from(asignacionesUnicas).forEach((asignacionId, index) => {
+                console.log(`\n--- Procesando alumno ${index + 1} (Asignación ID: ${asignacionId}) ---`);
+
+                // Buscar radio marcado (preferir desktop, luego mobile)
+                let estadoRadio = document.querySelector(`input[name="asistencia_${asignacionId}"]:checked`);
                 if (!estadoRadio) {
-                    // Si no encontró en desktop, buscar en mobile
                     estadoRadio = document.querySelector(
                         `input[name="asistencia_mobile_${asignacionId}"]:checked`);
                 }
 
-                const justificadoCheckbox = elemento.querySelector(`#justificado_${asignacionId}`);
+                // Buscar checkbox de justificado (preferir desktop, luego mobile)
+                let justificadoCheckbox = document.querySelector(`#justificado_desktop_${asignacionId}`);
+                if (!justificadoCheckbox) {
+                    justificadoCheckbox = document.querySelector(`#justificado_mobile_${asignacionId}`);
+                }
+
+                console.log('Estado radio encontrado:', estadoRadio ? estadoRadio.value : 'NO ENCONTRADO');
+                console.log('Checkbox justificado encontrado:', justificadoCheckbox ? 'SÍ' : 'NO');
+
+                if (justificadoCheckbox) {
+                    console.log('Checkbox justificado checked:', justificadoCheckbox.checked);
+                    console.log('Checkbox justificado type:', justificadoCheckbox.type);
+                    console.log('Checkbox justificado id:', justificadoCheckbox.id);
+                } else {
+                    console.log('❌ NO SE ENCONTRÓ EL CHECKBOX DE JUSTIFICADO');
+                }
 
                 if (estadoRadio) {
-                    asistencias.push({
+                    // IMPORTANTE: El justificado solo es válido para Ausente (A) o Tarde (T)
+                    let justificadoValue = false;
+                    if ((estadoRadio.value === 'A' || estadoRadio.value === 'T') && justificadoCheckbox && justificadoCheckbox.checked) {
+                        justificadoValue = true;
+                    }
+
+                    const asistenciaData = {
                         asignacion_id: parseInt(asignacionId),
                         estado: estadoRadio.value,
-                        justificado: justificadoCheckbox ? justificadoCheckbox.checked : false
-                    });
+                        justificado: justificadoValue
+                    };
+
+                    console.log('Datos finales para enviar:', asistenciaData);
+                    console.log(`  Estado: ${estadoRadio.value}, Justificado permitido: ${estadoRadio.value === 'A' || estadoRadio.value === 'T'}, Checkbox marcado: ${justificadoCheckbox ? justificadoCheckbox.checked : false}, Resultado final: ${justificadoValue}`);
+                    asistencias.push(asistenciaData);
                 }
+            });
+
+            console.log('\n🚀 DATOS FINALES PARA ENVIAR:');
+            console.log('Total asistencias recolectadas:', asistencias.length);
+            asistencias.forEach((asistencia, idx) => {
+                console.log(`Asistencia ${idx + 1}:`, asistencia);
             });
 
             if (asistencias.length === 0) {
@@ -471,11 +499,81 @@
                     if (event.target.name.includes('mobile')) {
                         updateMobileCardVisual(event.target);
                     }
+
+                    // NUEVO: Manejar estado del checkbox justificado
+                    handleJustificadoCheckbox(event.target);
                 }
             });
 
+            // Función para manejar el estado del checkbox justificado
+            function handleJustificadoCheckbox(radioElement) {
+                // Extraer ID de asignación del nombre del radio
+                let asignacionId;
+                if (radioElement.name.includes('mobile')) {
+                    asignacionId = radioElement.name.replace('asistencia_mobile_', '');
+                } else {
+                    asignacionId = radioElement.name.replace('asistencia_', '');
+                }
+
+                const estadoSeleccionado = radioElement.value;
+                
+                // Encontrar ambos checkboxes (desktop y mobile)
+                const checkboxDesktop = document.querySelector(`#justificado_desktop_${asignacionId}`);
+                const checkboxMobile = document.querySelector(`#justificado_mobile_${asignacionId}`);
+                
+                console.log(`📋 Manejando checkbox justificado para asignación ${asignacionId}, estado: ${estadoSeleccionado}`);
+
+                // Habilitar/deshabilitar según el estado
+                if (estadoSeleccionado === 'P') {
+                    // Si está presente, deshabilitar y desmarcar justificado
+                    if (checkboxDesktop) {
+                        checkboxDesktop.disabled = true;
+                        checkboxDesktop.checked = false;
+                        checkboxDesktop.closest('label').querySelector('span').classList.add('text-gray-400');
+                        checkboxDesktop.closest('label').querySelector('span').classList.remove('text-gray-700');
+                    }
+                    if (checkboxMobile) {
+                        checkboxMobile.disabled = true;
+                        checkboxMobile.checked = false;
+                        checkboxMobile.closest('label').querySelector('span').classList.add('text-gray-400');
+                        checkboxMobile.closest('label').querySelector('span').classList.remove('text-gray-700');
+                    }
+                    console.log(`  ✅ Checkboxes deshabilitados (Presente)`);
+                } else if (estadoSeleccionado === 'A' || estadoSeleccionado === 'T') {
+                    // Si está ausente o tarde, habilitar justificado
+                    if (checkboxDesktop) {
+                        checkboxDesktop.disabled = false;
+                        checkboxDesktop.closest('label').querySelector('span').classList.remove('text-gray-400');
+                        checkboxDesktop.closest('label').querySelector('span').classList.add('text-gray-700');
+                    }
+                    if (checkboxMobile) {
+                        checkboxMobile.disabled = false;
+                        checkboxMobile.closest('label').querySelector('span').classList.remove('text-gray-400');
+                        checkboxMobile.closest('label').querySelector('span').classList.add('text-gray-700');
+                    }
+                    console.log(`  ✅ Checkboxes habilitados (${estadoSeleccionado === 'A' ? 'Ausente' : 'Tarde'})`);
+                }
+            }
+
             // Verificar si hay asistencias ya cargadas para hoy
             verificarAsistenciasExistentes();
+
+            // NUEVO: Inicializar estado de checkboxes justificado según estado actual
+            function inicializarCheckboxesJustificado() {
+                console.log('🔄 Inicializando estado de checkboxes justificado...');
+                
+                const todosLosRadios = document.querySelectorAll('input[type="radio"]:checked');
+                todosLosRadios.forEach(radio => {
+                    if (radio.name.includes('asistencia')) {
+                        handleJustificadoCheckbox(radio);
+                    }
+                });
+                
+                console.log('✅ Inicialización de checkboxes completada');
+            }
+
+            // Ejecutar inicialización
+            inicializarCheckboxesJustificado();
 
             // Debug: Contar radios en cada vista
             const allRadios = document.querySelectorAll('input[type="radio"]');
@@ -520,7 +618,7 @@
                     const asignacionId = this.name.replace('asistencia_', '');
                     const mobileRadio = document.querySelector(
                         `input[name="asistencia_mobile_${asignacionId}"][value="${this.value}"]`
-                        );
+                    );
                     if (mobileRadio) {
                         mobileRadio.checked = true;
                         updateMobileCardVisual(mobileRadio);
@@ -550,7 +648,7 @@
                     if (radioMarcado) {
                         console.log(
                             `Alumno ${asignacionId}: ${radioMarcado.value}, Justificado: ${justificado ? justificado.checked : false}`
-                            );
+                        );
                         asistencias.push({
                             asignacion_id: asignacionId,
                             estado: radioMarcado.value,
@@ -645,9 +743,179 @@
                 }
             };
 
+            // NUEVA FUNCIÓN: Verificar estado específico de justificados
+            window.verificarEstadoJustificado = function() {
+                console.log('=== VERIFICACIÓN ESTADO JUSTIFICADO ===');
+                
+                const todosLosElementos = document.querySelectorAll('[data-asignacion]');
+                const asignacionesUnicas = new Set();
+                
+                todosLosElementos.forEach(elemento => {
+                    asignacionesUnicas.add(elemento.dataset.asignacion);
+                });
+                
+                Array.from(asignacionesUnicas).forEach((asignacionId, index) => {
+                    // Buscar estado actual
+                    let estadoRadio = document.querySelector(`input[name="asistencia_${asignacionId}"]:checked`);
+                    if (!estadoRadio) {
+                        estadoRadio = document.querySelector(`input[name="asistencia_mobile_${asignacionId}"]:checked`);
+                    }
+                    
+                    // Buscar checkboxes
+                    const checkboxDesktop = document.querySelector(`#justificado_desktop_${asignacionId}`);
+                    const checkboxMobile = document.querySelector(`#justificado_mobile_${asignacionId}`);
+                    
+                    console.log(`Estudiante ${index + 1} (ID: ${asignacionId}):`);
+                    console.log(`  Estado: ${estadoRadio ? estadoRadio.value : 'SIN ESTADO'}`);
+                    console.log(`  Justificado permitido: ${estadoRadio && (estadoRadio.value === 'A' || estadoRadio.value === 'T')}`);
+                    
+                    if (checkboxDesktop) {
+                        console.log(`  Desktop - Disabled: ${checkboxDesktop.disabled}, Checked: ${checkboxDesktop.checked}`);
+                    }
+                    if (checkboxMobile) {
+                        console.log(`  Mobile - Disabled: ${checkboxMobile.disabled}, Checked: ${checkboxMobile.checked}`);
+                    }
+                });
+                
+                console.log('=== FIN VERIFICACIÓN ===');
+            };
+
+            // NUEVA FUNCIÓN: Verificar que no hay duplicados
+            window.verificarDuplicados = function() {
+                console.log('=== VERIFICACIÓN DE DUPLICADOS ===');
+                const todosLosElementos = document.querySelectorAll('[data-asignacion]');
+                const asignacionesUnicas = new Set();
+                const contadorPorAsignacion = {};
+
+                todosLosElementos.forEach(elemento => {
+                    const id = elemento.dataset.asignacion;
+                    asignacionesUnicas.add(id);
+                    contadorPorAsignacion[id] = (contadorPorAsignacion[id] || 0) + 1;
+                });
+
+                console.log('Total elementos encontrados:', todosLosElementos.length);
+                console.log('Asignaciones únicas:', asignacionesUnicas.size);
+                console.log('Conteo por asignación:', contadorPorAsignacion);
+
+                // Detectar duplicados
+                const duplicados = Object.entries(contadorPorAsignacion).filter(([id, count]) => count > 1);
+                if (duplicados.length > 0) {
+                    console.log('⚠️ DUPLICADOS DETECTADOS:', duplicados);
+                } else {
+                    console.log('✅ No hay duplicados');
+                }
+
+                return {
+                    total: todosLosElementos.length,
+                    unicos: asignacionesUnicas.size,
+                    duplicados: duplicados
+                };
+            };
+
+            // Función para verificar el estado de todos los checkboxes
+            window.verificarCheckboxes = function() {
+                console.log('=== VERIFICACIÓN DE CHECKBOXES ===');
+                const estudiantes = document.querySelectorAll('[data-asignacion]');
+                estudiantes.forEach((elemento, index) => {
+                    const asignacionId = elemento.dataset.asignacion;
+
+                    const checkboxDesktop = document.querySelector(
+                        `#justificado_desktop_${asignacionId}`);
+                    const checkboxMobile = document.querySelector(
+                        `#justificado_mobile_${asignacionId}`);
+
+                    console.log(`Estudiante ${index + 1} (ID: ${asignacionId}):`);
+                    console.log(`  Checkbox desktop: ${checkboxDesktop ? 'SÍ' : 'NO'}`);
+                    console.log(`  Checkbox mobile: ${checkboxMobile ? 'SÍ' : 'NO'}`);
+
+                    if (checkboxDesktop) {
+                        console.log(`  Desktop checked: ${checkboxDesktop.checked}`);
+                    }
+                    if (checkboxMobile) {
+                        console.log(`  Mobile checked: ${checkboxMobile.checked}`);
+                    }
+                });
+                console.log('=== FIN VERIFICACIÓN ===');
+            };
+
+            // Función para probar marcar algunos checkboxes
+            window.testCheckboxes = function() {
+                console.log('=== TEST DE CHECKBOXES ===');
+                const checkboxesDesktop = document.querySelectorAll(
+                    'input[type="checkbox"][id*="justificado_desktop_"]');
+                const checkboxesMobile = document.querySelectorAll(
+                    'input[type="checkbox"][id*="justificado_mobile_"]');
+
+                console.log('Checkboxes desktop encontrados:', checkboxesDesktop.length);
+                console.log('Checkboxes mobile encontrados:', checkboxesMobile.length);
+
+                // Marcar los primeros 2 checkboxes desktop
+                checkboxesDesktop.forEach((checkbox, index) => {
+                    if (index < 2) {
+                        checkbox.checked = true;
+                        console.log(`Marcado checkbox desktop ${index + 1}: ${checkbox.id}`);
+
+                        // Sincronizar con el mobile correspondiente
+                        const asignacionId = checkbox.id.replace('justificado_desktop_', '');
+                        const checkboxMobile = document.querySelector(
+                            `#justificado_mobile_${asignacionId}`);
+                        if (checkboxMobile) {
+                            checkboxMobile.checked = true;
+                            console.log(
+                                `Sincronizado checkbox mobile: justificado_mobile_${asignacionId}`);
+                        }
+                    }
+                });
+
+                console.log('Test completado. Verificar estado:');
+                verificarCheckboxes();
+            };
+
+            // Agregar event listeners para los checkboxes de justificado
+            const checkboxesDesktop = document.querySelectorAll(
+                'input[type="checkbox"][id*="justificado_desktop_"]');
+            const checkboxesMobile = document.querySelectorAll('input[type="checkbox"][id*="justificado_mobile_"]');
+
+            console.log('Checkboxes desktop encontrados para sync:', checkboxesDesktop.length);
+            console.log('Checkboxes mobile encontrados para sync:', checkboxesMobile.length);
+
+            // Sincronizar desktop -> mobile
+            checkboxesDesktop.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const asignacionId = this.id.replace('justificado_desktop_', '');
+                    const checkboxMobile = document.querySelector(
+                        `#justificado_mobile_${asignacionId}`);
+                    if (checkboxMobile) {
+                        checkboxMobile.checked = this.checked;
+                        console.log(`Sincronizado desktop -> mobile (${asignacionId}):`, this
+                            .checked);
+                    }
+                });
+            });
+
+            // Sincronizar mobile -> desktop
+            checkboxesMobile.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const asignacionId = this.id.replace('justificado_mobile_', '');
+                    const checkboxDesktop = document.querySelector(
+                        `#justificado_desktop_${asignacionId}`);
+                    if (checkboxDesktop) {
+                        checkboxDesktop.checked = this.checked;
+                        console.log(`Sincronizado mobile -> desktop (${asignacionId}):`, this
+                            .checked);
+                    }
+                });
+            });
+
+            console.log('Sincronización de checkboxes configurada');
+
             console.log('Inicialización completada. Funciones disponibles:');
+            console.log('- verificarEstadoJustificado(): Verifica el estado de los checkboxes según asistencia');
+            console.log('- verificarDuplicados(): Verifica si hay elementos duplicados');
             console.log('- testMarcarTodos(): Prueba marcar todos como presentes');
             console.log('- verificarRadios(): Muestra el estado de todos los radios');
+            console.log('- verificarCheckboxes(): Muestra el estado de todos los checkboxes de justificado');
+            console.log('- testCheckboxes(): Marca algunos checkboxes para prueba');
             console.log('- testCSRF(): Prueba la funcionalidad CSRF');
         });
     </script>
