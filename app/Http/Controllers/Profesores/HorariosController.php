@@ -1,16 +1,16 @@
 <?php
+
 namespace App\Http\Controllers\Profesores;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 class HorariosController extends Controller
 {
     public function index(Request $request)
     {
-        // Días: clave = código en la DB, valor = etiqueta visible
+        // Días: clave = código que guarda la base (LUN/MAR/...) ; etiqueta = lo que se muestra
         $dias = [
             'LUN' => 'LUNES',
             'MAR' => 'MARTES',
@@ -19,14 +19,14 @@ class HorariosController extends Controller
             'VIE' => 'VIERNES',
         ];
 
-        // Traer las horas activas ordenadas por hora de inicio (hd)
+        // 1) Horas activas (crea las filas)
         $horas = DB::table('horas')
             ->where('activo', 1)
             ->orderBy('hd')
             ->get();
 
-        // Base query para registros
-        $query = DB::table('horarios')
+        // 2) Registros de horarios (sin subconsulta profesor)
+        $registros = DB::table('horarios')
             ->join('horas', 'horarios.id_horas', '=', 'horas.id')
             ->leftJoin('cupof', 'horarios.cupof', '=', 'cupof.cupof')
             ->leftJoin('materias', 'cupof.id_materias', '=', 'materias.id')
@@ -39,60 +39,62 @@ class HorariosController extends Controller
                 'materias.nombre as materia',
                 'materias.abreviatura as materia_abrev',
                 'salones.numero as salon_numero',
+                'salones.id as salon_id',
                 'cupof.cupof as cupof_id'
             )
             ->where('horarios.estado', 'A')
-            ->where('horas.activo', 1);
+            ->where('horas.activo', 1)
+            ->get();
 
-        // Intento detectar tabla persona(s) y columna en cupof para hacer join profesor
-        $personaTables = ['personas', 'persona'];
-        $personaTable = null;
-        foreach ($personaTables as $pt) {
-            if (Schema::hasTable($pt)) {
-                $personaTable = $pt;
-                break;
-            }
-        }
+        // 3) Extraer cupof únicos
+        $cupofs = collect($registros)->pluck('cupof_id')->filter()->unique()->values()->all();
 
-        if ($personaTable) {
-            // nombres de columnas posibles en cupof que apuntan a persona
-            $possibleCols = ['id_persona', 'id_docente', 'id_personal', 'id_personas', 'persona_id', 'docente_id'];
-            foreach ($possibleCols as $col) {
-                if (Schema::hasColumn('cupof', $col) && Schema::hasColumn($personaTable, 'id')) {
-                    // hacemos left join dinámico y seleccionamos nombre completo del docente
-                    $query->leftJoin($personaTable, 'cupof.' . $col, '=', $personaTable . '.id')
-                          ->addSelect(DB::raw("CONCAT(COALESCE({$personaTable}.apellido,''),' ',COALESCE({$personaTable}.nombre,'')) as profesor"));
-                    break;
+        // 4) Mapear cupof => profesor (última revista activa por cupof)
+        $profesoresMap = [];
+        if (!empty($cupofs)) {
+            $rows = DB::table('revista as r')
+                ->join('tipousuario as t', 'r.id_tipousuario', '=', 't.id')
+                ->join('persona as p', 't.id_persona', '=', 'p.id')
+                ->select('r.cupof', 'r.secuencia', 'r.id as revista_id', DB::raw("CONCAT(p.apellido,' ',p.nombre) as profesor"))
+                ->whereIn('r.cupof', $cupofs)
+                ->where('r.estado', 'A')
+                ->orderBy('r.cupof')
+                ->orderBy('r.secuencia', 'desc')
+                ->orderBy('r.id', 'desc')
+                ->get();
+
+            // Tomamos la primera fila por cupof (ya ordenado por secuencia,id desc)
+            foreach ($rows as $row) {
+                $cup = $row->cupof;
+                if (!isset($profesoresMap[$cup])) {
+                    $profesoresMap[$cup] = $row->profesor;
                 }
             }
         }
 
-        $registros = $query->get();
-
-        // Construir la estructura: 'horaLabel' => ['LUN' => [...], 'MAR' => null, ...]
+        // 5) Construir la estructura final $horarios
         $horarios = [];
-
-        // Inicializo filas a partir de las horas (uso hd-hh si no existe nombre)
         foreach ($horas as $h) {
             $label = trim($h->nombre) ?: (trim($h->hd) . ' - ' . trim($h->hh));
             $horarios[$label] = array_fill_keys(array_keys($dias), null);
         }
 
-        // Relleno con los registros obtenidos
         foreach ($registros as $r) {
             $label = trim($r->hora_nombre) ?: (trim($r->hd) . ' - ' . trim($r->hh));
-            $dia = strtoupper(trim($r->dia)); // LUN/MAR/...
+            $dia = strtoupper(trim($r->dia)); // debe ser LUN/MAR/...
 
             if (!array_key_exists($label, $horarios)) {
                 $horarios[$label] = array_fill_keys(array_keys($dias), null);
             }
 
+            $cup = $r->cupof_id;
             $info = [
                 'titulo' => $r->materia ?? null,
                 'abreviatura' => $r->materia_abrev ?? null,
                 'salon' => $r->salon_numero ?? null,
-                'cupof' => $r->cupof_id ?? null,
-                'profesor' => $r->profesor ?? null, // puede venir o no
+                'salon_id' => $r->salon_id ?? null,
+                'cupof' => $cup ?? null,
+                'profesor' => $cup && isset($profesoresMap[$cup]) ? $profesoresMap[$cup] : null,
             ];
 
             if (array_key_exists($dia, $horarios[$label])) {
