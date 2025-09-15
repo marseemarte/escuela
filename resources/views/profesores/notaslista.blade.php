@@ -7,37 +7,37 @@
             <table class="w-full text-sm text-left rtl:text-right text-gray-500">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 text-center">
                     <tr>
-                        <th class="px-4 py-3 ">
+                        <th class="px-2 py-3 ">
                             Nombre
                         </th>
-                        <th class="px-4 py-3 ">
+                        <th class="px-2 py-3 ">
                             Apellido
                         </th>
-                        <th class="px-4 py-3 ">
+                        <th class="px-2 py-3 ">
                             1° Informe
                         </th>
-                        <th class="px-4 py-3 ">
+                        <th class="px-2 py-3 ">
                             1° Cuatrimestre
                         </th>
-                        <th class="px-4 py-3 ">
+                        <th class="px-2 py-3 ">
                             2° Informe
                         </th>
-                        <th class="px-4 py-3 ">
+                        <th class="px-2 py-3 ">
                             2° Cuatrimestre
                         </th>
-                        <th class="px-4 py-3 ">
+                        <th class="px-2 py-3 ">
                             Cierre
                         </th>
-                        <th class="px-4 py-3 ">
+                        <th class="px-2 py-3 ">
                             Diciembre
                         </th>
-                        <th class="px-4 py-3 ">
+                        <th class="px-2 py-3 ">
                             Febrero
                         </th>
-                        <th class="px-4 py-3 ">
+                        <th class="px-2 py-3 ">
                             Nota Final
                         </th>
-                        <th class="px-4 py-3 ">
+                        <th class="px-2 py-3 ">
                             Opciones
                         </th>
                     </tr>
@@ -72,75 +72,6 @@
                         </td>
                         <td class="px-6 py-3">
                             <p style="color:green;">TEP</p>
-                        </td>
-                        <td class="px-6 py-3">
-                           <button data-modal-target="default-modal" data-modal-toggle="default-modal" class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">Editar</button>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b border-gray-200">
-                        <td class="px-6 py-3">
-                            Aaron
-                        </td>
-                        <td class="px-6 py-3">
-                            Cascino
-                        </td>
-                        <td class="px-6 py-3">
-                            
-                        </td>
-                        <td class="px-6 py-3">
-
-                        </td>
-                        <td class="px-6 py-3">
-
-                        </td>
-                        <td class="px-6 py-3">
-
-                        </td>
-                        <td class="px-6 py-3">
-
-                        </td>
-                        <td class="px-6 py-3">
-
-                        </td>
-                        <td class="px-6 py-3">
-
-                        </td>
-                        <td class="px-6 py-3">
-                            <p style="color:green;">TEP</p>
-                        </td>
-                        <td class="px-6 py-3">
-                           <button data-modal-target="default-modal" data-modal-toggle="default-modal" class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">Editar</button>
-                        </td>
-                    </tr>
-                    <tr class="bg-white border-b border-gray-200">
-                        <td class="px-6 py-3">
-                            Lionel
-                        </td>
-                        <td class="px-6 py-3">
-                            Frate
-                        </td>
-                        <td class="px-6 py-3">
-                        </td>
-                        <td class="px-6 py-3">
-                            
-                        </td>
-                        <td class="px-6 py-3">
-
-                        </td>
-                        <td class="px-6 py-3">
-
-                        </td>
-                        <td class="px-6 py-3">
-
-                        </td>
-                        <td class="px-6 py-3">
-
-                        </td>
-                        <td class="px-6 py-3">
-
-                        </td>
-                        <td class="px-6 py-3">
-                            <p style="color:blue;">TEA</p>
                         </td>
                         <td class="px-6 py-3">
                            <button data-modal-target="default-modal" data-modal-toggle="default-modal" class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">Editar</button>
