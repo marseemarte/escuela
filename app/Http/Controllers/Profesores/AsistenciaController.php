@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Log;
 
 class AsistenciaController extends Controller
 {
-    public function materias(Request $request)
+    public function index(Request $request)
     {
         // Obtener materias del profesor logueado
         $profesor = Auth::user();
@@ -429,7 +429,7 @@ class AsistenciaController extends Controller
         }
     }
 
-    public function porcentajes(Request $request, $cupof)
+    public function totales(Request $request, $cupof)
     {
         try {
             // Verificar autenticación

@@ -53,6 +53,18 @@ class Persona extends Authenticatable
         return $this->hasMany(TipoUsuario::class, 'id_persona');
     }
 
+    /**
+     * Determine si la persona tiene el tipo 'Personal' (profesor).
+     */
+    public function isProfesor(): bool
+    {
+        return $this->tiposUsuario()
+            ->whereHas('tipoPersona', function ($q) {
+                $q->where('tipo', 'Profesor');
+            })
+            ->exists();
+    }
+
     // Scopes y Accessors
     public function getNombreCompletoAttribute()
     {
