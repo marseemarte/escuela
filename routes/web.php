@@ -27,7 +27,7 @@ Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->
 
     Route::apiResource('notas', NotaController::class);
     Route::post('notas/materias', [NotaController::class, 'materias'])->name('profesores.notas.materias');
-    Route::post('notas/materias/lista', [NotaController::class, 'lista'])->name('profesores.notas.materias.lista');
+    Route::get('notas/materias/lista', [NotaController::class, 'lista'])->name('profesores.notas.materias.lista');
 
     // Rutas específicas de asistencias (sin apiResource completo)
     Route::get('asistencias', [AsistenciaController::class, 'index'])->name('profesores.asistencias.index');
