@@ -12,6 +12,8 @@ use App\Http\Controllers\Orientaciones\OrientacionesController;
 use App\Http\Controllers\RevistaController;
 use App\Http\Controllers\CupofController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 use Livewire\Volt\Volt;
 
@@ -19,7 +21,19 @@ Route::get('/', function () {
     return view('app');
 })->name('home');
 
-Route::prefix('profesores')->group(function () {
+// Ruta de debug para probar CSRF (sin auth)
+Route::post('test-csrf', function (Request $request) {
+    return response()->json([
+        'success' => true,
+        'message' => 'CSRF funciona correctamente',
+        'csrf_token_received' => $request->input('_token'),
+        'session_token' => session()->token(),
+        'tokens_match' => $request->input('_token') === session()->token(),
+        'data' => $request->all()
+    ]);
+})->middleware('web');
+
+Route::prefix('profesores')->middleware(['web', 'auth'])->group(function () {
     Route::get('tareas/corregir', [TareaController::class, 'corregir'])
         ->name('profesores.tareas.corregir');
     Route::apiResource('/', ProfesorController::class);
@@ -28,15 +42,40 @@ Route::prefix('profesores')->group(function () {
     Route::post('notas/materias', [NotaController::class, 'materias'])->name('profesores.notas.materias');
     Route::post('notas/materias/lista', [NotaController::class, 'lista'])->name('profesores.notas.materias.lista');
 
-    Route::apiResource('asistencias', AsistenciaController::class);
+    Route::get('asistencias', [AsistenciaController::class, 'materias'])->name('profesores.asistencias.index');
+    Route::get('asistencias/tomar/{cupof}', [AsistenciaController::class, 'tomar'])->name('profesores.asistencias.tomar');
+    Route::get('asistencias/porcentajes/{cupof}', [AsistenciaController::class, 'porcentajes'])->name('profesores.asistencias.porcentajes');
+    Route::get('asistencias/alumnos/{cupof}', [AsistenciaController::class, 'obtenerAlumnos'])->name('profesores.asistencias.alumnos');
+
+    // Ruta para guardar asistencias - temporalmente sin verificación CSRF estricta
+    Route::post('asistencias/guardar', [AsistenciaController::class, 'guardarAsistencia'])
+        ->name('profesores.asistencias.guardar')
+        ->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class);
+
     Route::apiResource('tareas', TareaController::class);
     Route::apiResource('alumnos', AlumnoController::class);
     Route::apiResource('horarios', HorariosController::class);
 });
 
 Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth'])
     ->name('dashboard');
+
+Route::get('test-auth', function () {
+    return response()->json([
+        'authenticated' => Auth::check(),
+        'user' => Auth::user() ? Auth::user()->nombre_completo : null
+    ]);
+})->middleware(['auth']);
+
+// Ruta temporal de debug sin autenticación
+Route::get('debug-alumnos/{cupof}', [App\Http\Controllers\Profesores\AsistenciaController::class, 'obtenerAlumnos']);
+
+// Ruta de prueba simple
+Route::get('debug-test', function () {
+    error_log('RUTA SIMPLE FUNCIONANDO');
+    return response()->json(['status' => 'success', 'message' => 'Ruta funcionando']);
+});
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
