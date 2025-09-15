@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Http\Controllers\Profesores;
 
 use App\Http\Controllers\Controller;
@@ -14,7 +15,7 @@ use Illuminate\Support\Facades\Log;
 
 class AsistenciaController extends Controller
 {
-    public function index(Request $request)
+    public function materias(Request $request)
     {
         // Obtener materias del profesor logueado
         $profesor = Auth::user();
