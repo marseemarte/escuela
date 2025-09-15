@@ -18,7 +18,7 @@
             <tbody>
                 <tr class="bg-white border-b hover:bg-gray-50">
                     <td class="px-6 py-4 font-medium text-gray-900">Juan Pérez</td>
-                    <td class="px-6 py-4">Respuesta del alumno...</td>
+                    <td><a href="#" class="text-blue-600 hover:underline">Ver Archivo</a></td>
 
                     <td class="px-6 py-4">
                         <input type="number" min="1" max="10" class="nota w-16 border rounded px-2 py-1 text-center">
@@ -41,7 +41,7 @@
 
                 <tr class="bg-white border-b hover:bg-gray-50">
                     <td class="px-6 py-4 font-medium text-gray-900">María López</td>
-                    <td class="px-6 py-4">Otra respuesta...</td>
+                    <td><a href="#" class="text-blue-600 hover:underline">Ver Archivo</a></td>
                     
                     <td class="px-6 py-4">
                         <input type="number" min="1" max="10" class="nota w-16 border rounded px-2 py-1 text-center">
