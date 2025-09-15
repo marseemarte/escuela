@@ -17,31 +17,38 @@ class AsistenciaController extends Controller
 {
     public function index(Request $request)
     {
-        // Obtener materias del profesor logueado
-        $profesor = Auth::user();
+        // Verificar si el usuario es profesor
+        $usuario = Auth::user();
 
-        $materias = DB::table('cupof')
-            ->join('materias', 'cupof.id_materias', '=', 'materias.id')
-            ->join('cursos', 'cupof.id_cursos', '=', 'cursos.id')
-            ->join('grupos', 'cupof.id_grupos', '=', 'grupos.id')
-            ->join('revista', 'cupof.cupof', '=', 'revista.cupof')
-            ->join('tipousuario', 'revista.id_tipousuario', '=', 'tipousuario.id')
-            ->join('persona', 'tipousuario.id_persona', '=', 'persona.id')
-            ->where('persona.dni', $profesor->dni)
-            ->where('cupof.estado', 'A')
-            ->where('revista.situacion', 'A') // Solo asignaciones activas
-            ->select(
-                'cupof.cupof',
-                'materias.nombre as materia_nombre',
-                'cursos.division',
-                'cursos.ano',
-                'grupos.nombre as grupo_nombre',
-                'cupof.turno'
-            )
-            ->distinct()
-            ->get();
+        if ($usuario && method_exists($usuario, 'isProfesor') && $usuario->isProfesor()) {
+            // Lógica para profesores
+            $materias = DB::table('cupof')
+                ->join('materias', 'cupof.id_materias', '=', 'materias.id')
+                ->join('cursos', 'cupof.id_cursos', '=', 'cursos.id')
+                ->join('grupos', 'cupof.id_grupos', '=', 'grupos.id')
+                ->join('revista', 'cupof.cupof', '=', 'revista.cupof')
+                ->join('tipousuario', 'revista.id_tipousuario', '=', 'tipousuario.id')
+                ->join('persona', 'tipousuario.id_persona', '=', 'persona.id')
+                ->where('persona.dni', $usuario->dni)
+                ->where('cupof.estado', 'A')
+                ->where('revista.situacion', 'A') // Solo asignaciones activas
+                ->select(
+                    'cupof.cupof',
+                    'materias.nombre as materia_nombre',
+                    'cursos.division',
+                    'cursos.ano',
+                    'grupos.nombre as grupo_nombre',
+                    'cupof.turno'
+                )
+                ->distinct()
+                ->get();
 
-        return view('profesores.asistencias.index', compact('materias'));
+            return view('profesores.asistencias.index', compact('materias'));
+        } else {
+            // Lógica para estudiantes/padres - mostrar asistencias del alumno
+            // Por ahora, redirigir al dashboard
+            return redirect()->route('dashboard')->with('info', 'Vista de asistencias para estudiantes en desarrollo');
+        }
     }
 
     public function tomar(Request $request, $cupof)

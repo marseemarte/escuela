@@ -20,6 +20,11 @@ Route::get('/', function () {
     return view('app');
 })->name('home');
 
+// Rutas de asistencias para usuarios generales (estudiantes/padres)
+Route::middleware(['auth'])->group(function () {
+    Route::get('asistencias', [AsistenciaController::class, 'index'])->name('asistencias.index');
+});
+
 Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->group(function () {
     Route::get('tareas/corregir', [TareaController::class, 'corregir'])
         ->name('profesores.tareas.corregir');
@@ -105,3 +110,11 @@ Route::view('/turismo', 'orientaciones.turismo.index')->name('turismo.index');
 
 // Ruta temporal para testing de totales (sin middleware)
 Route::get('/test/totales/{cupof}', [App\Http\Controllers\Profesores\AsistenciaController::class, 'totales'])->name('test.totales');
+
+// Ruta de prueba temporal para verificar CSRF
+Route::post('test-csrf', function () {
+    return response()->json(['status' => 'success', 'message' => 'CSRF token válido']);
+})->name('test.csrf');
+
+// Incluir rutas de autenticación
+require __DIR__ . '/auth.php';

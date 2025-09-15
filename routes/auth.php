@@ -16,7 +16,6 @@ Route::middleware('guest')->group(function () {
 
     Volt::route('reset-password/{token}', 'auth.reset-password')
         ->name('password.reset');
-
 });
 
 Route::middleware('auth')->group(function () {
@@ -33,3 +32,8 @@ Route::middleware('auth')->group(function () {
 
 Route::post('logout', App\Livewire\Actions\Logout::class)
     ->name('logout');
+
+// Ruta GET para logout que redirecciona al login (por si alguien accede directamente)
+Route::get('logout', function () {
+    return redirect()->route('login')->with('info', 'Para cerrar sesión, use el botón correspondiente.');
+});

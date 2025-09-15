@@ -112,7 +112,8 @@
                                                 class="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out checkbox-justificado"
                                                 {{ $alumno->justificado === '1' ? 'checked' : '' }}
                                                 {{ $alumno->estado_asistencia === 'P' ? 'disabled' : '' }}>
-                                            <span class="ml-2 text-sm {{ $alumno->estado_asistencia === 'P' ? 'text-gray-400' : 'text-gray-700' }}">Justificado</span>
+                                            <span
+                                                class="ml-2 text-sm {{ $alumno->estado_asistencia === 'P' ? 'text-gray-400' : 'text-gray-700' }}">Justificado</span>
                                         </label>
                                     </td>
                                 </tr>
@@ -183,7 +184,8 @@
                                             class="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out checkbox-justificado"
                                             {{ $alumno->justificado === '1' ? 'checked' : '' }}
                                             {{ $alumno->estado_asistencia === 'P' ? 'disabled' : '' }}>
-                                        <span class="ml-2 text-sm {{ $alumno->estado_asistencia === 'P' ? 'text-gray-400' : 'text-gray-700' }}">Justificado</span>
+                                        <span
+                                            class="ml-2 text-sm {{ $alumno->estado_asistencia === 'P' ? 'text-gray-400' : 'text-gray-700' }}">Justificado</span>
                                     </label>
                                 </div>
                             </div>
@@ -341,7 +343,8 @@
                 if (estadoRadio) {
                     // IMPORTANTE: El justificado solo es válido para Ausente (A) o Tarde (T)
                     let justificadoValue = false;
-                    if ((estadoRadio.value === 'A' || estadoRadio.value === 'T') && justificadoCheckbox && justificadoCheckbox.checked) {
+                    if ((estadoRadio.value === 'A' || estadoRadio.value === 'T') && justificadoCheckbox &&
+                        justificadoCheckbox.checked) {
                         justificadoValue = true;
                     }
 
@@ -352,7 +355,9 @@
                     };
 
                     console.log('Datos finales para enviar:', asistenciaData);
-                    console.log(`  Estado: ${estadoRadio.value}, Justificado permitido: ${estadoRadio.value === 'A' || estadoRadio.value === 'T'}, Checkbox marcado: ${justificadoCheckbox ? justificadoCheckbox.checked : false}, Resultado final: ${justificadoValue}`);
+                    console.log(
+                        `  Estado: ${estadoRadio.value}, Justificado permitido: ${estadoRadio.value === 'A' || estadoRadio.value === 'T'}, Checkbox marcado: ${justificadoCheckbox ? justificadoCheckbox.checked : false}, Resultado final: ${justificadoValue}`
+                        );
                     asistencias.push(asistenciaData);
                 }
             });
@@ -516,12 +521,14 @@
                 }
 
                 const estadoSeleccionado = radioElement.value;
-                
+
                 // Encontrar ambos checkboxes (desktop y mobile)
                 const checkboxDesktop = document.querySelector(`#justificado_desktop_${asignacionId}`);
                 const checkboxMobile = document.querySelector(`#justificado_mobile_${asignacionId}`);
-                
-                console.log(`📋 Manejando checkbox justificado para asignación ${asignacionId}, estado: ${estadoSeleccionado}`);
+
+                console.log(
+                    `📋 Manejando checkbox justificado para asignación ${asignacionId}, estado: ${estadoSeleccionado}`
+                    );
 
                 // Habilitar/deshabilitar según el estado
                 if (estadoSeleccionado === 'P') {
@@ -561,14 +568,14 @@
             // NUEVO: Inicializar estado de checkboxes justificado según estado actual
             function inicializarCheckboxesJustificado() {
                 console.log('🔄 Inicializando estado de checkboxes justificado...');
-                
+
                 const todosLosRadios = document.querySelectorAll('input[type="radio"]:checked');
                 todosLosRadios.forEach(radio => {
                     if (radio.name.includes('asistencia')) {
                         handleJustificadoCheckbox(radio);
                     }
                 });
-                
+
                 console.log('✅ Inicialización de checkboxes completada');
             }
 
@@ -746,37 +753,47 @@
             // NUEVA FUNCIÓN: Verificar estado específico de justificados
             window.verificarEstadoJustificado = function() {
                 console.log('=== VERIFICACIÓN ESTADO JUSTIFICADO ===');
-                
+
                 const todosLosElementos = document.querySelectorAll('[data-asignacion]');
                 const asignacionesUnicas = new Set();
-                
+
                 todosLosElementos.forEach(elemento => {
                     asignacionesUnicas.add(elemento.dataset.asignacion);
                 });
-                
+
                 Array.from(asignacionesUnicas).forEach((asignacionId, index) => {
                     // Buscar estado actual
-                    let estadoRadio = document.querySelector(`input[name="asistencia_${asignacionId}"]:checked`);
+                    let estadoRadio = document.querySelector(
+                        `input[name="asistencia_${asignacionId}"]:checked`);
                     if (!estadoRadio) {
-                        estadoRadio = document.querySelector(`input[name="asistencia_mobile_${asignacionId}"]:checked`);
+                        estadoRadio = document.querySelector(
+                            `input[name="asistencia_mobile_${asignacionId}"]:checked`);
                     }
-                    
+
                     // Buscar checkboxes
-                    const checkboxDesktop = document.querySelector(`#justificado_desktop_${asignacionId}`);
-                    const checkboxMobile = document.querySelector(`#justificado_mobile_${asignacionId}`);
-                    
+                    const checkboxDesktop = document.querySelector(
+                        `#justificado_desktop_${asignacionId}`);
+                    const checkboxMobile = document.querySelector(
+                    `#justificado_mobile_${asignacionId}`);
+
                     console.log(`Estudiante ${index + 1} (ID: ${asignacionId}):`);
                     console.log(`  Estado: ${estadoRadio ? estadoRadio.value : 'SIN ESTADO'}`);
-                    console.log(`  Justificado permitido: ${estadoRadio && (estadoRadio.value === 'A' || estadoRadio.value === 'T')}`);
-                    
+                    console.log(
+                        `  Justificado permitido: ${estadoRadio && (estadoRadio.value === 'A' || estadoRadio.value === 'T')}`
+                        );
+
                     if (checkboxDesktop) {
-                        console.log(`  Desktop - Disabled: ${checkboxDesktop.disabled}, Checked: ${checkboxDesktop.checked}`);
+                        console.log(
+                            `  Desktop - Disabled: ${checkboxDesktop.disabled}, Checked: ${checkboxDesktop.checked}`
+                            );
                     }
                     if (checkboxMobile) {
-                        console.log(`  Mobile - Disabled: ${checkboxMobile.disabled}, Checked: ${checkboxMobile.checked}`);
+                        console.log(
+                            `  Mobile - Disabled: ${checkboxMobile.disabled}, Checked: ${checkboxMobile.checked}`
+                            );
                     }
                 });
-                
+
                 console.log('=== FIN VERIFICACIÓN ===');
             };
 
