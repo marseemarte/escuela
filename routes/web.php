@@ -8,6 +8,7 @@ use App\Http\Controllers\Profesores\HorariosController;
 use App\Http\Controllers\Cursos\CursoController;
 use App\Http\Controllers\Materias\MateriasController;
 use App\Http\Controllers\Orientaciones\OrientacionesController;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\RevistaController;
 use App\Http\Controllers\CupofController;
 use App\Http\Controllers\Profesores\AsistenciaController;
@@ -50,9 +51,14 @@ Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->
     Route::apiResource('horarios', HorariosController::class);
 });
 
+Route::view('/', 'welcome')->name('home');
+
 Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth'])
     ->name('dashboard');
+
+// Dashboard sin middleware para testing
+// Debug routes eliminadas - autenticación funcionando correctamente
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
@@ -115,6 +121,8 @@ Route::get('/test/totales/{cupof}', [App\Http\Controllers\Profesores\AsistenciaC
 Route::post('test-csrf', function () {
     return response()->json(['status' => 'success', 'message' => 'CSRF token válido']);
 })->name('test.csrf');
+
+// Debug routes eliminadas - autenticación funcionando correctamente
 
 // Incluir rutas de autenticación
 require __DIR__ . '/auth.php';

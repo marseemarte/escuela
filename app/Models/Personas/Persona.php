@@ -37,7 +37,7 @@ class Persona extends Authenticatable
     protected $casts = [
         'fechan' => 'date',
         'email_verified_at' => 'datetime',
-        'pass' => 'hashed', // Hashing para contraseñas
+        'pass' => 'hashed', // Laravel 12 maneja esto automáticamente
         'dni' => 'integer',
         'id_localidad' => 'integer',
     ];
@@ -111,12 +111,12 @@ class Persona extends Authenticatable
 
     public function getAuthIdentifier()
     {
-        return $this->mail;
+        return $this->getKey(); // Devolver la clave primaria (ID)
     }
 
     public function getAuthIdentifierName()
     {
-        return 'mail'; // Usar 'mail' en lugar de 'email'
+        return $this->getKeyName(); // Devolver el nombre de la clave primaria
     }
 
     public function getAuthPasswordName()
@@ -134,8 +134,6 @@ class Persona extends Authenticatable
         $this->attributes['pass'] = $value;
     }
 
-    public function setPassAttribute($value)
-    {
-        $this->attributes['pass'] = Hash::make($value);
-    }
+    // Eliminado el mutador setPassAttribute para evitar doble hash
+    // Laravel 12 con cast 'pass' => 'hashed' maneja esto automáticamente
 }

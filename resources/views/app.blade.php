@@ -430,6 +430,18 @@
         var localDate = new Date(utcDate.getTime() + (timezoneOffset * 60000));
         document.write("<script>var currentTime = '" + localDate.toISOString().slice(0, 19).replace('T', ' ') + "';</" +
             "script>");
+
+        // Asegurar que el pre-loader se oculte después de cargar
+        $(document).ready(function() {
+            setTimeout(function() {
+                $('.theme-loader').fadeOut('slow');
+            }, 1000);
+        });
+
+        // Si viene de Livewire, ocultar pre-loader inmediatamente
+        if (window.history.replaceState && window.location.href.includes('livewire')) {
+            $('.theme-loader').hide();
+        }
     </script>
 
 </body>

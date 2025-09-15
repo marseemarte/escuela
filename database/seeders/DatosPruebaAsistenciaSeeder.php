@@ -77,18 +77,18 @@ class DatosPruebaAsistenciaSeeder extends Seeder
 
         $alumnosIds = [];
         foreach ($alumnosData as $alumno) {
-            $alumnosIds[] = DB::table('persona')->insertGetId([
+            $alumnosIds[] = Persona::create([
                 'dni' => $alumno['dni'],
                 'apellido' => $alumno['apellido'],
                 'nombre' => $alumno['nombre'],
-                'fechan' => '2006-01-01',
+                'fechan' => '2005-01-01',
                 'sexo' => 'M',
                 'domicilio' => 'Calle Falsa 123',
                 'id_localidad' => $localidadId,
-                'pass' => Hash::make('123456'),
+                'pass' => '123456', // Sin hashear, que el modelo lo haga automáticamente
                 'telefono' => '11-0000-0000',
                 'mail' => Str::lower($alumno['nombre'] . '.' . $alumno['apellido']) . '@estudiante.edu.ar'
-            ]);
+            ])->id;
         }
 
         // 4. Crear tipos de usuario

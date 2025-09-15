@@ -11,10 +11,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Agregar middleware CSRF a rutas web
-        $middleware->web(append: [
-            \App\Http\Middleware\VerifyCsrfToken::class,
-        ]);
+        // Laravel 12 tiene el middleware configurado por defecto
+        // Solo agregamos configuraciones específicas si es necesario
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
