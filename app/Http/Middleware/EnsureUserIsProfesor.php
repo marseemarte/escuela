@@ -14,6 +14,18 @@ class EnsureUserIsProfesor
     {
         $user = $request->user();
 
+        // Debug temporal
+        if ($request->has('debug_middleware')) {
+            return response()->json([
+                'middleware' => 'EnsureUserIsProfesor',
+                'user_exists' => $user ? true : false,
+                'user_id' => $user ? $user->id : null,
+                'has_isProfesor_method' => $user ? method_exists($user, 'isProfesor') : false,
+                'is_profesor' => $user && method_exists($user, 'isProfesor') ? $user->isProfesor() : false,
+                'url' => $request->url()
+            ]);
+        }
+
         if (! $user || ! method_exists($user, 'isProfesor') || ! $user->isProfesor()) {
             abort(403, 'Acceso restringido a profesores');
         }
