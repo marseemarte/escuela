@@ -1,12 +1,13 @@
 <x-layouts.profesores.dashboard titulo="Tareas"> 
+
    
     <h1 class="text-2xl font-semibold mb-2">Tareas</h1>
     <p class="mb-6 text-gray-600">Gestiona las tareas que compartes con tus cursos. 
         Aquí puedes subir archivos, ver a qué curso se asignaron y hacer el seguimiento de respuestas.</p>
 
     <!-- Botón para subir nueva tarea -->
-    <button class="btn btn-primary bg-blue-600 text-white px-4 py-2 rounded-lg shadow mb-3" id="openModalBtn">
-        + Subir nueva tarea
+    <button class="btn btn-primary bg-blue-600 text-white px-4 py-2 rounded-lg shadow mb-3 cursor-pointer" id="openModalBtn">
+        + Subir nuevo archivo
     </button>
 
     <!-- Modal para subir tareas--> 
@@ -15,7 +16,7 @@
            class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative transform transition-all duration-300 scale-95 opacity-0">
 
         <!-- Botón cerrar -->
-        <button id="closeModalBtn" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+        <button id="closeModalBtn" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 cursor-pointer">
           ✕
         </button>
 
@@ -23,10 +24,10 @@
         <div id="modalSeleccion" class="text-center">
           <h2 class="text-xl font-semibold mb-6">¿Qué deseas subir?</h2>
           <div class="flex flex-col gap-3">
-            <button id="btnModulo" class="px-4 py-2 rounded bg-indigo-500 text-white hover:bg-indigo-600">
+            <button id="btnModulo" class="px-4 py-2 rounded bg-indigo-500 text-white hover:bg-indigo-600 cursor-pointer">
               📘 Módulo de teoría
             </button>
-            <button id="btnTarea" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">
+            <button id="btnTarea" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 cursor-pointer">
               📑 Tarea con fecha de entrega
             </button>
           </div>
@@ -57,7 +58,7 @@
               </select>
             </div>
 
-            <!-- Campo fecha (solo para tarea) -->
+            <!-- Campo fecha de entrega (solo para tarea) -->
             <div id="fechaEntrega" class="mb-4 hidden">
               <label class="block text-sm font-medium text-gray-700">Fecha de entrega</label>
               <input type="date" name="fecha_entrega"
@@ -79,54 +80,92 @@
               </div>
             </div>
 
-          <!-- Boton Cerrar y Subir -->
-          <div class="flex justify-end space-x-2">
-            <button type="button" id="cancelModalBtn" 
-                    class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400">Cancelar</button>
-            <button type="submit" 
-                    class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">Subir</button>
-          </div>
+            <!-- Boton Cerrar y Subir -->
+            <div class="flex justify-end space-x-2">
+              <button type="button" id="cancelModalBtn" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 cursor-pointer">
+                Cancelar
+              </button>
+              <button type="submit" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 cursor-pointer">
+                Subir
+              </button>
+            </div>
           </form>
         </div>
       </div>
     </div>
 
-    <!-- Tabla de tareas -->
-    <div class="overflow-x-auto shadow-md sm:rounded-lg mt-3">
-        <table class="w-full text-sm text-center text-gray-600 table-fixed">
-            <thead class="bg-gray-50 text-gray-700 uppercase text-xs">
-                <tr>
-                    <th class="px-6 py-3 w-1/5">Nombre</th>
-                    <th class="px-6 py-3 w-1/5">Curso</th>
-                    <th class="px-6 py-3 w-1/5">Archivo</th>
-                    <th class="px-6 py-3 w-1/5">Fecha de entrega</th>
-                    <th class="px-6 py-3 w-1/5">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="bg-white border-b hover:bg-gray-50">
-                    <td class="px-6 py-4 font-medium text-gray-900">Ejercicio de Matematica</td>
-                    <td class="px-6 py-4">2°A</td>
-                    <td><a href="#" class="text-blue-600 hover:underline">Ver Archivo</a></td>
-                    <td class="px-6 py-4">—</td>
-                    <td class="text-center">
-                        <button class="btn btn-sm btn-outline-info me-2 text-green-600 hover:underline seguimientoBtn">Seguimiento</button>
-                        <button class="btn btn-sm btn-outline-danger text-red-600 hover:underline">Eliminar</button>
-                    </td>
-                </tr>
-                <tr class="bg-white border-b hover:bg-gray-50">
-                    <td class="px-6 py-4 font-medium text-gray-900">Revolucion Francesa</td>
-                    <td class="px-6 py-4">3°B</td>
-                    <td><a href="#" class="text-blue-600 hover:underline">Ver Archivo</a></td>
-                    <td class="px-6 py-4">—</td>
-                    <td class="text-center">
-                        <button class="btn btn-sm btn-outline-info me-2 text-green-600 hover:underline seguimientoBtn">Seguimiento</button>
-                        <button class="btn btn-sm btn-outline-danger text-red-600 hover:underline">Eliminar</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+<div class="mb-4">
+    <nav class="flex space-x-2">
+        <button id="tabModulos" 
+                style="padding:0.5rem 1rem; border-radius:0.5rem 0.5rem 0 0; 
+                       background-color:#c0c0c0; color:#fff; font-weight:500; border:none; cursor:pointer; transition:all 0.2s; border-bottom:3px solid transparent; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+            Módulos de teoría
+        </button>
+        <button id="tabTareas" 
+                style="padding:0.5rem 1rem; border-radius:0.5rem 0.5rem 0 0; 
+                       background-color:#c0c0c0; color:#fff; font-weight:500; border:none; cursor:pointer; transition:all 0.2s; border-bottom:3px solid transparent; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+            Tareas con fecha de entrega
+        </button>
+    </nav>
+</div>
+
+
+
+<!-- Sección Módulos de teoría -->
+<div id="modulosSection" class="overflow-x-auto shadow-md sm:rounded-lg">
+    <table class="w-full text-sm text-center text-gray-600 table-fixed">
+        <thead class="bg-gray-50 text-gray-700 uppercase text-xs">
+            <tr>
+                <th class="px-6 py-3">Nombre</th>
+                <th class="px-6 py-3">Curso</th>
+                <th class="px-6 py-3">Fecha de subida</th>
+                <th class="px-6 py-3">Archivo</th>
+                <th class="px-6 py-3">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="bg-white border-b hover:bg-gray-50">
+                <td class="px-6 py-4 font-medium text-gray-900">Módulo de Álgebra</td>
+                <td class="px-6 py-4">2°A</td>
+                <td class="px-6 py-4">-</td>
+                <td><a href="#" class="text-blue-600 hover:underline">Ver Archivo</a></td>
+                <td>
+                    <button class="btn btn-sm btn-outline-info me-2 text-green-600 hover:underline seguimientoBtn cursor-pointer">Seguimiento</button>
+                    <button class="btn btn-sm btn-outline-danger text-red-600 hover:underline cursor-pointer">Eliminar</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Sección Tareas con fecha de entrega -->
+<div id="tareasSection" class="overflow-x-auto shadow-md sm:rounded-lg hidden">
+    <table class="w-full text-sm text-center text-gray-600 table-fixed">
+        <thead class="bg-gray-50 text-gray-700 uppercase text-xs">
+            <tr>
+                <th class="px-6 py-3">Nombre</th>
+                <th class="px-6 py-3">Curso</th>
+                <th class="px-6 py-3">Fecha de Subida</th>
+                <th class="px-6 py-3">Fecha de entrega</th>
+                <th class="px-6 py-3">Archivo</th>
+                <th class="px-6 py-3">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="bg-white border-b hover:bg-gray-50">
+                <td class="px-6 py-4 font-medium text-gray-900">Revolución Francesa</td>
+                <td class="px-6 py-4">3°B</td>
+                <td class="px-6 py-4">-</td>
+                <td class="px-6 py-4">-</td>
+                <td><a href="#" class="text-blue-600 hover:underline">Ver Archivo</a></td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-outline-info me-2 text-green-600 hover:underline seguimientoBtn cursor-pointer">Seguimiento</button>
+                    <button class="btn btn-sm btn-outline-danger text-red-600 hover:underline cursor-pointer">Eliminar</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
     <!-- Modal de seguimiento -->
     <div id="seguimientoModal" class="fixed inset-0 z-50 backdrop-blur bg-black/50 hidden items-center justify-center overflow-auto">
@@ -185,140 +224,194 @@
       </div>
     </div>
 
-    <script>
-      // Modal subir tareas
-      const openBtn = document.getElementById('openModalBtn');
-      const closeBtn = document.getElementById('closeModalBtn');
-      const cancelBtn = document.getElementById('cancelModalBtn');
-      const modal = document.getElementById('tareaModal');
-      const modalContent = document.getElementById('tareaModalContent');
-      const btnModulo = document.getElementById("btnModulo");
-      const btnTarea = document.getElementById("btnTarea");
-      const modalSeleccion = document.getElementById("modalSeleccion");
-      const modalFormulario = document.getElementById("modalFormulario");
-      const fechaEntrega = document.getElementById("fechaEntrega");
-      const archivoInput = document.getElementById('archivo');
-      const archivoNombre = document.getElementById('archivoNombre');
-      const eliminarBtns = document.querySelectorAll('.btn-outline-danger');
-      const eliminarModal = document.getElementById('eliminarModal');
-      const closeEliminarModalBtn = document.getElementById('closeEliminarModal');
-      const cancelEliminarBtn = document.getElementById('cancelEliminar');
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Modal subir tareas ---
+    const openBtn = document.getElementById('openModalBtn');
+    const closeBtn = document.getElementById('closeModalBtn');
+    const cancelBtn = document.getElementById('cancelModalBtn');
+    const modal = document.getElementById('tareaModal');
+    const modalContent = document.getElementById('tareaModalContent');
+    const btnModulo = document.getElementById("btnModulo");
+    const btnTarea = document.getElementById("btnTarea");
+    const modalSeleccion = document.getElementById("modalSeleccion");
+    const modalFormulario = document.getElementById("modalFormulario");
+    const fechaEntrega = document.getElementById("fechaEntrega");
+    const archivoInput = document.getElementById('archivo');
+    const archivoNombre = document.getElementById('archivoNombre');
 
-      function openModal() {
+    function openModal() {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
         setTimeout(() => {
-          modalContent.classList.remove('scale-95', 'opacity-0');
-          modalContent.classList.add('scale-100', 'opacity-100');
+            modalContent.classList.remove('scale-95', 'opacity-0');
+            modalContent.classList.add('scale-100', 'opacity-100');
         }, 20);
-      }
+    }
 
-      function closeModal() {
+    function closeModal() {
         modalContent.classList.add('scale-95', 'opacity-0');
         modalContent.classList.remove('scale-100', 'opacity-100');
         setTimeout(() => {
-          modal.classList.add('hidden');
-          modal.classList.remove('flex');
-          modalSeleccion.classList.remove("hidden");
-          modalFormulario.classList.add("hidden");
-          fechaEntrega.classList.add("hidden");
-          limpiarFormulario();
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            modalSeleccion.classList.remove("hidden");
+            modalFormulario.classList.add("hidden");
+            fechaEntrega.classList.add("hidden");
+            limpiarFormulario();
         }, 300);
-      }
+    }
 
-      openBtn.addEventListener('click', openModal);
-      closeBtn.addEventListener('click', closeModal);
-      cancelBtn.addEventListener('click', closeModal);
-
-      function limpiarFormulario() {
-        // Limpiar inputs comunes
+    function limpiarFormulario() {
         document.querySelector('input[name="nombre"]').value = '';
         document.querySelector('input[name="archivo"]').value = '';
-        document.getElementById('archivoNombre').textContent = "No se ha seleccionado ningún archivo";
-
-        // Limpiar campos de tarea
+        archivoNombre.textContent = "No se ha seleccionado ningún archivo";
         document.querySelector('input[name="fecha_entrega"]').value = '';
-
-        // reiniciar select de curso
         const cursoSelect = document.querySelector('select[name="curso"]');
-        if(cursoSelect) {
-            cursoSelect.selectedIndex = 0;
-        }
-     }
+        if(cursoSelect) cursoSelect.selectedIndex = 0;
+    }
 
-      btnModulo.addEventListener("click", () => {
+    openBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+
+    btnModulo.addEventListener("click", () => {
         limpiarFormulario();
         modalSeleccion.classList.add("hidden");
         modalFormulario.classList.remove("hidden");
         fechaEntrega.classList.add("hidden");
         document.getElementById("formTitulo").textContent = "Subir Módulo de Teoría";
-      });
+    });
 
-      btnTarea.addEventListener("click", () => {
+    btnTarea.addEventListener("click", () => {
         limpiarFormulario();
         modalSeleccion.classList.add("hidden");
         modalFormulario.classList.remove("hidden");
         fechaEntrega.classList.remove("hidden");
         document.getElementById("formTitulo").textContent = "Subir Tarea con Fecha de Entrega";
-      });
+    });
 
-      archivoInput.addEventListener('change', () => {
+    archivoInput.addEventListener('change', () => {
         archivoNombre.textContent = archivoInput.files.length > 0 ? archivoInput.files[0].name : "No se ha seleccionado ningún archivo";
-      });
+    });
 
-      // Modal seguimiento
-      const seguimientoBtns = document.querySelectorAll('.seguimientoBtn');
-      const seguimientoModal = document.getElementById('seguimientoModal');
-      const closeSeguimientoBtn = document.getElementById('closeSeguimientoModal');
-      const btnCorregir = document.getElementById('btnCorregir');
+    // --- Modal seguimiento ---
+    const seguimientoBtns = document.querySelectorAll('.seguimientoBtn');
+    const seguimientoModal = document.getElementById('seguimientoModal');
+    const closeSeguimientoBtn = document.getElementById('closeSeguimientoModal');
+    const btnCorregir = document.getElementById('btnCorregir');
 
-      seguimientoBtns.forEach(btn => {
+    seguimientoBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-          seguimientoModal.classList.remove('hidden');
-          seguimientoModal.classList.add('flex');
-          setTimeout(() => {
-            seguimientoModal.firstElementChild.classList.remove('scale-95','opacity-0');
-            seguimientoModal.firstElementChild.classList.add('scale-100','opacity-100');
-          }, 20);
+            seguimientoModal.classList.remove('hidden');
+            seguimientoModal.classList.add('flex');
+            setTimeout(() => {
+                seguimientoModal.firstElementChild.classList.remove('scale-95','opacity-0');
+                seguimientoModal.firstElementChild.classList.add('scale-100','opacity-100');
+            }, 20);
         });
-      });
+    });
 
-      closeSeguimientoBtn.addEventListener('click', () => {
+    closeSeguimientoBtn.addEventListener('click', () => {
         seguimientoModal.firstElementChild.classList.add('scale-95','opacity-0');
         seguimientoModal.firstElementChild.classList.remove('scale-100','opacity-100');
         setTimeout(() => {
-          seguimientoModal.classList.remove('flex');
-          seguimientoModal.classList.add('hidden');
+            seguimientoModal.classList.remove('flex');
+            seguimientoModal.classList.add('hidden');
         }, 300);
-      });
-
-      btnCorregir.addEventListener('click', () => {
-        window.location.href = '/profesores/tareas/corregir';
-      });
-
-        eliminarBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-        eliminarModal.classList.remove('hidden');
-        eliminarModal.classList.add('flex');
-        setTimeout(() => {
-          eliminarModal.firstElementChild.classList.remove('scale-95','opacity-0');
-          eliminarModal.firstElementChild.classList.add('scale-100','opacity-100');
-        }, 20);
-      });
     });
 
-      function cerrarEliminarModal() {
+    btnCorregir?.addEventListener('click', () => {
+        window.location.href = '/profesores/tareas/corregir';
+    });
+
+    // --- Modal eliminar ---
+    const eliminarBtns = document.querySelectorAll('.btn-outline-danger');
+    const eliminarModal = document.getElementById('eliminarModal');
+    const closeEliminarModalBtn = document.getElementById('closeEliminarModal');
+    const cancelEliminarBtn = document.getElementById('cancelEliminar');
+
+    eliminarBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            eliminarModal.classList.remove('hidden');
+            eliminarModal.classList.add('flex');
+            setTimeout(() => {
+                eliminarModal.firstElementChild.classList.remove('scale-95','opacity-0');
+                eliminarModal.firstElementChild.classList.add('scale-100','opacity-100');
+            }, 20);
+        });
+    });
+
+    function cerrarEliminarModal() {
         eliminarModal.firstElementChild.classList.add('scale-95','opacity-0');
         eliminarModal.firstElementChild.classList.remove('scale-100','opacity-100');
         setTimeout(() => {
-          eliminarModal.classList.remove('flex');
-          eliminarModal.classList.add('hidden');
+            eliminarModal.classList.remove('flex');
+            eliminarModal.classList.add('hidden');
         }, 300);
-      }
+    }
 
-      closeEliminarModalBtn.addEventListener('click', cerrarEliminarModal);
-      cancelEliminarBtn.addEventListener('click', cerrarEliminarModal);
+    closeEliminarModalBtn.addEventListener('click', cerrarEliminarModal);
+    cancelEliminarBtn.addEventListener('click', cerrarEliminarModal);
 
-    </script>
+    // --- Tabs secciones ---
+    const tabModulos = document.getElementById('tabModulos');
+    const tabTareas = document.getElementById('tabTareas');
+    const modulosSection = document.getElementById('modulosSection');
+    const tareasSection = document.getElementById('tareasSection');
+
+tabModulos.addEventListener('click', () => {
+    modulosSection.classList.remove('hidden');
+    tareasSection.classList.add('hidden');
+
+    tabModulos.style.borderBottom = "3px solid #4f46e5";
+    tabTareas.style.borderBottom = "3px solid transparent";
+    tabModulos.style.backgroundColor = "#f9f9f9";
+    tabTareas.style.backgroundColor = "#e5e5e5";
+    tabModulos.style.color = "#111";
+    tabTareas.style.color = "#333";
+});
+
+tabTareas.addEventListener('click', () => {
+    tareasSection.classList.remove('hidden');
+    modulosSection.classList.add('hidden');
+
+    tabTareas.style.borderBottom = "3px solid #4f46e5";
+    tabModulos.style.borderBottom = "3px solid transparent";
+    tabTareas.style.backgroundColor = "#f9f9f9";
+    tabModulos.style.backgroundColor = "#e5e5e5";
+    tabTareas.style.color = "#111";
+    tabModulos.style.color = "#333";
+});
+
+function activarBoton(tabActivo, tabInactivo, sectionActivo, sectionInactivo) {
+    sectionActivo.classList.remove('hidden');
+    sectionInactivo.classList.add('hidden');
+
+    // Botón activo
+    tabActivo.style.backgroundColor = "#f9f9f9";
+    tabActivo.style.color = "#111";
+    tabActivo.style.borderBottom = "3px solid #4f46e5";
+    tabActivo.style.boxShadow = "0 4px 8px rgba(0,0,0,0.2)";
+
+    // Botón inactivo
+    tabInactivo.style.backgroundColor = "#a0a0a0";
+    tabInactivo.style.color = "#fff";
+    tabInactivo.style.borderBottom = "3px solid transparent";
+    tabInactivo.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
+}
+
+tabModulos.addEventListener('click', () => {
+    activarBoton(tabModulos, tabTareas, modulosSection, tareasSection);
+});
+
+tabTareas.addEventListener('click', () => {
+    activarBoton(tabTareas, tabModulos, tareasSection, modulosSection);
+});
+// Inicializar con el primer tab activo
+activarBoton(tabModulos, tabTareas, modulosSection, tareasSection); 
+});
+</script>
+
 
 </x-layouts.profesores.dashboard>
