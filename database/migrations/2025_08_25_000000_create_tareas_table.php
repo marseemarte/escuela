@@ -13,9 +13,10 @@ return new class extends Migration {
             $table->mediumText('descripcion'); // Descripción detallada de lo que debe hacer el estudiante
             $table->integer('tamanio'); // Tamaño máximo permitido para archivos de entrega (en bytes)
             $table->string('nombre_archivo', 255); // Nombre del archivo de consigna si lo hay
+            $table->string('ruta_archivo', 255); // Ruta donde se almacena el archivo de consigna
             $table->string('tipo', 150); // Tipo de archivo permitido para entrega
             $table->date('fecha_subida'); // Fecha en que el docente publicó la tarea
-            $table->date('fecha_entrega'); // Fecha límite para entregar la tarea
+            $table->date('fecha_entrega')->nullable(); // Fecha límite para entregar la tarea
 
             // Relación con revista - define qué docente asignó la tarea
             $table->foreignId('id_revista')->constrained('revista')->onDelete('cascade');

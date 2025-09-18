@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('archivos_visto', function (Blueprint $table) {
             $table->id(); // ID para cada registro de visualización
             // Relación con archivo - qué archivo fue visualizado
-            $table->foreignId('id_archivo')->constrained('archivos')->onDelete('cascade');
+            $table->foreignId('id_tarea')->constrained('tareas')->onDelete('cascade');
             // Relación con asignación de alumno - quién visualizó el archivo
             $table->foreignId('id_asignacionesalumnos')->constrained('asignacionesalumnos')->onDelete('cascade');
 
