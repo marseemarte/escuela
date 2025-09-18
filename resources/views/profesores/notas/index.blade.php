@@ -50,32 +50,10 @@
 
                             {{-- Botón de acción --}}
                             <div class="pt-3 sm:pt-4 border-t border-gray-200">
-                                {{-- Debug URLs generadas --}}
-                                <div class="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
-                                    <strong>🔍 URLs Debug:</strong><br>
-                                    Test: {{ route('test.notas.cargar', $materia->cupof) }}<br>
-                                    Original: {{ route('profesores.notas.cargar', $materia->cupof) }}<br>
-                                    Debug Info: <a href="{{ route('debug.cupof', $materia->cupof) }}" target="_blank"
-                                        class="text-blue-600 underline">CUPOF Info</a><br>
-                                    Debug Alumnos: <a href="{{ route('debug.alumnos', $materia->cupof) }}"
-                                        target="_blank" class="text-purple-600 underline">Alumnos Test</a><br>
-                                    CUPOF: {{ $materia->cupof }}
-                                </div>
-
-                                {{-- Botón temporal de prueba --}}
-                                <a href="{{ route('test.notas.cargar', $materia->cupof) }}"
-                                    onclick="console.log('🔵 Click en botón TEST'); console.log('URL:', this.href); console.log('CUPOF:', '{{ $materia->cupof }}'); return true;"
-                                    class="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 shadow-sm mb-2">
-                                    <i class="fas fa-bug mr-2"></i>
-                                    TEST - Gestionar Notas (Sin Middleware)
-                                </a>
-
-                                {{-- Botón original --}}
                                 <a href="{{ route('profesores.notas.cargar', $materia->cupof) }}"
-                                    onclick="console.log('🟢 Click en botón ORIGINAL'); console.log('URL:', this.href); console.log('CUPOF:', '{{ $materia->cupof }}'); return true;"
                                     class="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200 shadow-sm">
-                                    <i class="fas fa-clipboard-list mr-2"></i>
-                                    Gestionar Notas (Original)
+                                    <i class="fas fa-edit mr-2"></i>
+                                    Cargar Notas
                                 </a>
                             </div>
                         </div>
