@@ -16,6 +16,7 @@ use App\Http\Controllers\Profesores\AsistenciaController;
 use App\Http\Middleware\EnsureUserIsProfesor;
 use Illuminate\Support\Facades\Route;
 
+
 use Livewire\Volt\Volt;
 
 Route::get('/', function () {
@@ -28,9 +29,22 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->group(function () {
-    Route::get('tareas/corregir', [TareaController::class, 'corregir'])
-        ->name('profesores.tareas.corregir');
+
+    // Sección de Tareas
+    Route::prefix('tareas')->name('profesores.tareas.')->group(function () {
+        Route::get('/', [TareaController::class, 'index'])->name('index');
+        Route::post('/', [TareaController::class, 'store'])->name('store');
+
+        Route::get('/corregir', [TareaController::class, 'corregir'])->name('corregir');
+        Route::get('/{id}/descargar', [TareaController::class, 'descargar'])->name('descargar');
+        Route::get('/{id}/seguimiento', [TareaController::class, 'seguimiento'])->name('seguimiento');
+        Route::delete('/{id}', [TareaController::class, 'destroy'])->name('destroy');
+    });
+
+    // API de Profesores
     Route::apiResource('/', ProfesorController::class);
+
+
 
     // Rutas específicas de notas (similar a asistencias)
     Route::get('notas', [NotaController::class, 'index'])->name('profesores.notas.index');

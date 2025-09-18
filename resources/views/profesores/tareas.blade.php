@@ -1,9 +1,25 @@
 <x-layouts.profesores.dashboard titulo="Tareas"> 
-
-   
     <h1 class="text-2xl font-semibold mb-2">Tareas</h1>
     <p class="mb-6 text-gray-600">Gestiona las tareas que compartes con tus cursos. 
         Aquí puedes subir archivos, ver a qué curso se asignaron y hacer el seguimiento de respuestas.</p>
+
+    @if(session('success'))
+        <div id="alert-success" 
+            class="mb-4 p-4 bg-green-100 border border-green-300 text-green-700 rounded transition-opacity duration-500">
+            {{ session('success') }}
+        </div>
+    @endif
+
+
+    @if($errors->any())
+        <div class="mb-4 p-4 bg-red-100 border border-red-300 text-red-700 rounded">
+            <ul class="list-disc list-inside">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <!-- Botón para subir nueva tarea -->
     <button class="btn btn-primary bg-blue-600 text-white px-4 py-2 rounded-lg shadow mb-3 cursor-pointer" id="openModalBtn">
@@ -28,7 +44,7 @@
               📘 Módulo de teoría
             </button>
             <button id="btnTarea" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 cursor-pointer">
-              📑 Tarea con fecha de entrega
+              📝 Tarea con fecha de entrega
             </button>
           </div>
         </div>
@@ -48,13 +64,21 @@
             </div>
 
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Curso</label>
-              <select name="curso"
+              <label class="block text-sm font-medium text-gray-700">Descripción (opcional)</label>
+              <textarea name="descripcion"
+                        class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-300"
+                        rows="3"></textarea>
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700">Curso/Materia</label>
+              <select name="cupof"
                       class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-300"
                       required>
                 <option value="" disabled selected>Selecciona un curso</option>
-                <option value="2°A">2°A</option>
-                <option value="3°B">3°B</option>
+                @foreach($cursos as $curso)
+                    <option value="{{ $curso['id'] }}">{{ $curso['nombre'] }} - {{ $curso['materia'] }}</option>
+                @endforeach
               </select>
             </div>
 
@@ -62,12 +86,13 @@
             <div id="fechaEntrega" class="mb-4 hidden">
               <label class="block text-sm font-medium text-gray-700">Fecha de entrega</label>
               <input type="date" name="fecha_entrega"
-                     class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-300">
+                     class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-300"
+                     min="{{ date('Y-m-d', strtotime('+1 day')) }}">
             </div>
 
             <!-- Archivo -->
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Archivo</label>
+              <label class="block text-sm font-medium text-gray-700">Archivo (máx. 10MB)</label>
               <div class="flex border rounded items-center overflow-hidden">
                 <label for="archivo"
                        class="px-4 py-2 bg-gray-100 hover:bg-gray-200 cursor-pointer border-l">
@@ -76,7 +101,8 @@
                 <span id="archivoNombre" class="flex-1 px-3 py-2 text-gray-600 text-sm">
                   No se ha seleccionado ningún archivo
                 </span>
-                <input type="file" name="archivo" id="archivo" class="hidden" required>
+                <input type="file" name="archivo" id="archivo" class="hidden" required
+                       accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png">
               </div>
             </div>
 
@@ -94,138 +120,183 @@
       </div>
     </div>
 
-<div class="mb-4">
-    <nav class="flex space-x-2">
-        <button id="tabModulos" 
-                style="padding:0.5rem 1rem; border-radius:0.5rem 0.5rem 0 0; 
-                       background-color:#c0c0c0; color:#fff; font-weight:500; border:none; cursor:pointer; transition:all 0.2s; border-bottom:3px solid transparent; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
-            Módulos de teoría
-        </button>
-        <button id="tabTareas" 
-                style="padding:0.5rem 1rem; border-radius:0.5rem 0.5rem 0 0; 
-                       background-color:#c0c0c0; color:#fff; font-weight:500; border:none; cursor:pointer; transition:all 0.2s; border-bottom:3px solid transparent; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
-            Tareas con fecha de entrega
-        </button>
-    </nav>
-</div>
+    <div class="mb-4">
+        <nav class="flex space-x-2">
+            <button id="tabModulos" 
+                    class="tab-button px-4 py-2 rounded-t-lg font-medium border-none cursor-pointer transition-all duration-200">
+                Módulos de teoría
+            </button>
+            <button id="tabTareas" 
+                    class="tab-button px-4 py-2 rounded-t-lg font-medium border-none cursor-pointer transition-all duration-200">
+                Tareas con fecha de entrega
+            </button>
+        </nav>
+    </div>
 
+    <!-- Sección Módulos de teoría -->
+    <div id="modulosSection" class="overflow-x-auto shadow-md sm:rounded-lg">
+        <table class="w-full text-sm text-center text-gray-600 table-fixed">
+            <thead class="bg-gray-50 text-gray-700 uppercase text-xs">
+                <tr>
+                    <th class="px-6 py-3">Nombre</th>
+                    <th class="px-6 py-3">Materia</th>
+                    <th class="px-6 py-3">Curso</th>
+                    <th class="px-6 py-3">Fecha de subida</th>
+                    <th class="px-6 py-3">Archivo</th>
+                    <th class="px-6 py-3">Vistos</th>
+                    <th class="px-6 py-3">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($modulos as $modulo)
+                    <tr class="bg-white border-b hover:bg-gray-50">
+                        <td class="px-6 py-4 font-medium text-gray-900">{{ $modulo['titulo'] }}</td>
+                        <td class="px-6 py-4">{{ $modulo['materia'] }}</td>
+                        <td class="px-6 py-4">{{ $modulo['curso'] }}</td>
+                        <td class="px-6 py-4">{{ $modulo['fecha_subida'] }}</td>
+                        <td class="px-6 py-4">
+                            <a href="{{ route('profesores.tareas.descargar', $modulo['id']) }}" 
+                               class="text-blue-600 hover:underline">
+                                {{ $modulo['archivo'] }}
+                            </a>
+                        </td>
+                        <td class="px-6 py-4">{{ $modulo['vistos'] }}</td>
+                        <td class="px-6 py-4">
+                            <button class="text-green-600 hover:underline seguimientoBtn mr-2 cursor-pointer" 
+                                    data-tarea-id="{{ $modulo['id'] }}">
+                                Seguimiento
+                            </button>
+                            <button class="text-red-600 hover:underline eliminarBtn cursor-pointer" 
+                                    data-tarea-id="{{ $modulo['id'] }}">
+                                Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="px-6 py-4 text-gray-500 italic">
+                            No hay módulos subidos aún.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 
-
-<!-- Sección Módulos de teoría -->
-<div id="modulosSection" class="overflow-x-auto shadow-md sm:rounded-lg">
-    <table class="w-full text-sm text-center text-gray-600 table-fixed">
-        <thead class="bg-gray-50 text-gray-700 uppercase text-xs">
-            <tr>
-                <th class="px-6 py-3">Nombre</th>
-                <th class="px-6 py-3">Curso</th>
-                <th class="px-6 py-3">Fecha de subida</th>
-                <th class="px-6 py-3">Archivo</th>
-                <th class="px-6 py-3">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="bg-white border-b hover:bg-gray-50">
-                <td class="px-6 py-4 font-medium text-gray-900">Módulo de Álgebra</td>
-                <td class="px-6 py-4">2°A</td>
-                <td class="px-6 py-4">-</td>
-                <td><a href="#" class="text-blue-600 hover:underline">Ver Archivo</a></td>
-                <td>
-                    <button class="btn btn-sm btn-outline-info me-2 text-green-600 hover:underline seguimientoBtn cursor-pointer">Seguimiento</button>
-                    <button class="btn btn-sm btn-outline-danger text-red-600 hover:underline cursor-pointer">Eliminar</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
-<!-- Sección Tareas con fecha de entrega -->
-<div id="tareasSection" class="overflow-x-auto shadow-md sm:rounded-lg hidden">
-    <table class="w-full text-sm text-center text-gray-600 table-fixed">
-        <thead class="bg-gray-50 text-gray-700 uppercase text-xs">
-            <tr>
-                <th class="px-6 py-3">Nombre</th>
-                <th class="px-6 py-3">Curso</th>
-                <th class="px-6 py-3">Fecha de Subida</th>
-                <th class="px-6 py-3">Fecha de entrega</th>
-                <th class="px-6 py-3">Archivo</th>
-                <th class="px-6 py-3">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="bg-white border-b hover:bg-gray-50">
-                <td class="px-6 py-4 font-medium text-gray-900">Revolución Francesa</td>
-                <td class="px-6 py-4">3°B</td>
-                <td class="px-6 py-4">-</td>
-                <td class="px-6 py-4">-</td>
-                <td><a href="#" class="text-blue-600 hover:underline">Ver Archivo</a></td>
-                <td class="text-center">
-                    <button class="btn btn-sm btn-outline-info me-2 text-green-600 hover:underline seguimientoBtn cursor-pointer">Seguimiento</button>
-                    <button class="btn btn-sm btn-outline-danger text-red-600 hover:underline cursor-pointer">Eliminar</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+    <!-- Sección Tareas con fecha de entrega -->
+    <div id="tareasSection" class="overflow-x-auto shadow-md sm:rounded-lg hidden">
+        <table class="w-full text-sm text-center text-gray-600 table-fixed">
+            <thead class="bg-gray-50 text-gray-700 uppercase text-xs">
+                <tr>
+                    <th class="px-6 py-3">Nombre</th>
+                    <th class="px-6 py-3">Materia</th>
+                    <th class="px-6 py-3">Curso</th>
+                    <th class="px-6 py-3">Fecha de Subida</th>
+                    <th class="px-6 py-3">Fecha de entrega</th>
+                    <th class="px-6 py-3">Archivo</th>
+                    <th class="px-6 py-3">Entregas</th>
+                    <th class="px-6 py-3">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($tareas as $tarea)
+                    <tr class="bg-white border-b hover:bg-gray-50">
+                        <td class="px-6 py-4 font-medium text-gray-900">{{ $tarea['titulo'] }}</td>
+                        <td class="px-6 py-4">{{ $tarea['materia'] }}</td>
+                        <td class="px-6 py-4">{{ $tarea['curso'] }}</td>
+                        <td class="px-6 py-4">{{ $tarea['fecha_subida'] }}</td>
+                        <td class="px-6 py-4">
+                            <span class="@if(strtotime($tarea['fecha_entrega']) < time()) text-red-600 font-semibold @endif">
+                                {{ $tarea['fecha_entrega'] }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <a href="{{ route('profesores.tareas.descargar', $tarea['id']) }}" 
+                               class="text-blue-600 hover:underline">
+                                {{ $tarea['archivo'] }}
+                            </a>
+                        </td>
+                        <td class="px-6 py-4">{{ $tarea['entregas'] }}/{{ $tarea['vistos'] }}</td>
+                        <td class="px-6 py-4">
+                            <button class="text-green-600 hover:underline seguimientoBtn mr-2 cursor-pointer" 
+                                    data-tarea-id="{{ $tarea['id'] }}">
+                                Seguimiento
+                            </button>
+                            <button class="text-red-600 hover:underline eliminarBtn cursor-pointer" 
+                                    data-tarea-id="{{ $tarea['id'] }}">
+                                Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="8" class="px-6 py-4 text-gray-500 italic">
+                            No hay tareas subidas aún.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 
     <!-- Modal de seguimiento -->
     <div id="seguimientoModal" class="fixed inset-0 z-50 backdrop-blur bg-black/50 hidden items-center justify-center overflow-auto">
-      <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative transform transition-all duration-300 scale-95 opacity-0">
+      <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl p-6 relative transform transition-all duration-300 scale-95 opacity-0">
 
         <button id="closeSeguimientoModal" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">✕</button>
 
         <h2 class="text-xl font-semibold mb-4">Seguimiento de la tarea</h2>
+        
+        <div id="tareaInfo" class="mb-4 p-4 bg-gray-50 rounded">
+            <!-- Info de la tarea se carga dinámicamente -->
+        </div>
 
-        <table class="w-full text-sm text-center text-gray-600 table-fixed mb-4">
-          <thead class="bg-gray-50 text-gray-700 uppercase text-xs">
-            <tr>
-              <th class="px-4 py-2">Alumno</th>
-              <th class="px-4 py-2">Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="bg-white border-b hover:bg-gray-50">
-              <td class="px-4 py-2">Juan Pérez</td>
-              <td class="px-4 py-2">Visto</td>
-            </tr>
-            <tr class="bg-white border-b hover:bg-gray-50">
-              <td class="px-4 py-2">María López</td>
-              <td class="px-4 py-2">No visto</td>
-            </tr>
-            <tr class="bg-white border-b hover:bg-gray-50">
-              <td class="px-4 py-2">Carlos Gómez</td>
-              <td class="px-4 py-2">Visto y respondido</td>
-            </tr>
-            <tr class="bg-white border-b hover:bg-gray-50">
-              <td class="px-4 py-2">Lucía Fernández</td>
-              <td class="px-4 py-2">Visto y no respondido</td>
-            </tr>
-          </tbody>
-        </table>
+        <div id="seguimientoContent" class="mb-4">
+            <!-- Contenido del seguimiento se carga via AJAX -->
+        </div>
 
         <div class="flex justify-end mt-4">
-          <a href="{{ route('profesores.tareas.corregir') }}" 
-            class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-            Corregir
+          <a href="#" id="btnCorregir" 
+            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 hidden">
+            Ir a Corregir
           </a>
         </div>
       </div>
     </div>
 
-    <!-- Modal visual de eliminacion -->
+    <!-- Modal visual de eliminación -->
     <div id="eliminarModal" class="fixed inset-0 z-50 backdrop-blur bg-black/50 hidden items-center justify-center overflow-auto">
       <div class="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 relative transform transition-all duration-300 scale-95 opacity-0">
         <button id="closeEliminarModal" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">✕</button>
         <h2 class="text-xl font-semibold mb-4">Confirmar eliminación</h2>
-        <p class="mb-6 text-gray-700">¿Estás seguro de que quieres eliminar esta tarea?</p>
+        <p class="mb-6 text-gray-700">¿Estás seguro de que quieres eliminar esta tarea? Esta acción no se puede deshacer.</p>
         <div class="flex justify-end gap-2">
           <button id="cancelEliminar" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400">Cancelar</button>
-          <button class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">Eliminar</button>
+          <button id="confirmarEliminar" class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">Eliminar</button>
         </div>
       </div>
     </div>
 
+<style>
+.tab-button {
+    background-color: #e5e5e5;
+    color: #666;
+    border-bottom: 3px solid transparent;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.tab-button.active {
+    background-color: #f9f9f9;
+    color: #111;
+    border-bottom: 3px solid #4f46e5;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    let tareaIdParaEliminar = null;
+
     // --- Modal subir tareas ---
     const openBtn = document.getElementById('openModalBtn');
     const closeBtn = document.getElementById('closeModalBtn');
@@ -264,11 +335,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function limpiarFormulario() {
         document.querySelector('input[name="nombre"]').value = '';
+        document.querySelector('textarea[name="descripcion"]').value = '';
         document.querySelector('input[name="archivo"]').value = '';
         archivoNombre.textContent = "No se ha seleccionado ningún archivo";
         document.querySelector('input[name="fecha_entrega"]').value = '';
-        const cursoSelect = document.querySelector('select[name="curso"]');
-        if(cursoSelect) cursoSelect.selectedIndex = 0;
+        const cupofSelect = document.querySelector('select[name="cupof"]');
+        if(cupofSelect) cupofSelect.selectedIndex = 0;
     }
 
     openBtn.addEventListener('click', openModal);
@@ -299,16 +371,72 @@ document.addEventListener('DOMContentLoaded', () => {
     const seguimientoBtns = document.querySelectorAll('.seguimientoBtn');
     const seguimientoModal = document.getElementById('seguimientoModal');
     const closeSeguimientoBtn = document.getElementById('closeSeguimientoModal');
-    const btnCorregir = document.getElementById('btnCorregir');
 
     seguimientoBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            seguimientoModal.classList.remove('hidden');
-            seguimientoModal.classList.add('flex');
-            setTimeout(() => {
-                seguimientoModal.firstElementChild.classList.remove('scale-95','opacity-0');
-                seguimientoModal.firstElementChild.classList.add('scale-100','opacity-100');
-            }, 20);
+        btn.addEventListener('click', async () => {
+            const tareaId = btn.getAttribute('data-tarea-id');
+            
+            try {
+                const response = await fetch(`/profesores/tareas/${tareaId}/seguimiento`);
+                const data = await response.json();
+                
+                // Llenar info de la tarea
+                document.getElementById('tareaInfo').innerHTML = `
+                    <h3 class="font-semibold">${data.tarea.titulo}</h3>
+                    <p class="text-sm text-gray-600">Curso: ${data.tarea.curso} | Materia: ${data.tarea.materia}</p>
+                `;
+                
+                // Crear tabla de seguimiento
+                let seguimientoHTML = `
+                    <table class="w-full text-sm text-center text-gray-600 table-fixed">
+                        <thead class="bg-gray-50 text-gray-700 uppercase text-xs">
+                            <tr>
+                                <th class="px-4 py-2">Alumno</th>
+                                <th class="px-4 py-2">Estado</th>
+                                ${data.tarea.es_tarea ? '<th class="px-4 py-2">Nota</th>' : ''}
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                data.alumnos.forEach(alumno => {
+                    const estadoClass = alumno.estado === 'No visto' ? 'text-red-600' : 
+                                      alumno.estado === 'Visto y no respondido' ? 'text-yellow-600' : 
+                                      'text-green-600';
+                    
+                    seguimientoHTML += `
+                        <tr class="bg-white border-b hover:bg-gray-50">
+                            <td class="px-4 py-2">${alumno.nombre_completo}</td>
+                            <td class="px-4 py-2 ${estadoClass}">${alumno.estado}</td>
+                            ${data.tarea.es_tarea ? `<td class="px-4 py-2">${alumno.nota || '-'}</td>` : ''}
+                        </tr>
+                    `;
+                });
+                
+                seguimientoHTML += '</tbody></table>';
+                document.getElementById('seguimientoContent').innerHTML = seguimientoHTML;
+                
+                // Mostrar botón corregir solo para tareas
+                const btnCorregir = document.getElementById('btnCorregir');
+                if (data.tarea.es_tarea) {
+                    btnCorregir.classList.remove('hidden');
+                    btnCorregir.href = `/profesores/tareas/${tareaId}/corregir`;
+                } else {
+                    btnCorregir.classList.add('hidden');
+                }
+                
+                // Mostrar modal
+                seguimientoModal.classList.remove('hidden');
+                seguimientoModal.classList.add('flex');
+                setTimeout(() => {
+                    seguimientoModal.firstElementChild.classList.remove('scale-95','opacity-0');
+                    seguimientoModal.firstElementChild.classList.add('scale-100','opacity-100');
+                }, 20);
+                
+            } catch (error) {
+                console.error('Error al cargar seguimiento:', error);
+                alert('Error al cargar el seguimiento de la tarea');
+            }
         });
     });
 
@@ -321,18 +449,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 300);
     });
 
-    btnCorregir?.addEventListener('click', () => {
-        window.location.href = '/profesores/tareas/corregir';
-    });
-
     // --- Modal eliminar ---
-    const eliminarBtns = document.querySelectorAll('.btn-outline-danger');
+    const eliminarBtns = document.querySelectorAll('.eliminarBtn');
     const eliminarModal = document.getElementById('eliminarModal');
     const closeEliminarModalBtn = document.getElementById('closeEliminarModal');
     const cancelEliminarBtn = document.getElementById('cancelEliminar');
+    const confirmarEliminarBtn = document.getElementById('confirmarEliminar');
 
     eliminarBtns.forEach(btn => {
         btn.addEventListener('click', () => {
+            tareaIdParaEliminar = btn.getAttribute('data-tarea-id');
             eliminarModal.classList.remove('hidden');
             eliminarModal.classList.add('flex');
             setTimeout(() => {
@@ -348,11 +474,38 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             eliminarModal.classList.remove('flex');
             eliminarModal.classList.add('hidden');
+            tareaIdParaEliminar = null;
         }, 300);
     }
 
     closeEliminarModalBtn.addEventListener('click', cerrarEliminarModal);
     cancelEliminarBtn.addEventListener('click', cerrarEliminarModal);
+
+    confirmarEliminarBtn.addEventListener('click', async () => {
+        if (!tareaIdParaEliminar) return;
+        
+        try {
+            const response = await fetch(`/profesores/tareas/${tareaIdParaEliminar}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                cerrarEliminarModal();
+                location.reload(); // Recargar página para actualizar listados
+            } else {
+                alert('Error al eliminar la tarea');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al eliminar la tarea');
+        }
+    });
 
     // --- Tabs secciones ---
     const tabModulos = document.getElementById('tabModulos');
@@ -360,58 +513,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const modulosSection = document.getElementById('modulosSection');
     const tareasSection = document.getElementById('tareasSection');
 
-tabModulos.addEventListener('click', () => {
-    modulosSection.classList.remove('hidden');
-    tareasSection.classList.add('hidden');
+    function activarTab(tabActivo, tabInactivo, sectionActivo, sectionInactivo) {
+        // Mostrar/ocultar secciones
+        sectionActivo.classList.remove('hidden');
+        sectionInactivo.classList.add('hidden');
+        
+        // Activar/desactivar tabs
+        tabActivo.classList.add('active');
+        tabInactivo.classList.remove('active');
+    }
 
-    tabModulos.style.borderBottom = "3px solid #4f46e5";
-    tabTareas.style.borderBottom = "3px solid transparent";
-    tabModulos.style.backgroundColor = "#f9f9f9";
-    tabTareas.style.backgroundColor = "#e5e5e5";
-    tabModulos.style.color = "#111";
-    tabTareas.style.color = "#333";
+    tabModulos.addEventListener('click', () => {
+        activarTab(tabModulos, tabTareas, modulosSection, tareasSection);
+    });
+
+    tabTareas.addEventListener('click', () => {
+        activarTab(tabTareas, tabModulos, tareasSection, modulosSection);
+    });
+
+    // Inicializar con el primer tab activo
+    activarTab(tabModulos, tabTareas, modulosSection, tareasSection);
 });
 
-tabTareas.addEventListener('click', () => {
-    tareasSection.classList.remove('hidden');
-    modulosSection.classList.add('hidden');
-
-    tabTareas.style.borderBottom = "3px solid #4f46e5";
-    tabModulos.style.borderBottom = "3px solid transparent";
-    tabTareas.style.backgroundColor = "#f9f9f9";
-    tabModulos.style.backgroundColor = "#e5e5e5";
-    tabTareas.style.color = "#111";
-    tabModulos.style.color = "#333";
-});
-
-function activarBoton(tabActivo, tabInactivo, sectionActivo, sectionInactivo) {
-    sectionActivo.classList.remove('hidden');
-    sectionInactivo.classList.add('hidden');
-
-    // Botón activo
-    tabActivo.style.backgroundColor = "#f9f9f9";
-    tabActivo.style.color = "#111";
-    tabActivo.style.borderBottom = "3px solid #4f46e5";
-    tabActivo.style.boxShadow = "0 4px 8px rgba(0,0,0,0.2)";
-
-    // Botón inactivo
-    tabInactivo.style.backgroundColor = "#a0a0a0";
-    tabInactivo.style.color = "#fff";
-    tabInactivo.style.borderBottom = "3px solid transparent";
-    tabInactivo.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
+const alertSuccess = document.getElementById('alert-success');
+if (alertSuccess) {
+    setTimeout(() => {
+        alertSuccess.style.opacity = '0';
+        setTimeout(() => alertSuccess.remove(), 500);
+    }, 3000);
 }
 
-tabModulos.addEventListener('click', () => {
-    activarBoton(tabModulos, tabTareas, modulosSection, tareasSection);
-});
-
-tabTareas.addEventListener('click', () => {
-    activarBoton(tabTareas, tabModulos, tareasSection, modulosSection);
-});
-// Inicializar con el primer tab activo
-activarBoton(tabModulos, tabTareas, modulosSection, tareasSection); 
-});
 </script>
-
 
 </x-layouts.profesores.dashboard>
