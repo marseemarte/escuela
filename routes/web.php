@@ -9,6 +9,7 @@ use App\Http\Controllers\Cursos\CursoController;
 use App\Http\Controllers\Materias\MateriasController;
 use App\Http\Controllers\Orientaciones\OrientacionesController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\RevistaController;
 use App\Http\Controllers\CupofController;
 use App\Http\Controllers\Profesores\AsistenciaController;
@@ -33,7 +34,7 @@ Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->
 
     // Rutas específicas de notas (similar a asistencias)
     Route::get('notas', [NotaController::class, 'index'])->name('profesores.notas.index');
-    Route::get('notas/cargar/{cupof}', [NotaController::class, 'cargar'])->name('profesores.notas.cargar');
+    Route::get('notas/{cupof}', [NotaController::class, 'cargar'])->name('profesores.notas.cargar');
     Route::get('notas/totales/{cupof}', [NotaController::class, 'totales'])->name('profesores.notas.totales');
     Route::post('notas/guardar', [NotaController::class, 'guardarNotas'])->name('profesores.notas.guardar');
 
@@ -121,6 +122,101 @@ Route::get('/test/totales/{cupof}', [App\Http\Controllers\Profesores\AsistenciaC
 
 // Ruta temporal para testing de notas (sin middleware)
 Route::get('/test/notas/cargar/{cupof}', [App\Http\Controllers\Profesores\NotaController::class, 'cargar'])->name('test.notas.cargar');
+
+// Ruta de debug para verificar datos del CUPOF
+Route::get('/debug/cupof/{cupof}', function ($cupof) {
+    $usuario = Auth::user();
+    if (!$usuario) {
+        return response()->json(['error' => 'No autenticado']);
+    }
+
+    // Buscar CUPOF sin restricciones
+    $cupofGeneral = DB::table('cupof')->where('cupof', $cupof)->first();
+
+    // Buscar con restricciones del profesor
+    $cupofProfesor = DB::table('cupof')
+        ->join('materias', 'cupof.id_materias', '=', 'materias.id')
+        ->join('cursos', 'cupof.id_cursos', '=', 'cursos.id')
+        ->join('grupos', 'cupof.id_grupos', '=', 'grupos.id')
+        ->join('revista', 'cupof.cupof', '=', 'revista.cupof')
+        ->join('tipousuario', 'revista.id_tipousuario', '=', 'tipousuario.id')
+        ->join('persona', 'tipousuario.id_persona', '=', 'persona.id')
+        ->where('cupof.cupof', $cupof)
+        ->where('persona.dni', $usuario->dni)
+        ->where('cupof.estado', 'A')
+        ->where('revista.situacion', 'A')
+        ->select(
+            'cupof.*',
+            'materias.nombre as materia_nombre',
+            'cursos.*',
+            'grupos.*',
+            'persona.dni',
+            'persona.nombre as profesor_nombre',
+            'revista.situacion'
+        )
+        ->first();
+
+    return response()->json([
+        'usuario' => [
+            'id' => $usuario->id,
+            'dni' => $usuario->dni,
+            'nombre' => $usuario->nombre,
+            'apellido' => $usuario->apellido,
+            'es_profesor' => $usuario instanceof App\Models\Personas\Persona ? $usuario->isProfesor() : false
+        ],
+        'cupof_solicitado' => $cupof,
+        'cupof_general' => $cupofGeneral,
+        'cupof_profesor' => $cupofProfesor,
+        'existe_cupof' => $cupofGeneral ? 'SI' : 'NO',
+        'profesor_tiene_acceso' => $cupofProfesor ? 'SI' : 'NO'
+    ]);
+})->middleware(['auth'])->name('debug.cupof');
+
+// Ruta de debug para verificar consulta de alumnos
+Route::get('/debug/alumnos/{cupof}', function ($cupof) {
+    $usuario = Auth::user();
+    if (!$usuario) {
+        return response()->json(['error' => 'No autenticado']);
+    }
+
+    // Obtener información del CUPOF
+    $cupofInfo = DB::table('cupof')
+        ->join('materias', 'cupof.id_materias', '=', 'materias.id')
+        ->join('cursos', 'cupof.id_cursos', '=', 'cursos.id')
+        ->join('grupos', 'cupof.id_grupos', '=', 'grupos.id')
+        ->where('cupof.cupof', $cupof)
+        ->select('cupof.*', 'materias.nombre as materia_nombre', 'cursos.*', 'grupos.*')
+        ->first();
+
+    if (!$cupofInfo) {
+        return response()->json(['error' => 'CUPOF no encontrado']);
+    }
+
+    // Verificar tablas disponibles
+    $tables = DB::select('SHOW TABLES');
+    $tableNames = array_map(function ($table) {
+        return array_values((array)$table)[0];
+    }, $tables);
+
+    // Intentar consulta de alumnos simplificada
+    try {
+        $alumnos = DB::table('persona')
+            ->join('tipousuario', 'persona.id', '=', 'tipousuario.id_persona')
+            ->join('tipopersona', 'tipousuario.id_tipopersona', '=', 'tipopersona.id')
+            ->where('tipopersona.tipo', 'Alumno')
+            ->select('persona.*', 'tipousuario.id as tipousuario_id')
+            ->limit(5)
+            ->get();
+    } catch (\Exception $e) {
+        $alumnos = 'Error: ' . $e->getMessage();
+    }
+
+    return response()->json([
+        'cupof_info' => $cupofInfo,
+        'tablas_disponibles' => $tableNames,
+        'alumnos_test' => $alumnos
+    ]);
+})->middleware(['auth'])->name('debug.alumnos');
 
 // Ruta de prueba temporal para verificar CSRF
 Route::post('test-csrf', function () {

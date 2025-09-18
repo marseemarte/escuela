@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\Materia;
 use App\Models\InformePeriodo;
 use App\Models\Personas\Persona;
@@ -69,17 +70,26 @@ class NotaController extends Controller
         }
 
         try {
+            // Debug: Agregar logs para ver dónde falla
+            Log::info('NotaController::cargar - INICIO', ['cupof' => $cupof, 'user' => Auth::id()]);
+
             // Verificar autenticación
             if (!Auth::check()) {
+                Log::warning('NotaController::cargar - Usuario no autenticado');
                 return redirect()->route('login')->with('error', 'Debe estar autenticado');
             }
 
             $usuario = Auth::user();
+            Log::info('NotaController::cargar - Usuario autenticado', ['user_id' => $usuario->id, 'user_type' => get_class($usuario)]);
+
             if (!($usuario instanceof Persona && $usuario->isProfesor())) {
+                Log::warning('NotaController::cargar - Usuario no es profesor', ['user_id' => $usuario->id]);
                 return redirect()->route('dashboard')->with('error', 'Acceso denegado');
             }
 
             // Obtener información del CUPOF y verificar que pertenece al profesor
+            Log::info('NotaController::cargar - Buscando CUPOF', ['cupof' => $cupof, 'dni_usuario' => $usuario->dni]);
+
             $cupofInfo = DB::table('cupof')
                 ->join('materias', 'cupof.id_materias', '=', 'materias.id')
                 ->join('cursos', 'cupof.id_cursos', '=', 'cursos.id')
@@ -103,36 +113,50 @@ class NotaController extends Controller
                 )
                 ->first();
 
+            Log::info('NotaController::cargar - Resultado CUPOF', ['found' => $cupofInfo ? 'SI' : 'NO', 'cupof_info' => $cupofInfo]);
+
             if (!$cupofInfo) {
+                Log::warning('NotaController::cargar - CUPOF no encontrado', ['cupof' => $cupof, 'dni' => $usuario->dni]);
                 return redirect()->route('profesores.notas.index')
                     ->with('error', 'CUPOF no encontrado o no tiene permisos para acceder');
             }
 
+            Log::info('NotaController::cargar - Iniciando consulta de alumnos', ['id_cursos' => $cupofInfo->id_cursos, 'id_grupos' => $cupofInfo->id_grupos]);
+
             // Obtener alumnos del curso y grupo con sus notas existentes
-            $alumnos = DB::table('persona')
-                ->join('tipousuario', 'persona.id', '=', 'tipousuario.id_persona')
-                ->join('tipopersona', 'tipousuario.id_tipopersona', '=', 'tipopersona.id')
-                ->join('asignacion_alumno', 'tipousuario.id', '=', 'asignacion_alumno.id_tipousuario')
-                ->leftJoin('informe_periodo', function ($join) use ($cupof) {
-                    $join->on('asignacion_alumno.id', '=', 'informe_periodo.id_asignacionesalumnos')
-                        ->where('informe_periodo.cupof', $cupof);
-                })
-                ->where('tipopersona.tipo', 'Alumno')
-                ->where('asignacion_alumno.id_cursos', $cupofInfo->id_cursos)
-                ->where('asignacion_alumno.id_grupos', $cupofInfo->id_grupos)
-                ->where('asignacion_alumno.estado', 'A')
-                ->select(
-                    'persona.id',
-                    'persona.nombre',
-                    'persona.apellido',
-                    'persona.dni',
-                    'asignacion_alumno.id as asignacion_id',
-                    'informe_periodo.nota',
-                    'informe_periodo.periodo'
-                )
-                ->orderBy('persona.apellido')
-                ->orderBy('persona.nombre')
-                ->get();
+            try {
+                // Consulta simplificada primero para ver si encuentra alumnos
+                $alumnos = DB::table('persona')
+                    ->join('tipousuario', 'persona.id', '=', 'tipousuario.id_persona')
+                    ->join('tipopersona', 'tipousuario.id_tipopersona', '=', 'tipopersona.id')
+                    ->join('asignacionesalumnos', 'tipousuario.id', '=', 'asignacionesalumnos.id_tipousuario')
+                    ->leftJoin('informe_periodo', function ($join) use ($cupof) {
+                        $join->on('asignacionesalumnos.id', '=', 'informe_periodo.id_asignacionesalumnos')
+                            ->where('informe_periodo.cupof', $cupof);
+                    })
+                    ->where('tipopersona.tipo', 'Alumno')
+                    ->where('asignacionesalumnos.id_grupos', $cupofInfo->id_grupos)
+                    ->where('asignacionesalumnos.estado', 'A')
+                    ->select(
+                        'persona.id',
+                        'persona.nombre',
+                        'persona.apellido',
+                        'persona.dni',
+                        'asignacionesalumnos.id as asignacion_id',
+                        'asignacionesalumnos.id_cursosciclolectivo',
+                        'informe_periodo.nota',
+                        'informe_periodo.periodo'
+                    )
+                    ->orderBy('persona.apellido')
+                    ->orderBy('persona.nombre')
+                    ->get();
+
+                Log::info('NotaController::cargar - Consulta de alumnos exitosa', ['cantidad_alumnos' => count($alumnos)]);
+            } catch (\Exception $e) {
+                Log::error('NotaController::cargar - Error en consulta de alumnos', ['error' => $e->getMessage()]);
+                return redirect()->route('profesores.notas.index')
+                    ->with('error', 'Error al obtener lista de alumnos: ' . $e->getMessage());
+            }
 
             // Agrupar notas por alumno
             $alumnosConNotas = [];
@@ -145,22 +169,38 @@ class NotaController extends Controller
                         'apellido' => $alumno->apellido,
                         'dni' => $alumno->dni,
                         'asignacion_id' => $alumno->asignacion_id,
-                        'notas' => [
-                            '1' => $alumno->periodo == 1 ? $alumno->nota : '',
-                            '2' => $alumno->periodo == 2 ? $alumno->nota : '',
-                            '3' => $alumno->periodo == 3 ? $alumno->nota : ''
-                        ]
+                        'nota_periodo_1' => '',  // 1° Informe
+                        'nota_periodo_2' => '',  // 1° Cuatrimestre
+                        'nota_periodo_3' => '',  // 2° Informe
+                        'nota_periodo_4' => ''   // 2° Cuatrimestre
                     ];
-                } else {
-                    // Agregar nota al periodo correspondiente
-                    if ($alumno->periodo && $alumno->nota !== null) {
-                        $alumnosConNotas[$key]['notas'][$alumno->periodo] = $alumno->nota;
+                }
+
+                // Agregar nota al periodo correspondiente
+                if ($alumno->periodo && $alumno->nota !== null) {
+                    switch ($alumno->periodo) {
+                        case 1:
+                            $alumnosConNotas[$key]['nota_periodo_1'] = $alumno->nota;
+                            break;
+                        case 2:
+                            $alumnosConNotas[$key]['nota_periodo_2'] = $alumno->nota;
+                            break;
+                        case 3:
+                            $alumnosConNotas[$key]['nota_periodo_3'] = $alumno->nota;
+                            break;
+                        case 4:
+                            $alumnosConNotas[$key]['nota_periodo_4'] = $alumno->nota;
+                            break;
                     }
                 }
             }
 
+            Log::info('NotaController::cargar - Procesamiento exitoso', ['total_alumnos_procesados' => count($alumnosConNotas)]);
+            Log::info('NotaController::cargar - Renderizando vista');
+
             return view('profesores.notas.cargar', compact('cupofInfo', 'alumnosConNotas', 'cupof'));
         } catch (\Exception $e) {
+            Log::error('NotaController::cargar - Error general', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return redirect()->route('profesores.notas.index')
                 ->with('error', 'Error al cargar la vista: ' . $e->getMessage());
         }

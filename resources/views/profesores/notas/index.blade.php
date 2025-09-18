@@ -55,6 +55,10 @@
                                     <strong>🔍 URLs Debug:</strong><br>
                                     Test: {{ route('test.notas.cargar', $materia->cupof) }}<br>
                                     Original: {{ route('profesores.notas.cargar', $materia->cupof) }}<br>
+                                    Debug Info: <a href="{{ route('debug.cupof', $materia->cupof) }}" target="_blank"
+                                        class="text-blue-600 underline">CUPOF Info</a><br>
+                                    Debug Alumnos: <a href="{{ route('debug.alumnos', $materia->cupof) }}"
+                                        target="_blank" class="text-purple-600 underline">Alumnos Test</a><br>
                                     CUPOF: {{ $materia->cupof }}
                                 </div>
 
