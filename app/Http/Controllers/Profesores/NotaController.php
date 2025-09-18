@@ -307,6 +307,10 @@ class NotaController extends Controller
 
     public function guardarNotas(Request $request)
     {
+        // Log simple para verificar que el método se ejecuta
+        Log::error('=== METODO GUARDAR NOTAS EJECUTANDOSE ===');
+        Log::error('REQUEST DATA: ' . json_encode($request->all()));
+
         try {
             Log::info('NotaController::guardarNotas - INICIO', [
                 'method' => $request->method(),
@@ -384,61 +388,83 @@ class NotaController extends Controller
 
             foreach ($notas as $asignacionId => $notasAlumno) {
                 foreach ($notasAlumno as $periodo => $nota) {
-                    if (!empty($nota) && is_numeric($nota) && $nota >= 1 && $nota <= 10 && $periodo >= 1 && $periodo <= 5) {
-                        try {
-                            Log::info('NotaController::guardarNotas - Procesando nota', [
+                    // Validar período
+                    if ($periodo < 1 || $periodo > 5) {
+                        continue;
+                    }
+
+                    try {
+                        Log::info('NotaController::guardarNotas - Procesando nota', [
+                            'asignacion_id' => $asignacionId,
+                            'periodo' => $periodo,
+                            'nota' => $nota,
+                            'nota_vacia' => empty($nota)
+                        ]);
+
+                        // Buscar si ya existe una nota para este alumno, cupof y periodo
+                        $existingNota = InformePeriodo::where('id_asignacionesalumnos', $asignacionId)
+                            ->where('cupof', $cupof)
+                            ->where('periodo', $periodo)
+                            ->first();
+
+                        // Si la nota está vacía, eliminar el registro existente
+                        if (empty($nota) || $nota === '') {
+                            if ($existingNota) {
+                                $existingNota->delete();
+                                $notasActualizadas++; // Contar como actualización (eliminación)
+                                Log::info('NotaController::guardarNotas - Nota eliminada', [
+                                    'id' => $existingNota->id,
+                                    'asignacion_id' => $asignacionId,
+                                    'periodo' => $periodo
+                                ]);
+                            }
+                            continue;
+                        }
+
+                        // Validar que la nota sea válida
+                        if (!is_numeric($nota) || $nota < 1 || $nota > 10) {
+                            Log::warning('NotaController::guardarNotas - Nota inválida ignorada', [
                                 'asignacion_id' => $asignacionId,
                                 'periodo' => $periodo,
                                 'nota' => $nota
                             ]);
+                            continue;
+                        }
 
-                            // Buscar si ya existe una nota para este alumno, cupof y periodo
-                            $existingNota = InformePeriodo::where('id_asignacionesalumnos', $asignacionId)
-                                ->where('cupof', $cupof)
-                                ->where('periodo', $periodo)
-                                ->first();
-
-                            if ($existingNota) {
-                                // Actualizar nota existente
-                                $existingNota->update([
-                                    'nota' => $nota,
-                                    'dni_personal' => $usuario->dni,
-                                    'fecha' => now()->format('Y-m-d')
-                                ]);
-                                $notasActualizadas++;
-                                Log::info('NotaController::guardarNotas - Nota actualizada', [
-                                    'id' => $existingNota->id,
-                                    'nota' => $nota
-                                ]);
-                            } else {
-                                // Crear nueva nota
-                                $nuevaNota = InformePeriodo::create([
-                                    'id_asignacionesalumnos' => $asignacionId,
-                                    'cupof' => $cupof,
-                                    'dni_personal' => $usuario->dni,
-                                    'fecha' => now()->format('Y-m-d'),
-                                    'nota' => $nota,
-                                    'periodo' => $periodo
-                                ]);
-                                $notasGuardadas++;
-                                Log::info('NotaController::guardarNotas - Nota creada', [
-                                    'id' => $nuevaNota->id,
-                                    'nota' => $nota
-                                ]);
-                            }
-                        } catch (\Exception $e) {
-                            $error = "Error al guardar nota para asignación {$asignacionId}, período {$periodo}: " . $e->getMessage();
-                            $errores[] = $error;
-                            Log::error('NotaController::guardarNotas - Error individual', [
-                                'error' => $error,
-                                'trace' => $e->getTraceAsString()
+                        if ($existingNota) {
+                            // Actualizar nota existente
+                            $existingNota->update([
+                                'nota' => $nota,
+                                'dni_personal' => $usuario->dni,
+                                'fecha' => now()->format('Y-m-d')
+                            ]);
+                            $notasActualizadas++;
+                            Log::info('NotaController::guardarNotas - Nota actualizada', [
+                                'id' => $existingNota->id,
+                                'nota' => $nota
+                            ]);
+                        } else {
+                            // Crear nueva nota
+                            $nuevaNota = InformePeriodo::create([
+                                'id_asignacionesalumnos' => $asignacionId,
+                                'cupof' => $cupof,
+                                'dni_personal' => $usuario->dni,
+                                'fecha' => now()->format('Y-m-d'),
+                                'nota' => $nota,
+                                'periodo' => $periodo
+                            ]);
+                            $notasGuardadas++;
+                            Log::info('NotaController::guardarNotas - Nota creada', [
+                                'id' => $nuevaNota->id,
+                                'nota' => $nota
                             ]);
                         }
-                    } else {
-                        Log::warning('NotaController::guardarNotas - Nota inválida ignorada', [
-                            'asignacion_id' => $asignacionId,
-                            'periodo' => $periodo,
-                            'nota' => $nota
+                    } catch (\Exception $e) {
+                        $error = "Error al guardar nota para asignación {$asignacionId}, período {$periodo}: " . $e->getMessage();
+                        $errores[] = $error;
+                        Log::error('NotaController::guardarNotas - Error individual', [
+                            'error' => $error,
+                            'trace' => $e->getTraceAsString()
                         ]);
                     }
                 }
@@ -456,7 +482,7 @@ class NotaController extends Controller
             if ($totalProcesadas === 0) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No se procesaron notas. Verifique que las notas sean válidas (1-10)',
+                    'message' => 'No se procesaron notas. Verifique que las notas sean válidas (1-10) o que haya cambios para aplicar',
                     'debug_info' => [
                         'notas_recibidas' => count($notas),
                         'errores' => $errores
@@ -467,19 +493,19 @@ class NotaController extends Controller
             if (count($errores) > 0) {
                 return response()->json([
                     'success' => false,
-                    'message' => "Se procesaron {$totalProcesadas} notas con " . count($errores) . " errores",
+                    'message' => "Se procesaron {$totalProcesadas} cambios con " . count($errores) . " errores",
                     'errores' => $errores,
                     'notas_nuevas' => $notasGuardadas,
-                    'notas_actualizadas' => $notasActualizadas,
+                    'notas_actualizadas_eliminadas' => $notasActualizadas,
                     'total_procesadas' => $totalProcesadas
                 ]);
             }
 
             return response()->json([
                 'success' => true,
-                'message' => "Notas guardadas correctamente",
+                'message' => "Cambios guardados correctamente",
                 'notas_nuevas' => $notasGuardadas,
-                'notas_actualizadas' => $notasActualizadas,
+                'notas_actualizadas_eliminadas' => $notasActualizadas,
                 'total_procesadas' => $totalProcesadas
             ]);
         } catch (\Exception $e) {
@@ -504,15 +530,16 @@ class NotaController extends Controller
         $desaprobados = 0;
         $enRiesgo = 0;
         $totalCamposLlenos = 0;
-        $totalCamposPosibles = $totalEstudiantes * 5; // 5 períodos por estudiante
+        $totalCamposPosibles = $totalEstudiantes * 4; // Solo 4 períodos activos (1° Informe, 1° Cuatrimestre, 2° Informe, 2° Cuatrimestre)
 
         foreach ($alumnosConNotas as $alumno) {
+            // Solo considerar los 4 períodos que se muestran en la vista
             $notas = [
-                $alumno['nota_periodo_1'],
-                $alumno['nota_periodo_2'],
-                $alumno['nota_periodo_3'],
-                $alumno['nota_periodo_4'],
-                $alumno['nota_periodo_5']
+                $alumno['nota_periodo_1'], // 1° Informe
+                $alumno['nota_periodo_2'], // 1° Cuatrimestre
+                $alumno['nota_periodo_3'], // 2° Informe
+                $alumno['nota_periodo_4']  // 2° Cuatrimestre
+                // No incluir nota_periodo_5 (Cierre) ya que no se muestra en la vista
             ];
 
             // Contar campos llenos
@@ -553,7 +580,7 @@ class NotaController extends Controller
             'desaprobados' => $desaprobados,
             'en_riesgo' => $enRiesgo,
             'porcentaje_aprobacion' => $porcentajeAprobacion,
-            'progreso_carga' => $progresoCompletitud, // Corregir nombre de variable
+            'progreso_carga' => $progresoCompletitud,
             'campos_llenos' => $totalCamposLlenos,
             'campos_totales' => $totalCamposPosibles
         ];
