@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Tarea;
 use App\Models\Revista;
 use App\Models\Cupof;
+use App\Models\Persona;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,67 +16,90 @@ class TareaController extends Controller
 {
     public function index()
     {
+        // Verificar autenticación
         $usuarioId = Auth::id();
-        
+
         if (!$usuarioId) {
             return redirect()->route('login');
         }
-        
-        // Primero, obtengamos las revistas sin eager loading para debug
-        $revistas = Revista::whereHas('tipoUsuario.persona', function($q) use ($usuarioId) {
-                $q->where('id', $usuarioId);
-            })
-            ->where('estado', 'A')
+
+        // Obtener materias asignadas al profesor
+        $materias = DB::table('cupof')
+            ->join('materias', 'cupof.id_materias', '=', 'materias.id')
+            ->join('cursos', 'cupof.id_cursos', '=', 'cursos.id')
+            ->join('grupos', 'cupof.id_grupos', '=', 'grupos.id')
+            ->join('revista', 'cupof.cupof', '=', 'revista.cupof')
+            ->join('tipousuario', 'revista.id_tipousuario', '=', 'tipousuario.id')
+            ->join('persona', 'tipousuario.id_persona', '=', 'persona.id')
+            ->where('persona.id', $usuarioId)
+            ->where('cupof.estado', 'A')
+            ->where('revista.situacion', 'A') // Solo asignaciones activas
+            ->select(
+                'cupof.cupof',
+                'materias.id as materia_id',
+                'materias.nombre as materia_nombre',
+                'cursos.division',
+                'cursos.ano',
+                'grupos.nombre as grupo_nombre',
+                'cupof.turno'
+            )
+            ->distinct()
             ->get();
 
-        if ($revistas->isEmpty()) {
-            return view('profesores.tareas', [
-                'cursos' => collect(),
-                'modulos' => collect(), 
-                'tareas' => collect()
-            ])->with('info', 'No tienes cargos docentes asignados.');
+        return view('profesores.tareas.index', compact('materias'));
+    }
+
+    public function cargar($cupof)
+    {
+        $usuarioId = Auth::id();
+
+        if (!$usuarioId) {
+            return redirect()->route('login');
         }
 
-        // Ahora carga las relaciones manualmente para cada revista
+        // Obtener la revista específica para este CUPOF
+        $revista = Revista::whereHas('tipoUsuario.persona', function ($q) use ($usuarioId) {
+            $q->where('id', $usuarioId);
+        })
+            ->where('cupof', $cupof)
+            ->where('estado', 'A')
+            ->first();
+
+        if (!$revista) {
+            return redirect()->route('profesores.tareas.index')
+                ->with('error', 'No tienes permisos para este curso/materia.');
+        }
+
+        // Obtener información del curso/materia
+        $cupofModel = Cupof::with(['materia', 'curso'])->find($cupof);
         $cursos = collect();
-        foreach($revistas as $revista) {
-            $cupofModel = Cupof::with(['materia', 'curso'])->find($revista->cupof);
-            
-            if ($cupofModel && $cupofModel->curso) {
-                $cursos->push([
-                    'id' => $cupofModel->cupof,
-                    'nombre' => $cupofModel->curso->ano . '°' . $cupofModel->curso->division,
-                    'materia' => $cupofModel->materia->nombre ?? 'Sin materia'
-                ]);
-            }
-        }
-        
-        $cursos = $cursos->unique('id')->values();
 
-        // Para módulos y tareas, usemos queries más simples
-        $modulos = Tarea::whereIn('id_revista', $revistas->pluck('id'))
+        if ($cupofModel && $cupofModel->curso) {
+            $cursos->push([
+                'id' => $cupofModel->cupof,
+                'nombre' => $cupofModel->curso->ano . '°' . $cupofModel->curso->division,
+                'materia' => $cupofModel->materia->nombre ?? 'Sin materia'
+            ]);
+        }
+
+        // Obtener módulos (tareas sin fecha de entrega) para este CUPOF específico
+        $modulos = Tarea::where('id_revista', $revista->id)
             ->whereNull('fecha_entrega')
             ->orderByDesc('fecha_subida')
             ->get()
-            ->map(function($tarea) {
-                // Obtener info del curso de forma manual
-                $revista = Revista::find($tarea->id_revista);
-                $cupofModel = null;
+            ->map(function ($tarea) use ($cupofModel) {
                 $curso = 'Sin asignar';
                 $materia = 'Sin materia';
-                
-                if ($revista) {
-                    $cupofModel = Cupof::with(['materia', 'curso'])->find($revista->cupof);
-                    if ($cupofModel) {
-                        if ($cupofModel->curso) {
-                            $curso = $cupofModel->curso->ano . '°' . $cupofModel->curso->division;
-                        }
-                        if ($cupofModel->materia) {
-                            $materia = $cupofModel->materia->nombre;
-                        }
+
+                if ($cupofModel) {
+                    if ($cupofModel->curso) {
+                        $curso = $cupofModel->curso->ano . '°' . $cupofModel->curso->division;
+                    }
+                    if ($cupofModel->materia) {
+                        $materia = $cupofModel->materia->nombre;
                     }
                 }
-                
+
                 return [
                     'id' => $tarea->id,
                     'titulo' => $tarea->titulo,
@@ -87,29 +111,24 @@ class TareaController extends Controller
                 ];
             });
 
-        $tareas = Tarea::whereIn('id_revista', $revistas->pluck('id'))
+        // Obtener tareas (con fecha de entrega) para este CUPOF específico
+        $tareas = Tarea::where('id_revista', $revista->id)
             ->whereNotNull('fecha_entrega')
             ->orderByDesc('fecha_subida')
             ->get()
-            ->map(function($tarea) {
-                // Obtener info del curso de forma manual
-                $revista = Revista::find($tarea->id_revista);
-                $cupofModel = null;
+            ->map(function ($tarea) use ($cupofModel) {
                 $curso = 'Sin asignar';
                 $materia = 'Sin materia';
-                
-                if ($revista) {
-                    $cupofModel = Cupof::with(['materia', 'curso'])->find($revista->cupof);
-                    if ($cupofModel) {
-                        if ($cupofModel->curso) {
-                            $curso = $cupofModel->curso->ano . '°' . $cupofModel->curso->division;
-                        }
-                        if ($cupofModel->materia) {
-                            $materia = $cupofModel->materia->nombre;
-                        }
+
+                if ($cupofModel) {
+                    if ($cupofModel->curso) {
+                        $curso = $cupofModel->curso->ano . '°' . $cupofModel->curso->division;
+                    }
+                    if ($cupofModel->materia) {
+                        $materia = $cupofModel->materia->nombre;
                     }
                 }
-                
+
                 return [
                     'id' => $tarea->id,
                     'titulo' => $tarea->titulo,
@@ -123,7 +142,7 @@ class TareaController extends Controller
                 ];
             });
 
-        return view('profesores.tareas', compact('cursos', 'modulos', 'tareas'));
+        return view('profesores.tareas.cargar', compact('cursos', 'modulos', 'tareas'));
     }
 
     public function store(Request $request)
@@ -137,9 +156,9 @@ class TareaController extends Controller
         ]);
 
         // Obtener la revista activa del profesor para este CUPOF
-        $revista = Revista::whereHas('tipoUsuario.persona', function($q) {
-                $q->where('id', Auth::id());
-            })
+        $revista = Revista::whereHas('tipoUsuario.persona', function ($q) {
+            $q->where('id', Auth::id());
+        })
             ->where('cupof', $request->cupof)
             ->where('estado', 'A')
             ->first();
@@ -164,14 +183,14 @@ class TareaController extends Controller
             $tarea->id_revista = $revista->id;
             $tarea->save();
 
-            return redirect()->route('profesores.tareas.index')
+            return redirect()->route('profesores.tareas.cargar', $request->cupof)
                 ->with('success', 'Archivo subido correctamente.');
         } catch (\Exception $e) {
             // Si falla, eliminar el archivo subido
             if (Storage::disk('local')->exists($ruta)) {
                 Storage::disk('local')->delete($ruta);
             }
-            
+
             return back()->withErrors(['error' => 'Error al guardar la tarea: ' . $e->getMessage()]);
         }
     }
@@ -189,7 +208,7 @@ class TareaController extends Controller
         // Obtener información básica de la tarea
         $curso = 'Sin asignar';
         $materia = 'Sin materia';
-        
+
         if ($tarea->revista && $tarea->revista->cupof) {
             if ($tarea->revista->cupof->curso) {
                 $curso = $tarea->revista->cupof->curso->ano . '°' . $tarea->revista->cupof->curso->division;
@@ -201,7 +220,7 @@ class TareaController extends Controller
 
         // Obtener todos los alumnos del curso (usando query builder por simplicidad)
         $alumnos = collect(); // Por ahora devolver vacío hasta resolver las relaciones
-        
+
         if ($tarea->revista && $tarea->revista->cupof && $tarea->revista->cupof->curso) {
             $alumnos = DB::table('asignacionesalumnos as aa')
                 ->join('cursociclolectivo as ccl', 'aa.id_cursosciclolectivo', '=', 'ccl.id')
@@ -217,14 +236,14 @@ class TareaController extends Controller
                     'p.dni'
                 ])
                 ->get()
-                ->map(function($alumno) use ($tarea) {
+                ->map(function ($alumno) use ($tarea) {
                     // Por simplicidad, devolver estados básicos
                     return [
                         'id' => $alumno->id,
                         'nombre_completo' => $alumno->apellido . ', ' . $alumno->nombre,
                         'dni' => $alumno->dni,
-                        'visto' => rand(0,1) == 1, // Temporal
-                        'entrego' => rand(0,1) == 1, // Temporal
+                        'visto' => rand(0, 1) == 1, // Temporal
+                        'entrego' => rand(0, 1) == 1, // Temporal
                         'nota' => null,
                         'estado' => 'Visto' // Temporal
                     ];
@@ -245,7 +264,7 @@ class TareaController extends Controller
     public function destroy($id)
     {
         $tarea = Tarea::findOrFail($id);
-        
+
         // Verificar permisos
         $this->verificarPermisos($tarea);
 
@@ -269,7 +288,7 @@ class TareaController extends Controller
         }
 
         return response()->download(
-            storage_path('app/' . $tarea->ruta_archivo), 
+            storage_path('app/' . $tarea->ruta_archivo),
             $tarea->nombre_archivo
         );
     }
@@ -277,9 +296,9 @@ class TareaController extends Controller
     private function verificarPermisos($tarea)
     {
         $usuarioId = Auth::id();
-        $tienePermiso = Revista::whereHas('tipoUsuario.persona', function($q) use ($usuarioId) {
-                $q->where('id', $usuarioId);
-            })
+        $tienePermiso = Revista::whereHas('tipoUsuario.persona', function ($q) use ($usuarioId) {
+            $q->where('id', $usuarioId);
+        })
             ->where('id', $tarea->id_revista)
             ->exists();
 
