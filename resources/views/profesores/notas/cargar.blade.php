@@ -98,7 +98,7 @@
                         <div class="text-2xl font-bold text-red-600" id="contador-desaprobados-detalle">
                             {{ isset($estadisticasDinamicas['desaprobados']) ? $estadisticasDinamicas['desaprobados'] : 0 }}
                         </div>
-                        <div class="text-sm text-gray-600">Desaprobados (<4)< /div>
+                        <div class="text-sm text-gray-600">Desaprobados (<4)>
                         </div>
                     </div>
                 </div>
