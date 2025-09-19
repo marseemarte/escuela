@@ -449,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 300);
     });
 
-    // --- Modal eliminar (MEJORADO) ---
+    // Modal eliminar  
     const eliminarBtns = document.querySelectorAll('.eliminarBtn');
     const eliminarModal = document.getElementById('eliminarModal');
     const closeEliminarModalBtn = document.getElementById('closeEliminarModal');
@@ -481,7 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
     closeEliminarModalBtn.addEventListener('click', cerrarEliminarModal);
     cancelEliminarBtn.addEventListener('click', cerrarEliminarModal);
 
-    // SCRIPT DE ELIMINACIÓN MEJORADO
+    // Manejo de la eliminación con fetch y CSRF
     confirmarEliminarBtn.addEventListener('click', async () => {
         if (!tareaIdParaEliminar) return;
         
@@ -542,30 +542,46 @@ document.addEventListener('DOMContentLoaded', () => {
                     setTimeout(() => alertDiv.remove(), 500);
                 }, 3000);
                 
-                // Remover la fila de la tabla con animación
-                const filaAEliminar = document.querySelector(`button[data-tarea-id="${tareaIdParaEliminar}"]`).closest('tr');
-                if (filaAEliminar) {
-                    filaAEliminar.style.transition = 'opacity 0.3s, transform 0.3s';
-                    filaAEliminar.style.opacity = '0';
-                    filaAEliminar.style.transform = 'translateX(-100%)';
-                    setTimeout(() => filaAEliminar.remove(), 300);
-                    
-                    // Si no quedan más filas, mostrar mensaje de tabla vacía
-                    setTimeout(() => {
-                        const tbody = filaAEliminar.parentNode;
-                        if (tbody && tbody.children.length === 0) {
-                            const colspan = tbody.parentNode.querySelector('thead tr').children.length;
-                            tbody.innerHTML = `
-                                <tr>
-                                    <td colspan="${colspan}" class="px-6 py-4 text-gray-500 italic">
-                                        No hay ${document.getElementById('tabModulos').classList.contains('active') ? 'módulos' : 'tareas'} subidas aún.
-                                    </td>
-                                </tr>
-                            `;
-                        }
-                    }, 350);
+ if (data.success) {
+    // Guardar ID antes de cerrar modal
+    const idAEliminar = tareaIdParaEliminar;
+
+    // Cerrar modal primero
+    cerrarEliminarModal();
+
+    // Esperar a que termine la animación del modal (300ms aprox)
+    setTimeout(() => {
+        const filaAEliminar = document.querySelector(`button[data-tarea-id="${idAEliminar}"]`).closest('tr');
+        if (filaAEliminar) {
+            filaAEliminar.style.transition = 'opacity 0.3s, transform 0.3s';
+            filaAEliminar.style.opacity = '0';
+            filaAEliminar.style.transform = 'translateX(-100%)';
+
+            // Esperar animación antes de remover
+            setTimeout(() => {
+                const tbody = filaAEliminar.parentNode;
+                filaAEliminar.remove();
+
+                // Revisar si la tabla quedó vacía
+                const filasRestantes = Array.from(tbody.querySelectorAll('tr'))
+                    .filter(tr => tr.style.display !== 'none');
+
+                if (filasRestantes.length === 0) {
+                    const colspan = tbody.parentNode.querySelector('thead tr').children.length;
+                    const esTablaModulos = tbody.closest('#modulosSection') !== null;
+
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="${colspan}" class="px-6 py-4 text-gray-500 italic">
+                                No hay ${esTablaModulos ? 'módulos' : 'tareas'} subidos aún.
+                            </td>
+                        </tr>
+                    `;
                 }
-                
+            }, 350); // esperar animación fila
+        }
+    }, 300); // esperar animación modal
+}
             } else {
                 throw new Error(data.message || 'Error desconocido al eliminar la tarea');
             }
