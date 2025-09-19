@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Models\Tarea;
 use App\Models\Revista;
 use App\Models\Cupof;
-use App\Models\Persona;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -195,70 +194,103 @@ class TareaController extends Controller
         }
     }
 
-    public function seguimiento($tareaId)
+    public function seguimiento($id)
     {
-        $tarea = Tarea::with([
-            'revista.cupof.curso',
-            'revista.cupof.materia'
-        ])->findOrFail($tareaId);
+        try {
+            // Obtener la tarea
+            $tarea = Tarea::findOrFail($id);
+            
+            // Verificar permisos
+            $this->verificarPermisos($tarea);
 
-        // Verificar que el profesor tiene permisos sobre esta tarea
-        $this->verificarPermisos($tarea);
-
-        // Obtener información básica de la tarea
-        $curso = 'Sin asignar';
-        $materia = 'Sin materia';
-
-        if ($tarea->revista && $tarea->revista->cupof) {
-            if ($tarea->revista->cupof->curso) {
-                $curso = $tarea->revista->cupof->curso->ano . '°' . $tarea->revista->cupof->curso->division;
+            // Obtener información del curso y materia a través de las relaciones correctas
+            $revista = Revista::find($tarea->id_revista);
+            $cupofModel = null;
+            $curso = 'Sin asignar';
+            $materia = 'Sin materia';
+            
+            if ($revista) {
+                $cupofModel = Cupof::with(['materia', 'curso'])->find($revista->cupof);
+                if ($cupofModel) {
+                    if ($cupofModel->curso) {
+                        $curso = $cupofModel->curso->ano . '°' . $cupofModel->curso->division;
+                    }
+                    if ($cupofModel->materia) {
+                        $materia = $cupofModel->materia->nombre;
+                    }
+                }
             }
-            if ($tarea->revista->cupof->materia) {
-                $materia = $tarea->revista->cupof->materia->nombre;
+
+            // Obtener alumnos del curso
+            $alumnos = collect();
+            
+            if ($cupofModel && $cupofModel->curso) {
+                $alumnos = DB::table('asignacionesalumnos as aa')
+                    ->join('cursociclolectivo as ccl', 'aa.id_cursosciclolectivo', '=', 'ccl.id')
+                    ->join('tipousuario as tu', 'aa.id_tipousuario', '=', 'tu.id')
+                    ->join('persona as p', 'tu.id_persona', '=', 'p.id')
+                    ->where('ccl.id_cursos', $cupofModel->curso->id)
+                    ->where('ccl.ciclolectivo', date('Y'))
+                    ->where('aa.estado', 'A')
+                    ->select([
+                        'aa.id',
+                        'p.nombre',
+                        'p.apellido',
+                        'p.dni'
+                    ])
+                    ->get()
+                    ->map(function($alumno) use ($tarea) {
+                        // Verificar si vio la tarea
+                        $visto = DB::table('archivos_visto')
+                            ->where('id_tarea', $tarea->id)
+                            ->where('id_asignacionesalumnos', $alumno->id)
+                            ->where('visto', 1)
+                            ->exists();
+
+                        // Verificar si entregó (solo para tareas con fecha de entrega)
+                        $entrego = false;
+                        if (!is_null($tarea->fecha_entrega)) {
+                            $entrego = DB::table('tareas_alumnos')
+                                ->where('id_tarea', $tarea->id)
+                                ->where('id_asignacionesalumnos', $alumno->id)
+                                ->where('borrado_fisico', 0)
+                                ->exists();
+                        }
+
+                        // Obtener nota si existe
+                        $nota = DB::table('tareas_notas')
+                            ->where('id_tarea', $tarea->id)
+                            ->where('id_asignacionesalumnos', $alumno->id)
+                            ->value('nota');
+
+                        return [
+                            'id' => $alumno->id,
+                            'nombre_completo' => $alumno->apellido . ', ' . $alumno->nombre,
+                            'dni' => $alumno->dni,
+                            'visto' => $visto,
+                            'entrego' => $entrego,
+                            'nota' => $nota,
+                            'estado' => $this->determinarEstado($visto, $entrego, !is_null($tarea->fecha_entrega))
+                        ];
+                    });
             }
+
+            return response()->json([
+                'tarea' => [
+                    'id' => $tarea->id,
+                    'titulo' => $tarea->titulo,
+                    'materia' => $materia,
+                    'curso' => $curso,
+                    'es_tarea' => !is_null($tarea->fecha_entrega)
+                ],
+                'alumnos' => $alumnos,
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        // Obtener todos los alumnos del curso (usando query builder por simplicidad)
-        $alumnos = collect(); // Por ahora devolver vacío hasta resolver las relaciones
-
-        if ($tarea->revista && $tarea->revista->cupof && $tarea->revista->cupof->curso) {
-            $alumnos = DB::table('asignacionesalumnos as aa')
-                ->join('cursociclolectivo as ccl', 'aa.id_cursosciclolectivo', '=', 'ccl.id')
-                ->join('tipousuario as tu', 'aa.id_tipousuario', '=', 'tu.id')
-                ->join('persona as p', 'tu.id_persona', '=', 'p.id')
-                ->where('ccl.id_cursos', $tarea->revista->cupof->curso->id)
-                ->where('ccl.ciclolectivo', date('Y'))
-                ->where('aa.estado', 'A')
-                ->select([
-                    'aa.id',
-                    'p.nombre',
-                    'p.apellido',
-                    'p.dni'
-                ])
-                ->get()
-                ->map(function ($alumno) use ($tarea) {
-                    // Por simplicidad, devolver estados básicos
-                    return [
-                        'id' => $alumno->id,
-                        'nombre_completo' => $alumno->apellido . ', ' . $alumno->nombre,
-                        'dni' => $alumno->dni,
-                        'visto' => rand(0, 1) == 1, // Temporal
-                        'entrego' => rand(0, 1) == 1, // Temporal
-                        'nota' => null,
-                        'estado' => 'Visto' // Temporal
-                    ];
-                });
-        }
-
-        return response()->json([
-            'tarea' => [
-                'titulo' => $tarea->titulo,
-                'curso' => $curso,
-                'materia' => $materia,
-                'es_tarea' => !is_null($tarea->fecha_entrega)
-            ],
-            'alumnos' => $alumnos
-        ]);
     }
 
     public function destroy($id)

@@ -1,7 +1,8 @@
+
 <x-layouts.profesores.dashboard titulo="Tareas"> 
-    <h1 class="text-2xl font-semibold mb-2">Tareas</h1>
-    <p class="mb-6 text-gray-600">Gestiona las tareas que compartes con tus cursos. 
-        Aquí puedes subir archivos, ver a qué curso se asignaron y hacer el seguimiento de respuestas.</p>
+    <h1 class="text-2xl font-semibold mb-2">{{ $cursos[0]['materia'] }} - {{ $cursos[0]['nombre'] }}</h1>
+    <p class="mb-6 text-gray-600">Gestiona las tareas de la materia {{ $cursos[0]['materia'] }} del curso {{ $cursos[0]['nombre'] }}.  
+        Aquí puedes subir modulos de teoria, tareas con fecha de entrega y hacer el seguimiento de respuestas.</p>
 
     @if(session('success'))
         <div id="alert-success" 
@@ -70,17 +71,7 @@
                         rows="3"></textarea>
             </div>
 
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Curso/Materia</label>
-              <select name="cupof"
-                      class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-300"
-                      required>
-                <option value="" disabled selected>Selecciona un curso</option>
-                @foreach($cursos as $curso)
-                    <option value="{{ $curso['id'] }}">{{ $curso['nombre'] }} - {{ $curso['materia'] }}</option>
-                @endforeach
-              </select>
-            </div>
+            <input type="hidden" name="cupof" value="{{ $cursos[0]['id'] ?? $cupof }}">
 
             <!-- Campo fecha de entrega (solo para tarea) -->
             <div id="fechaEntrega" class="mb-4 hidden">
@@ -111,7 +102,7 @@
               <button type="button" id="cancelModalBtn" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 cursor-pointer">
                 Cancelar
               </button>
-              <button type="submit" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 cursor-pointer">
+              <button type="submit" id="btnSubir" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 cursor-pointer">
                 Subir
               </button>
             </div>
@@ -310,6 +301,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const fechaEntrega = document.getElementById("fechaEntrega");
     const archivoInput = document.getElementById('archivo');
     const archivoNombre = document.getElementById('archivoNombre');
+    const formSubir = document.querySelector('#modalFormulario form');
+    const btnSubir = document.getElementById('btnSubir');
 
     function openModal() {
         modal.classList.remove('hidden');
@@ -341,6 +334,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('input[name="fecha_entrega"]').value = '';
         const cupofSelect = document.querySelector('select[name="cupof"]');
         if(cupofSelect) cupofSelect.selectedIndex = 0;
+    }
+
+    if (formSubir && btnSubir) {
+        formSubir.addEventListener('submit', () => {
+                btnSubir.disabled = true;
+            btnSubir.textContent = 'Subiendo...';
+        });
     }
 
     openBtn.addEventListener('click', openModal);
@@ -449,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 300);
     });
 
-    // --- Modal eliminar ---
+    // --- Modal eliminar (MEJORADO) ---
     const eliminarBtns = document.querySelectorAll('.eliminarBtn');
     const eliminarModal = document.getElementById('eliminarModal');
     const closeEliminarModalBtn = document.getElementById('closeEliminarModal');
@@ -481,29 +481,116 @@ document.addEventListener('DOMContentLoaded', () => {
     closeEliminarModalBtn.addEventListener('click', cerrarEliminarModal);
     cancelEliminarBtn.addEventListener('click', cerrarEliminarModal);
 
+    // SCRIPT DE ELIMINACIÓN MEJORADO
     confirmarEliminarBtn.addEventListener('click', async () => {
         if (!tareaIdParaEliminar) return;
         
+        // Deshabilitar botón para evitar múltiples clics
+        confirmarEliminarBtn.disabled = true;
+        confirmarEliminarBtn.textContent = 'Eliminando...';
+        
         try {
+            // Usar el token CSRF directamente desde Laravel
+            const csrfToken = '{{ csrf_token() }}';
+            
+            if (!csrfToken) {
+                throw new Error('Token CSRF no encontrado. Recarga la página e intenta nuevamente.');
+            }
+
+            // Hacer la petición DELETE
             const response = await fetch(`/profesores/tareas/${tareaIdParaEliminar}`, {
                 method: 'DELETE',
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'X-CSRF-TOKEN': csrfToken,
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 }
             });
+            
+            // Verificar si la respuesta es exitosa
+            if (!response.ok) {
+                let errorMessage = `Error HTTP ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.message || errorMessage;
+                } catch (e) {
+                    // Si no puede parsear JSON, usar mensaje genérico
+                    errorMessage = response.status === 404 ? 'Tarea no encontrada' :
+                                 response.status === 403 ? 'No tienes permisos para eliminar esta tarea' :
+                                 response.status === 500 ? 'Error interno del servidor' : errorMessage;
+                }
+                throw new Error(errorMessage);
+            }
             
             const data = await response.json();
             
             if (data.success) {
                 cerrarEliminarModal();
-                location.reload(); // Recargar página para actualizar listados
+                
+                // Mostrar mensaje de éxito
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'mb-4 p-4 bg-green-100 border border-green-300 text-green-700 rounded transition-opacity duration-500';
+                alertDiv.innerHTML = `<strong>¡Éxito!</strong> ${data.message || 'Tarea eliminada correctamente'}`;
+                
+                // Insertar al inicio del contenido
+                const mainContent = document.querySelector('h1').parentElement;
+                mainContent.insertBefore(alertDiv, mainContent.firstChild);
+                
+                // Auto-ocultar después de 3 segundos
+                setTimeout(() => {
+                    alertDiv.style.opacity = '0';
+                    setTimeout(() => alertDiv.remove(), 500);
+                }, 3000);
+                
+                // Remover la fila de la tabla con animación
+                const filaAEliminar = document.querySelector(`button[data-tarea-id="${tareaIdParaEliminar}"]`).closest('tr');
+                if (filaAEliminar) {
+                    filaAEliminar.style.transition = 'opacity 0.3s, transform 0.3s';
+                    filaAEliminar.style.opacity = '0';
+                    filaAEliminar.style.transform = 'translateX(-100%)';
+                    setTimeout(() => filaAEliminar.remove(), 300);
+                    
+                    // Si no quedan más filas, mostrar mensaje de tabla vacía
+                    setTimeout(() => {
+                        const tbody = filaAEliminar.parentNode;
+                        if (tbody && tbody.children.length === 0) {
+                            const colspan = tbody.parentNode.querySelector('thead tr').children.length;
+                            tbody.innerHTML = `
+                                <tr>
+                                    <td colspan="${colspan}" class="px-6 py-4 text-gray-500 italic">
+                                        No hay ${document.getElementById('tabModulos').classList.contains('active') ? 'módulos' : 'tareas'} subidas aún.
+                                    </td>
+                                </tr>
+                            `;
+                        }
+                    }, 350);
+                }
+                
             } else {
-                alert('Error al eliminar la tarea');
+                throw new Error(data.message || 'Error desconocido al eliminar la tarea');
             }
         } catch (error) {
-            console.error('Error:', error);
-            alert('Error al eliminar la tarea');
+            console.error('Error al eliminar tarea:', error);
+            
+            // Mostrar mensaje de error
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'mb-4 p-4 bg-red-100 border border-red-300 text-red-700 rounded';
+            alertDiv.innerHTML = `<strong>Error:</strong> ${error.message}`;
+            
+            const mainContent = document.querySelector('h1').parentElement;
+            mainContent.insertBefore(alertDiv, mainContent.firstChild);
+            
+            // Auto-ocultar después de 5 segundos para errores
+            setTimeout(() => {
+                alertDiv.style.opacity = '0';
+                setTimeout(() => alertDiv.remove(), 500);
+            }, 5000);
+            
+            cerrarEliminarModal();
+        } finally {
+            // Restaurar botón
+            confirmarEliminarBtn.disabled = false;
+            confirmarEliminarBtn.textContent = 'Eliminar';
         }
     });
 
@@ -535,6 +622,7 @@ document.addEventListener('DOMContentLoaded', () => {
     activarTab(tabModulos, tabTareas, modulosSection, tareasSection);
 });
 
+// Auto-ocultar alerta de éxito si existe
 const alertSuccess = document.getElementById('alert-success');
 if (alertSuccess) {
     setTimeout(() => {
@@ -542,7 +630,6 @@ if (alertSuccess) {
         setTimeout(() => alertSuccess.remove(), 500);
     }, 3000);
 }
-
 </script>
 
 </x-layouts.profesores.dashboard>

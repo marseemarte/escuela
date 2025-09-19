@@ -84,14 +84,6 @@ class Tarea extends Model
         );
     }
 
-    // Método para obtener información del curso
-    public function getCursoInfo()
-    {
-        return $this->revista?->cupof ? 
-            $this->revista->cupof->curso->ano . '°' . $this->revista->cupof->curso->division :
-            'Sin asignar';
-    }
-
     // Método para contar entregas
     public function contarEntregas()
     {
