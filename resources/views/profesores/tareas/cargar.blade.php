@@ -249,7 +249,7 @@
         <div class="flex justify-end mt-4">
           <a href="#" id="btnCorregir" 
             class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 hidden">
-            Ir a Corregir
+            Corregir
           </a>
         </div>
       </div>
