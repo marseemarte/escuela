@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class TareaController extends Controller
-{
+{   
+    // Mostrar lista de materias asignadas al profesor
     public function index()
     {
         // Verificar autenticación
@@ -48,6 +49,7 @@ class TareaController extends Controller
         return view('profesores.tareas.index', compact('materias'));
     }
 
+    // Cargar vista para un CUPOF específico
     public function cargar($cupof)
     {
         $usuarioId = Auth::id();
@@ -144,6 +146,7 @@ class TareaController extends Controller
         return view('profesores.tareas.cargar', compact('cursos', 'modulos', 'tareas'));
     }
 
+    // Guardar nueva tarea
     public function store(Request $request)
     {
         $request->validate([
@@ -154,7 +157,7 @@ class TareaController extends Controller
             'fecha_entrega' => 'nullable|date|after:today'
         ]);
 
-        // Obtener la revista activa del profesor para este CUPOF
+        // Obtener la revista del profesor para este CUPOF
         $revista = Revista::whereHas('tipoUsuario.persona', function ($q) {
             $q->where('id', Auth::id());
         })
@@ -194,6 +197,7 @@ class TareaController extends Controller
         }
     }
 
+    // Seguimiento de tarea
     public function seguimiento($id)
     {
         try {
@@ -293,6 +297,8 @@ class TareaController extends Controller
         }
     }
 
+
+    // Eliminar tarea
     public function destroy($id)
     {
         $tarea = Tarea::findOrFail($id);
@@ -310,21 +316,24 @@ class TareaController extends Controller
         return response()->json(['success' => true, 'message' => 'Tarea eliminada correctamente.']);
     }
 
+    // Descargar archivo de tarea
     public function descargar($id)
     {
         $tarea = Tarea::findOrFail($id);
         $this->verificarPermisos($tarea);
 
+        // Usa Storage::disk('local') y construye la ruta
         if (!Storage::disk('local')->exists($tarea->ruta_archivo)) {
             abort(404, 'Archivo no encontrado.');
         }
 
-        return response()->download(
-            storage_path('app/' . $tarea->ruta_archivo),
-            $tarea->nombre_archivo
-        );
+        // Usar Storage para obtener la ruta completa
+        $rutaCompleta = Storage::disk('local')->path($tarea->ruta_archivo);
+        
+        return response()->download($rutaCompleta, $tarea->nombre_archivo);
     }
 
+    // Verificar permisos del profesor para la tarea
     private function verificarPermisos($tarea)
     {
         $usuarioId = Auth::id();
@@ -339,6 +348,7 @@ class TareaController extends Controller
         }
     }
 
+    // Determinar estado del alumno respecto a la tarea
     private function determinarEstado($visto, $entrego, $esTarea)
     {
         if (!$visto) {

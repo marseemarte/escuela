@@ -542,46 +542,41 @@ document.addEventListener('DOMContentLoaded', () => {
                     setTimeout(() => alertDiv.remove(), 500);
                 }, 3000);
                 
- if (data.success) {
-    // Guardar ID antes de cerrar modal
-    const idAEliminar = tareaIdParaEliminar;
+                // Eliminar fila de la tabla con animación
+                if (data.success) {
+                    const idAEliminar = tareaIdParaEliminar;
+                    cerrarEliminarModal();
 
-    // Cerrar modal primero
-    cerrarEliminarModal();
+                    setTimeout(() => {
+                        const filaAEliminar = document.querySelector(`button[data-tarea-id="${idAEliminar}"]`).closest('tr');
+                        if (filaAEliminar) {
+                            filaAEliminar.style.transition = 'opacity 0.3s, transform 0.3s';
+                            filaAEliminar.style.opacity = '0';
+                            filaAEliminar.style.transform = 'translateX(-100%)';
 
-    // Esperar a que termine la animación del modal (300ms aprox)
-    setTimeout(() => {
-        const filaAEliminar = document.querySelector(`button[data-tarea-id="${idAEliminar}"]`).closest('tr');
-        if (filaAEliminar) {
-            filaAEliminar.style.transition = 'opacity 0.3s, transform 0.3s';
-            filaAEliminar.style.opacity = '0';
-            filaAEliminar.style.transform = 'translateX(-100%)';
+                            setTimeout(() => {
+                                const tbody = filaAEliminar.parentNode;
+                                filaAEliminar.remove();
 
-            // Esperar animación antes de remover
-            setTimeout(() => {
-                const tbody = filaAEliminar.parentNode;
-                filaAEliminar.remove();
+                                const filasRestantes = Array.from(tbody.querySelectorAll('tr'))
+                                    .filter(tr => tr.style.display !== 'none');
 
-                // Revisar si la tabla quedó vacía
-                const filasRestantes = Array.from(tbody.querySelectorAll('tr'))
-                    .filter(tr => tr.style.display !== 'none');
+                                if (filasRestantes.length === 0) {
+                                    const colspan = tbody.parentNode.querySelector('thead tr').children.length;
+                                    const esTablaModulos = tbody.closest('#modulosSection') !== null;
 
-                if (filasRestantes.length === 0) {
-                    const colspan = tbody.parentNode.querySelector('thead tr').children.length;
-                    const esTablaModulos = tbody.closest('#modulosSection') !== null;
-
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="${colspan}" class="px-6 py-4 text-gray-500 italic">
-                                No hay ${esTablaModulos ? 'módulos' : 'tareas'} subidos aún.
-                            </td>
-                        </tr>
-                    `;
+                                    tbody.innerHTML = `
+                                        <tr>
+                                            <td colspan="${colspan}" class="px-6 py-4 text-gray-500 italic">
+                                                No hay ${esTablaModulos ? 'módulos' : 'tareas'} subidos aún.
+                                            </td>
+                                        </tr>
+                                    `;
+                                }
+                            }, 350); 
+                        }
+                    }, 300); 
                 }
-            }, 350); // esperar animación fila
-        }
-    }, 300); // esperar animación modal
-}
             } else {
                 throw new Error(data.message || 'Error desconocido al eliminar la tarea');
             }
@@ -596,7 +591,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const mainContent = document.querySelector('h1').parentElement;
             mainContent.insertBefore(alertDiv, mainContent.firstChild);
             
-            // Auto-ocultar después de 5 segundos para errores
+            // Auto-ocultar mensaje de error después de 5 segundos
             setTimeout(() => {
                 alertDiv.style.opacity = '0';
                 setTimeout(() => alertDiv.remove(), 500);
@@ -610,7 +605,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Tabs secciones ---
+    // Tabs secciones
     const tabModulos = document.getElementById('tabModulos');
     const tabTareas = document.getElementById('tabTareas');
     const modulosSection = document.getElementById('modulosSection');
