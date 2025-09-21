@@ -15,7 +15,15 @@ class TareaAlumno extends Model
         'id_asignacionesalumnos',
         'fecha',
         'nombre_archivo',
+        'ruta_archivo', 
         'borrado_fisico'
+    ];
+
+    protected $casts = [
+        'fecha' => 'datetime',
+        'borrado_fisico' => 'integer',
+        'id_tarea' => 'integer',
+        'id_asignacionesalumnos' => 'integer'
     ];
 
     // Relaciones

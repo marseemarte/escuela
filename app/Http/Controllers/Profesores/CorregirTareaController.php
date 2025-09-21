@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Storage;
 
 class CorregirTareaController extends Controller
 {
-    // Mostrar página de corrección con todos los alumnos
+// Mostrar página de corrección con todos los alumnos
     public function index($tareaId)
     {
         try {
@@ -73,7 +73,8 @@ class CorregirTareaController extends Controller
                         'p.apellido',
                         'p.dni',
                         'ta.nombre_archivo',
-                        'ta.fecha as fecha_entrega',
+                        'ta.ruta_archivo',
+                        'ta.fecha as fecha_entrega',  // Cambié de ta.fecha a ta.fecha
                         'ta.id as tarea_alumno_id',
                         'tn.nota',
                         'tn.devolucion'
@@ -88,6 +89,7 @@ class CorregirTareaController extends Controller
                             'nombre_completo' => $entrega->apellido . ', ' . $entrega->nombre,
                             'dni' => $entrega->dni,
                             'archivo' => $entrega->nombre_archivo,
+                            'ruta_archivo' => $entrega->ruta_archivo,  // AGREGAR ESTE CAMPO
                             'fecha_entrega' => $entrega->fecha_entrega,
                             'tarea_alumno_id' => $entrega->tarea_alumno_id,
                             'nota' => $entrega->nota,
@@ -106,7 +108,47 @@ class CorregirTareaController extends Controller
         }
     }
 
-    // Guardar nota y devolución (AJAX)
+    // Descargar respuesta del alumno - CORREGIDO para usar respuestas_alumnos
+    public function descargarRespuesta($tareaAlumnoId)
+    {
+        try {
+            $tareaAlumno = DB::table('tareas_alumnos as ta')
+                ->join('tareas as t', 'ta.id_tarea', '=', 't.id')
+                ->where('ta.id', $tareaAlumnoId)
+                ->where('ta.borrado_fisico', 0)
+                ->select('ta.*', 't.id_revista')
+                ->first();
+
+            if (!$tareaAlumno) {
+                abort(404, 'Respuesta no encontrada');
+            }
+
+            // Verificar permisos - el profesor debe ser el owner de la tarea
+            $tarea = Tarea::findOrFail($tareaAlumno->id_tarea);
+            $this->verificarPermisos($tarea);
+
+            // Usar ruta_archivo si existe, sino construir ruta con respuestas_alumnos
+            if (!empty($tareaAlumno->ruta_archivo)) {
+                $rutaArchivo = $tareaAlumno->ruta_archivo;
+            } else {
+                // Si no hay ruta_archivo, usar la carpeta respuestas_alumnos
+                $rutaArchivo = 'respuestas_alumnos/' . $tareaAlumno->nombre_archivo;
+            }
+            
+            if (!Storage::disk('local')->exists($rutaArchivo)) {
+                abort(404, 'Archivo de respuesta no encontrado en: ' . $rutaArchivo);
+            }
+
+            $rutaCompleta = Storage::disk('local')->path($rutaArchivo);
+            
+            return response()->download($rutaCompleta, $tareaAlumno->nombre_archivo);
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error al descargar la respuesta: ' . $e->getMessage());
+        }
+    }
+
+    // Guardar nota y devolución (AJAX) - MÉTODO FALTANTE
     public function guardar(Request $request)
     {
         $request->validate([
@@ -131,7 +173,9 @@ class CorregirTareaController extends Controller
                 ],
                 [
                     'nota' => $notaString,
-                    'devolucion' => $request->devolucion
+                    'devolucion' => $request->devolucion,
+                    'updated_at' => now(),
+                    'created_at' => now()
                 ]
             );
 
@@ -139,41 +183,6 @@ class CorregirTareaController extends Controller
             
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Error al guardar la nota: ' . $e->getMessage()], 500);
-        }
-    }
-
-    // Descargar respuesta del alumno
-    public function descargarRespuesta($tareaAlumnoId)
-    {
-        try {
-            $tareaAlumno = DB::table('tareas_alumnos as ta')
-                ->join('tareas as t', 'ta.id_tarea', '=', 't.id')
-                ->where('ta.id', $tareaAlumnoId)
-                ->where('ta.borrado_fisico', 0)
-                ->select('ta.*', 't.id_revista')
-                ->first();
-
-            if (!$tareaAlumno) {
-                abort(404, 'Respuesta no encontrada');
-            }
-
-            // Verificar permisos - el profesor debe ser el owner de la tarea
-            $tarea = Tarea::findOrFail($tareaAlumno->id_tarea);
-            $this->verificarPermisos($tarea);
-
-            // Construir ruta del archivo (asumiendo que se guarda en respuestas_alumnos)
-            $rutaArchivo = 'respuestas_alumnos/' . $tareaAlumno->nombre_archivo;
-            
-            if (!Storage::disk('local')->exists($rutaArchivo)) {
-                abort(404, 'Archivo de respuesta no encontrado');
-            }
-
-            $rutaCompleta = Storage::disk('local')->path($rutaArchivo);
-            
-            return response()->download($rutaCompleta, $tareaAlumno->nombre_archivo);
-
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error al descargar la respuesta: ' . $e->getMessage());
         }
     }
 

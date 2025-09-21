@@ -31,12 +31,11 @@ Route::middleware(['auth'])->group(function () {
 
 Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->group(function () {
 
-    // Sección de Tareas - CORREGIDA
+    // Sección de Tareas
     Route::prefix('tareas')->name('profesores.tareas.')->group(function () {
         Route::get('/', [TareaController::class, 'index'])->name('index');
         Route::get('/{cupof}', [TareaController::class, 'cargar'])->name('cargar');
         Route::post('/', [TareaController::class, 'store'])->name('store');
-        Route::get('/corregir', [TareaController::class, 'corregir'])->name('corregir');
         Route::get('/{id}/descargar', [TareaController::class, 'descargar'])->name('descargar');
         Route::get('/{id}/seguimiento', [TareaController::class, 'seguimiento'])->name('seguimiento');
         Route::delete('/{id}', [TareaController::class, 'destroy'])->name('destroy');
