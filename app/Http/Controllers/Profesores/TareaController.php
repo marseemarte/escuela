@@ -83,12 +83,15 @@ class TareaController extends Controller
             ]);
         }
 
+        // Obtener total de alumnos del curso
+        $totalAlumnos = $this->obtenerTotalAlumnosCurso($cupofModel);
+
         // Obtener módulos (tareas sin fecha de entrega) para este CUPOF específico
         $modulos = Tarea::where('id_revista', $revista->id)
             ->whereNull('fecha_entrega')
             ->orderByDesc('fecha_subida')
             ->get()
-            ->map(function ($tarea) use ($cupofModel) {
+            ->map(function ($tarea) use ($cupofModel, $totalAlumnos) {
                 $curso = 'Sin asignar';
                 $materia = 'Sin materia';
 
@@ -100,6 +103,9 @@ class TareaController extends Controller
                         $materia = $cupofModel->materia->nombre;
                     }
                 }
+
+                // Contar alumnos que vieron el módulo
+                $vistos = $this->contarAlumnosVisto($tarea->id);
 
                 return [
                     'id' => $tarea->id,
@@ -108,7 +114,7 @@ class TareaController extends Controller
                     'materia' => $materia,
                     'fecha_subida' => $tarea->fecha_subida ? $tarea->fecha_subida->format('d/m/Y') : date('d/m/Y'),
                     'archivo' => $tarea->nombre_archivo,
-                    'vistos' => 0 // Temporal, implementar después
+                    'vistos' => $vistos . '/' . $totalAlumnos
                 ];
             });
 
@@ -117,7 +123,7 @@ class TareaController extends Controller
             ->whereNotNull('fecha_entrega')
             ->orderByDesc('fecha_subida')
             ->get()
-            ->map(function ($tarea) use ($cupofModel) {
+            ->map(function ($tarea) use ($cupofModel, $totalAlumnos) {
                 $curso = 'Sin asignar';
                 $materia = 'Sin materia';
 
@@ -129,6 +135,12 @@ class TareaController extends Controller
                         $materia = $cupofModel->materia->nombre;
                     }
                 }
+
+                // Contar entregas realizadas
+                $entregas = $this->contarEntregasRealizadas($tarea->id);
+                
+                // Contar alumnos que vieron la tarea
+                $vistos = $this->contarAlumnosVisto($tarea->id);
 
                 return [
                     'id' => $tarea->id,
@@ -138,12 +150,46 @@ class TareaController extends Controller
                     'fecha_subida' => $tarea->fecha_subida ? $tarea->fecha_subida->format('d/m/Y') : date('d/m/Y'),
                     'fecha_entrega' => $tarea->fecha_entrega ? $tarea->fecha_entrega->format('d/m/Y') : '-',
                     'archivo' => $tarea->nombre_archivo,
-                    'entregas' => 0, // Temporal
-                    'vistos' => 0 // Temporal
+                    'entregas' => $entregas . '/' . $totalAlumnos,
+                    'vistos' => $vistos . '/' . $totalAlumnos
                 ];
             });
 
         return view('profesores.tareas.cargar', compact('cursos', 'modulos', 'tareas'));
+    }
+
+    // Método privado para obtener total de alumnos del curso
+    private function obtenerTotalAlumnosCurso($cupofModel)
+    {
+        if (!$cupofModel || !$cupofModel->curso) {
+            return 0;
+        }
+
+        return DB::table('asignacionesalumnos as aa')
+            ->join('cursociclolectivo as ccl', 'aa.id_cursosciclolectivo', '=', 'ccl.id')
+            ->where('ccl.id_cursos', $cupofModel->curso->id)
+            ->where('ccl.ciclolectivo', date('Y'))
+            ->where('aa.estado', 'A')
+            ->count();
+    }
+
+    // Método privado para contar entregas realizadas
+    private function contarEntregasRealizadas($tareaId)
+    {
+        return DB::table('tareas_alumnos')
+            ->where('id_tarea', $tareaId)
+            ->where('borrado_fisico', 0)
+            ->count();
+    }
+
+    // Método privado para contar alumnos que vieron la tarea/módulo
+    private function contarAlumnosVisto($tareaId)
+    {
+        return DB::table('archivos_visto')
+            ->where('id_tarea', $tareaId)
+            ->where('visto', 1)
+            ->distinct('id_asignacionesalumnos')
+            ->count();
     }
 
     // Guardar nueva tarea
@@ -296,7 +342,6 @@ class TareaController extends Controller
             ], 500);
         }
     }
-
 
     // Eliminar tarea
     public function destroy($id)
