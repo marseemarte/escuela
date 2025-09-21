@@ -148,7 +148,7 @@ class CorregirTareaController extends Controller
         }
     }
 
-    // Guardar nota y devolución (AJAX) - MÉTODO FALTANTE
+    // Guardar corrección (nota y devolución)
     public function guardar(Request $request)
     {
         $request->validate([
@@ -161,8 +161,6 @@ class CorregirTareaController extends Controller
         try {
             $tarea = Tarea::findOrFail($request->tarea_id);
             $this->verificarPermisos($tarea);
-
-            // Convertir la nota a string para guardar en varchar
             $notaString = strval($request->nota);
 
             // Guardar o actualizar la nota
@@ -179,13 +177,44 @@ class CorregirTareaController extends Controller
                 ]
             );
 
-            return response()->json(['success' => true, 'message' => 'Nota guardada correctamente']);
+            return response()->json([
+                'success' => true, 
+                'message' => 'Nota guardada correctamente',
+                'has_correction' => true
+            ]);
             
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Error al guardar la nota: ' . $e->getMessage()], 500);
         }
     }
 
+    // Eliminar corrección
+    public function eliminar(Request $request)
+    {
+        $request->validate([
+            'asignacion_id' => 'required|integer',
+            'tarea_id' => 'required|integer|exists:tareas,id'
+        ]);
+
+        try {
+            $tarea = Tarea::findOrFail($request->tarea_id);
+            $this->verificarPermisos($tarea);
+
+            DB::table('tareas_notas')
+                ->where('id_tarea', $request->tarea_id)
+                ->where('id_asignacionesalumnos', $request->asignacion_id)
+                ->delete();
+
+            return response()->json([
+                'success' => true, 
+                'message' => 'Corrección eliminada correctamente',
+                'has_correction' => false  
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error al eliminar la corrección: ' . $e->getMessage()], 500);
+        }
+    }
     // Método privado para determinar el estado de entrega
     private function determinarEstadoEntrega($entrego, $nota, $fechaLimite, $fechaEntrega)
     {

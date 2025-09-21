@@ -41,6 +41,7 @@ Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->
         Route::delete('/{id}', [TareaController::class, 'destroy'])->name('destroy');
         Route::get('{id}/corregir', [CorregirTareaController::class, 'index'])->name('corregir');
         Route::post('guardar-correccion', [CorregirTareaController::class, 'guardar'])->name('guardar-correccion');
+        Route::post('eliminar-correccion', [CorregirTareaController::class, 'eliminar'])->name('eliminar-correccion');
         Route::get('alumno/{tareaAlumnoId}/descargar', [CorregirTareaController::class, 'descargarRespuesta'])->name('descargar-respuesta');
     });
 
