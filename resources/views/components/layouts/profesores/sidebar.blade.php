@@ -21,7 +21,7 @@
                 </a>
             </li>
             <li class="{{ $tareas == 'true' ? 'active' : '' }}">
-                <a href="{{ route('tareas.index') }}">
+                <a href="{{ route('profesores.tareas.index') }}">
                     <span class="pcoded-micon"><i class="feather icon-book"></i></span>
                     <span class="pcoded-mtext">Tareas</span>
                 </a>
