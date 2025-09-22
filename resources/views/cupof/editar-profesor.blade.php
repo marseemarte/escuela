@@ -21,7 +21,9 @@
     @if(session('error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
         </div>
     @endif
 
@@ -122,8 +124,21 @@
                 </div>
                 <div class="card-body">
                     <p><strong>Cupof:</strong> {{ $cupo->cupof }}</p>
-                    <p><strong>Turno:</strong> {{ $cupo->turno }}</p>
+                    <p><strong>Materia:</strong> {{ $cupo->materia_nombre ?? 'N/A' }}</p>
+                    <p><strong>Curso:</strong> {{ $cupo->curso_ano ?? 'N/A' }}° {{ $cupo->curso_division ?? '' }}</p>
+                    <p><strong>Turno:</strong> 
+                        @if($cupo->turno == 'M')
+                            Mañana
+                        @elseif($cupo->turno == 'T')
+                            Tarde
+                        @elseif($cupo->turno == 'V')
+                            Noche
+                        @else
+                            {{ $cupo->turno }}
+                        @endif
+                    </p>
                     <p><strong>Horas:</strong> {{ $cupo->hsmodcar }}</p>
+                    <p><strong>Grupo:</strong> {{ $cupo->grupo_nombre ?? 'Sin grupo' }}</p>
                     <p><strong>Función:</strong> {{ $cupo->funcion }}</p>
                     <p><strong>Cargo:</strong> {{ $cupo->cargo }}</p>
                     <p><strong>Estado:</strong> 

@@ -20,7 +20,7 @@ class Cupof extends Model
         'hsmodcar',
         'id_materias',
         'id_cursos',
-        'id_grupos',
+        'id_grupos', 
         'estado',
         'funcion',
         'cargo'
