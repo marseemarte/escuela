@@ -25,10 +25,10 @@ Route::get('/', function () {
 
 
 
-Route::get('/profesores/horarios/create', [HorariosSubidaController::class, 'create'])
+Route::get('/profesores/horarios/create', [HorariosController::class, 'create'])
     ->name('horarios.create');
 
-Route::post('/profesores/horarios', [HorariosSubidaController::class, 'store'])
+Route::post('/profesores/horarios', [HorariosController::class, 'store'])
     ->name('horarios.store');
 // Rutas de asistencias para usuarios generales (estudiantes/padres)
 Route::middleware(['auth'])->group(function () {
