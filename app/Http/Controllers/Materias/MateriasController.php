@@ -98,14 +98,16 @@ class MateriasController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255',
-            'resumen' => 'nullable|string',
+            'nombre' => 'required|string|max:70',
+            'abreviatura' => 'required|string|max:15',
+            'estado' => 'required|in:A,I',
+            'resumen' => 'required|string|max:50',
             'orientacion_id' => 'required|exists:orientaciones,id',
             'anio' => 'required|integer|min:1|max:7',
             'tipo' => 'required|in:materia,taller'
         ]);
 
-        Materia::create($request->only(['nombre', 'resumen', 'orientacion_id', 'anio', 'tipo']));
+        Materia::create($request->only(['nombre', 'abreviatura', 'estado', 'resumen', 'orientacion_id', 'anio', 'tipo']));
 
         return redirect()->route('materias.index')->with('success', 'Materia creada correctamente.');
     }
@@ -120,15 +122,17 @@ class MateriasController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255',
-            'resumen' => 'nullable|string',
+            'nombre' => 'required|string|max:70',
+            'abreviatura' => 'required|string|max:15',
+            'estado' => 'required|in:A,I',
+            'resumen' => 'required|string|max:50',
             'orientacion_id' => 'required|exists:orientaciones,id',
             'anio' => 'required|integer|min:1|max:7',
             'tipo' => 'required|in:materia,taller'
         ]);
 
         $materia = Materia::findOrFail($id);
-        $materia->update($request->only(['nombre', 'resumen', 'orientacion_id', 'anio', 'tipo']));
+        $materia->update($request->only(['nombre', 'abreviatura', 'estado', 'resumen', 'orientacion_id', 'anio', 'tipo']));
 
         return redirect()->route('materias.index')->with('success', 'Materia actualizada correctamente.');
     }

@@ -42,6 +42,39 @@
             <textarea name="resumen" class="form-control" maxlength="50" required>{{ old('resumen') }}</textarea>
         </div>
 
+        <div class="form-group mb-3">
+            <label for="orientacion_id">Orientación</label>
+            <select name="orientacion_id" class="form-control" required>
+                <option value="">-- Seleccionar Orientación --</option>
+                @foreach($orientaciones as $orientacion)
+                    <option value="{{ $orientacion->id }}" {{ old('orientacion_id') == $orientacion->id ? 'selected' : '' }}>
+                        {{ $orientacion->nombre }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="anio">Año</label>
+            <select name="anio" class="form-control" required>
+                <option value="">-- Seleccionar Año --</option>
+                @for($i = 1; $i <= 7; $i++)
+                    <option value="{{ $i }}" {{ old('anio') == $i ? 'selected' : '' }}>
+                        {{ $i }}° Año
+                    </option>
+                @endfor
+            </select>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="tipo">Tipo</label>
+            <select name="tipo" class="form-control" required>
+                <option value="">-- Seleccionar Tipo --</option>
+                <option value="materia" {{ old('tipo') == 'materia' ? 'selected' : '' }}>Materia</option>
+                <option value="taller" {{ old('tipo') == 'taller' ? 'selected' : '' }}>Taller</option>
+            </select>
+        </div>
+
         <button type="submit" class="btn btn-success">Guardar</button>
         <a href="{{ route('materias.index') }}" class="btn btn-secondary">Cancelar</a>
     </form>
