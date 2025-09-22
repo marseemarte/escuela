@@ -18,7 +18,13 @@
 
                             {{-- Información de la materia --}}
                             <div class="text-center text-md-left">
-                                <h1 class="h4 mb-1">{{ $cursos[0]['materia'] }} - {{ $cursos[0]['nombre'] }}</h1>
+                                <h1 class="h4 mb-1">
+                                    @if ($cursos->isNotEmpty())
+                                        {{ $cursos->first()['materia'] }} - {{ $cursos->first()['nombre'] }}
+                                    @else
+                                        Gestión de Tareas
+                                    @endif
+                                </h1>
                                 <p class="text-muted mb-0">
                                     Gestión de contenido académico y tareas con seguimiento de entregas
                                 </p>
@@ -114,18 +120,20 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($tareas->where('tipo', 'modulo') as $tarea)
+                                    @forelse($modulos as $modulo)
                                         <tr class="text-center">
-                                            <td class="font-weight-medium">{{ $tarea->titulo }}</td>
-                                            <td class="text-muted">{{ $tarea->descripcion ?? '-' }}</td>
+                                            <td class="font-weight-medium">{{ $modulo['titulo'] }}</td>
+                                            <td class="text-muted">
+                                                {{ isset($modulo['descripcion']) && $modulo['descripcion'] ? $modulo['descripcion'] : 'Sin descripción' }}
+                                            </td>
                                             <td>
                                                 <small class="text-muted">
-                                                    {{ $tarea->created_at ? $tarea->created_at->format('d/m/Y') : '-' }}
+                                                    {{ $modulo['fecha_subida'] ?? '-' }}
                                                 </small>
                                             </td>
                                             <td>
-                                                @if ($tarea->archivo_path)
-                                                    <a href="{{ route('profesores.tareas.descargar', $tarea->id) }}"
+                                                @if (isset($modulo['archivo']))
+                                                    <a href="{{ route('profesores.tareas.descargar', $modulo['id']) }}"
                                                         class="btn btn-outline-primary btn-sm" target="_blank">
                                                         <i class="feather icon-download mr-1"></i>
                                                         Ver archivo
@@ -136,8 +144,8 @@
                                             </td>
                                             <td>
                                                 <button class="btn btn-outline-danger btn-sm eliminarBtn"
-                                                    data-tarea-id="{{ $tarea->id }}"
-                                                    data-tarea-titulo="{{ $tarea->titulo }}">
+                                                    data-tarea-id="{{ $modulo['id'] }}"
+                                                    data-tarea-titulo="{{ $modulo['titulo'] }}">
                                                     <i class="feather icon-trash-2"></i>
                                                 </button>
                                             </td>
@@ -171,23 +179,29 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($tareas->where('tipo', 'tarea') as $tarea)
+                                    @forelse($tareas as $tarea)
                                         <tr class="text-center">
-                                            <td class="font-weight-medium">{{ $tarea->titulo }}</td>
-                                            <td class="text-muted">{{ $tarea->descripcion ?? '-' }}</td>
+                                            <td class="font-weight-medium">{{ $tarea['titulo'] }}</td>
+                                            <td class="text-muted">
+                                                {{ isset($tarea['descripcion']) && $tarea['descripcion'] ? $tarea['descripcion'] : 'Sin descripción' }}
+                                            </td>
                                             <td>
-                                                @if ($tarea->fecha_entrega)
+                                                @if (isset($tarea['fecha_entrega']))
+                                                    @php
+                                                        $fechaEntrega = \Carbon\Carbon::parse($tarea['fecha_entrega']);
+                                                        $esVencida = $fechaEntrega->isPast();
+                                                    @endphp
                                                     <span
-                                                        class="badge {{ $tarea->fecha_entrega->isPast() ? 'badge-danger' : 'badge-success' }}">
-                                                        {{ $tarea->fecha_entrega->format('d/m/Y') }}
+                                                        class="badge {{ $esVencida ? 'badge-danger' : 'badge-success' }}">
+                                                        {{ $fechaEntrega->format('d/m/Y') }}
                                                     </span>
                                                 @else
                                                     <span class="text-muted">-</span>
                                                 @endif
                                             </td>
                                             <td>
-                                                @if ($tarea->archivo_path)
-                                                    <a href="{{ route('profesores.tareas.descargar', $tarea->id) }}"
+                                                @if (isset($tarea['archivo']))
+                                                    <a href="{{ route('profesores.tareas.descargar', $tarea['id']) }}"
                                                         class="btn btn-outline-primary btn-sm" target="_blank">
                                                         <i class="feather icon-download mr-1"></i>
                                                         Ver archivo
@@ -199,13 +213,13 @@
                                             <td>
                                                 <div class="btn-group" role="group">
                                                     <button class="btn btn-outline-info btn-sm seguimientoBtn"
-                                                        data-tarea-id="{{ $tarea->id }}">
+                                                        data-tarea-id="{{ $tarea['id'] }}">
                                                         <i class="feather icon-eye mr-1"></i>
                                                         Seguimiento
                                                     </button>
                                                     <button class="btn btn-outline-danger btn-sm eliminarBtn"
-                                                        data-tarea-id="{{ $tarea->id }}"
-                                                        data-tarea-titulo="{{ $tarea->titulo }}">
+                                                        data-tarea-id="{{ $tarea['id'] }}"
+                                                        data-tarea-titulo="{{ $tarea['titulo'] }}">
                                                         <i class="feather icon-trash-2"></i>
                                                     </button>
                                                 </div>
@@ -277,12 +291,13 @@
                         <form method="POST" action="{{ route('profesores.tareas.store') }}"
                             enctype="multipart/form-data">
                             @csrf
-                            <input type="hidden" name="cupof" value="{{ $cursos[0]['id'] ?? $cupof }}">
+                            <input type="hidden" name="cupof"
+                                value="{{ request()->route('cupof') ?? ($cursos->isNotEmpty() ? $cursos->first()['id'] : '') }}">
                             <input type="hidden" name="tipo" id="tipoArchivo">
 
                             <div class="form-group">
                                 <label for="nombreArchivo">Título <span class="text-danger">*</span></label>
-                                <input type="text" name="titulo" id="nombreArchivo" class="form-control"
+                                <input type="text" name="nombre" id="nombreArchivo" class="form-control"
                                     required>
                                 <small class="form-text text-muted">Ingrese un título descriptivo para el
                                     archivo</small>
@@ -328,72 +343,18 @@
                 </div>
             </div>
         </div>
-        {{-- Modal de seguimiento --}}
-        <div class="modal fade" id="seguimientoModal" tabindex="-1" aria-labelledby="seguimientoModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-xl">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="seguimientoModalLabel">Seguimiento de Tarea</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div id="tareaInfo" class="mb-4">
-                            {{-- Info de la tarea se carga dinámicamente --}}
-                        </div>
-                        <div id="seguimientoContent">
-                            {{-- Contenido del seguimiento se carga via AJAX --}}
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <a href="#" id="btnCorregir" class="btn btn-primary d-none">
-                            <i class="feather icon-edit mr-1"></i>
-                            Ir a Corregir
-                        </a>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        {{-- Modal de confirmación eliminar --}}
-        <div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="eliminarModalLabel">Confirmar Eliminación</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="text-center">
-                            <i class="feather icon-alert-triangle text-warning mb-3" style="font-size: 3rem;"></i>
-                            <p class="mb-3">¿Está seguro de que desea eliminar esta tarea?</p>
-                            <p class="text-muted mb-0">Esta acción no se puede deshacer.</p>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                        <button type="button" id="confirmarEliminar" class="btn btn-danger">
-                            <i class="feather icon-trash-2 mr-1"></i>
-                            Eliminar
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <style>
-            /* Estilos mínimos para componentes específicos */
+            /* Estilos para el sistema de tareas */
             .custom-file-label::after {
                 content: "Seleccionar";
+                background-color: #007bff;
+                border-color: #007bff;
+                color: white;
             }
 
-            /* Ajustes para la visualización de seguimiento */
+            /* Mejoras en la visualización de seguimiento */
             #seguimientoContent table {
                 width: 100% !important;
                 margin: 0 auto !important;
@@ -402,17 +363,78 @@
             #seguimientoContent th,
             #seguimientoContent td {
                 text-align: center !important;
-                padding: 0.5rem !important;
+                padding: 0.75rem !important;
+                vertical-align: middle !important;
             }
 
             #seguimientoContent th {
                 background-color: #f8f9fa !important;
-                font-weight: bold !important;
+                font-weight: 600 !important;
+                border-bottom: 2px solid #dee2e6 !important;
             }
 
-            /* Bootstrap tab customization */
+            /* Personalización de pestañas Bootstrap */
+            .nav-tabs .nav-link {
+                border: 1px solid transparent;
+                border-radius: 0.25rem 0.25rem 0 0;
+                transition: all 0.3s ease;
+            }
+
             .nav-tabs .nav-link.active {
-                border-bottom-color: #007bff;
+                color: #007bff !important;
+                background-color: #fff;
+                border-color: #dee2e6 #dee2e6 #fff;
+                border-bottom-color: #fff;
+                font-weight: 600;
+            }
+
+            .nav-tabs .nav-link:hover:not(.active) {
+                border-color: #e9ecef #e9ecef #dee2e6;
+                background-color: #f8f9fa;
+            }
+
+            /* Mejoras en las tablas */
+            .table th {
+                font-weight: 600;
+                font-size: 0.9rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .table-hover tbody tr:hover {
+                background-color: rgba(0, 123, 255, 0.05);
+            }
+
+            /* Botones más elegantes */
+            .btn-group .btn {
+                border-radius: 0.25rem;
+                margin-right: 2px;
+            }
+
+            .btn-group .btn:last-child {
+                margin-right: 0;
+            }
+
+            /* Estilo para badges de fecha */
+            .badge {
+                font-weight: 500;
+                font-size: 0.8rem;
+            }
+
+            /* Responsive improvements */
+            @media (max-width: 768px) {
+                .table-responsive {
+                    border: none;
+                }
+
+                .btn-group {
+                    flex-direction: column;
+                }
+
+                .btn-group .btn {
+                    margin-bottom: 2px;
+                    border-radius: 0.25rem !important;
+                }
             }
         </style>
 
