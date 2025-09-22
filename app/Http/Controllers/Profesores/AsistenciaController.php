@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Http\Controllers\Profesores;
 
 use App\Http\Controllers\Controller;
@@ -14,33 +15,40 @@ use Illuminate\Support\Facades\Log;
 
 class AsistenciaController extends Controller
 {
-    public function materias(Request $request)
+    public function index(Request $request)
     {
-        // Obtener materias del profesor logueado
-        $profesor = Auth::user();
+        // Verificar si el usuario es profesor
+        $usuario = Auth::user();
 
-        $materias = DB::table('cupof')
-            ->join('materias', 'cupof.id_materias', '=', 'materias.id')
-            ->join('cursos', 'cupof.id_cursos', '=', 'cursos.id')
-            ->join('grupos', 'cupof.id_grupos', '=', 'grupos.id')
-            ->join('revista', 'cupof.cupof', '=', 'revista.cupof')
-            ->join('tipousuario', 'revista.id_tipousuario', '=', 'tipousuario.id')
-            ->join('persona', 'tipousuario.id_persona', '=', 'persona.id')
-            ->where('persona.dni', $profesor->dni)
-            ->where('cupof.estado', 'A')
-            ->where('revista.situacion', 'A') // Solo asignaciones activas
-            ->select(
-                'cupof.cupof',
-                'materias.nombre as materia_nombre',
-                'cursos.division',
-                'cursos.ano',
-                'grupos.nombre as grupo_nombre',
-                'cupof.turno'
-            )
-            ->distinct()
-            ->get();
+        if ($usuario instanceof Persona && $usuario->isProfesor()) {
+            // Lógica para profesores
+            $materias = DB::table('cupof')
+                ->join('materias', 'cupof.id_materias', '=', 'materias.id')
+                ->join('cursos', 'cupof.id_cursos', '=', 'cursos.id')
+                ->join('grupos', 'cupof.id_grupos', '=', 'grupos.id')
+                ->join('revista', 'cupof.cupof', '=', 'revista.cupof')
+                ->join('tipousuario', 'revista.id_tipousuario', '=', 'tipousuario.id')
+                ->join('persona', 'tipousuario.id_persona', '=', 'persona.id')
+                ->where('persona.dni', $usuario->dni)
+                ->where('cupof.estado', 'A')
+                ->where('revista.situacion', 'A') // Solo asignaciones activas
+                ->select(
+                    'cupof.cupof',
+                    'materias.nombre as materia_nombre',
+                    'cursos.division',
+                    'cursos.ano',
+                    'grupos.nombre as grupo_nombre',
+                    'cupof.turno'
+                )
+                ->distinct()
+                ->get();
 
-        return view('profesores.asistencias.index', compact('materias'));
+            return view('profesores.asistencias.index', compact('materias'));
+        } else {
+            // Lógica para estudiantes/padres - mostrar asistencias del alumno
+            // Por ahora, redirigir al dashboard
+            return redirect()->route('dashboard')->with('info', 'Vista de asistencias para estudiantes en desarrollo');
+        }
     }
 
     public function tomar(Request $request, $cupof)
@@ -270,7 +278,8 @@ class AsistenciaController extends Controller
                 'request_data_keys' => array_keys($request->all()),
                 'ip' => $request->ip(),
                 'user_agent' => $request->header('User-Agent'),
-                'all_input' => $request->all()
+                'all_input' => $request->all(),
+                'asistencias_raw' => $request->input('asistencias')
             ]);
 
             // Verificar autenticación
@@ -347,7 +356,33 @@ class AsistenciaController extends Controller
             $actualizados = 0;
             $creados = 0;
 
-            foreach ($asistenciasData as $asistenciaData) {
+            foreach ($asistenciasData as $index => $asistenciaData) {
+                Log::info("Procesando asistencia $index:", [
+                    'asignacion_id' => $asistenciaData['asignacion_id'],
+                    'estado' => $asistenciaData['estado'],
+                    'justificado' => $asistenciaData['justificado'],
+                    'justificado_type' => gettype($asistenciaData['justificado']),
+                    'justificado_var_dump' => var_export($asistenciaData['justificado'], true)
+                ]);
+
+                // VALIDACIÓN DEL SERVIDOR: Justificado solo permitido para Ausente (A) o Tarde (T)
+                $justificadoFinal = false;
+                if ($asistenciaData['justificado'] && ($asistenciaData['estado'] === 'A' || $asistenciaData['estado'] === 'T')) {
+                    $justificadoFinal = true;
+                } elseif ($asistenciaData['justificado'] && $asistenciaData['estado'] === 'P') {
+                    Log::warning("Intento de marcar justificado con estado Presente - rechazado:", [
+                        'asignacion_id' => $asistenciaData['asignacion_id'],
+                        'estado' => $asistenciaData['estado']
+                    ]);
+                }
+
+                Log::info("Valor justificado final calculado:", [
+                    'asignacion_id' => $asistenciaData['asignacion_id'],
+                    'estado' => $asistenciaData['estado'],
+                    'justificado_original' => $asistenciaData['justificado'],
+                    'justificado_final' => $justificadoFinal
+                ]);
+
                 // Verificar si ya existe un registro de asistencia para hoy
                 $asistencia = DB::table('inasistenciasalumnos')
                     ->where('id_asignacionesalumnos', $asistenciaData['asignacion_id'])
@@ -357,24 +392,53 @@ class AsistenciaController extends Controller
 
                 if ($asistencia) {
                     // Actualizar registro existente
-                    DB::table('inasistenciasalumnos')
+                    $justificadoValue = $justificadoFinal ? '1' : '0';
+                    Log::info("Actualizando registro existente:", [
+                        'id' => $asistencia->id,
+                        'nuevo_estado' => $asistenciaData['estado'],
+                        'nuevo_justificado' => $justificadoValue,
+                        'valor_original_justificado' => $asistencia->justificado
+                    ]);
+
+                    // Test: Verificar valor antes del update
+                    $antesUpdate = DB::table('inasistenciasalumnos')->where('id', $asistencia->id)->value('justificado');
+                    Log::info("Valor antes del UPDATE:", ['id' => $asistencia->id, 'justificado_antes' => $antesUpdate]);
+
+                    $resultadoUpdate = DB::table('inasistenciasalumnos')
                         ->where('id', $asistencia->id)
                         ->update([
                             'estado' => $asistenciaData['estado'],
-                            'justificado' => $asistenciaData['justificado'] ? '1' : '0',
+                            'justificado' => $justificadoValue,
                             'dni_personal' => $profesor->dni,
                             'updated_at' => now()
                         ]);
+
+                    // Test: Verificar valor después del update
+                    $despuesUpdate = DB::table('inasistenciasalumnos')->where('id', $asistencia->id)->value('justificado');
+                    Log::info("Resultado del UPDATE:", [
+                        'id' => $asistencia->id,
+                        'filas_afectadas' => $resultadoUpdate,
+                        'justificado_despues' => $despuesUpdate,
+                        'update_exitoso' => $despuesUpdate === $justificadoValue
+                    ]);
+
                     $actualizados++;
                 } else {
                     // Crear nuevo registro
+                    $justificadoValue = $justificadoFinal ? '1' : '0';
+                    Log::info("Creando nuevo registro:", [
+                        'asignacion_id' => $asistenciaData['asignacion_id'],
+                        'estado' => $asistenciaData['estado'],
+                        'justificado' => $justificadoValue
+                    ]);
+
                     DB::table('inasistenciasalumnos')->insert([
                         'id_asignacionesalumnos' => $asistenciaData['asignacion_id'],
                         'cupof' => $cupof,
                         'fecha' => $hoy,
                         'turno' => $turno,
                         'estado' => $asistenciaData['estado'],
-                        'justificado' => $asistenciaData['justificado'] ? '1' : '0',
+                        'justificado' => $justificadoValue,
                         'dni_personal' => $profesor->dni,
                         'created_at' => now(),
                         'updated_at' => now()
@@ -429,7 +493,7 @@ class AsistenciaController extends Controller
         }
     }
 
-    public function porcentajes(Request $request, $cupof)
+    public function totales(Request $request, $cupof)
     {
         try {
             // Verificar autenticación
@@ -525,7 +589,7 @@ class AsistenciaController extends Controller
                 ];
             }
 
-            return view('profesores.asistencias.porcentajes', compact('cupofInfo', 'estadisticas'));
+            return view('profesores.asistencias.totales', compact('cupofInfo', 'estadisticas'));
         } catch (\Exception $e) {
             Log::error("Error en porcentajes de asistencias", [
                 'cupof' => $cupof,

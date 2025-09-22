@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use App\Models\Personas\TipoUsuario;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Revista extends Model
 {
@@ -21,8 +21,6 @@ class Revista extends Model
     ];
 
     protected $casts = [
-        'cupof' => 'integer',
-        'id_tipousuario' => 'integer',
         'fd' => 'date',
         'fh' => 'date',
         'secuencia' => 'integer',
@@ -31,14 +29,18 @@ class Revista extends Model
     ];
 
     // Relaciones
-
     public function tipoUsuario(): BelongsTo
     {
-        return $this->belongsTo(TipoUsuario::class, 'id_tipousuario');
+        return $this->belongsTo(\App\Models\Personas\TipoUsuario::class, 'id_tipousuario');
     }
 
     public function cupof(): BelongsTo
     {
-        return $this->belongsTo(Cupof::class, 'cupof');
+        return $this->belongsTo(\App\Models\Cupof::class, 'cupof', 'cupof');
+    }
+
+    public function tareas(): HasMany
+    {
+        return $this->hasMany(Tarea::class, 'id_revista');
     }
 }

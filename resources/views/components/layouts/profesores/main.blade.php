@@ -1,11 +1,11 @@
 @php
     $mainResponsive = [
-        'df' => 'w-[100%] h-[91vh]',
-        'sm' => 'sm:w-[100%] sm:h-[90vh]',
-        'md' => 'md:w-[73%] md:h-[90vh]',
-        'lg' => 'lg:w-[77%] lg:h-[91vh]',
-        'xl' => 'xl:w-[80%] xl:h-[92vh]',
-        '2xl' => '2xl:w-[84%] 2xl:h-[93vh]',
+        'df' => 'w-[100%] min-h-[91vh]',
+        'sm' => 'sm:w-[100%] sm:min-h-[90vh]',
+        'md' => 'md:w-[73%] md:min-h-[90vh]',
+        'lg' => 'lg:w-[77%] lg:min-h-[91vh]',
+        'xl' => 'xl:w-[80%] xl:min-h-[92vh]',
+        '2xl' => '2xl:w-[84%] 2xl:min-h-[93vh]',
     ];
     $mainResponsive = implode(' ', $mainResponsive);
 

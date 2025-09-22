@@ -4,7 +4,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
 
-class SeederTodosHorarios extends Seeder
+class Horarios extends Seeder
 {
     public function run()
     {

@@ -8,6 +8,12 @@ Route::middleware('guest')->group(function () {
     Volt::route('login', 'auth.login')
         ->name('login');
 
+    // Login personalizado para modelo Persona
+    Route::get('login-custom', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])
+        ->name('login.custom.form');
+    Route::post('login-custom', [App\Http\Controllers\Auth\LoginController::class, 'login'])
+        ->name('login.custom');
+
     Volt::route('register', 'auth.register')
         ->name('register');
 
@@ -16,7 +22,6 @@ Route::middleware('guest')->group(function () {
 
     Volt::route('reset-password/{token}', 'auth.reset-password')
         ->name('password.reset');
-
 });
 
 Route::middleware('auth')->group(function () {
@@ -31,5 +36,15 @@ Route::middleware('auth')->group(function () {
         ->name('password.confirm');
 });
 
-Route::post('logout', App\Livewire\Actions\Logout::class)
+Route::post('logout', App\Http\Controllers\Auth\LogoutController::class)
     ->name('logout');
+
+// Ruta GET para logout que redirecciona al login (por si alguien accede directamente)
+Route::get('logout', function () {
+    return redirect()->route('login')->with('info', 'Para cerrar sesión, use el botón correspondiente.');
+});
+
+// Ruta de logout alternativa sin CSRF para testing (Laravel 12)
+Route::post('logout-alt', App\Http\Controllers\Auth\LogoutController::class)
+    ->name('logout.alt')
+    ->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class);
