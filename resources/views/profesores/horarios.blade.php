@@ -50,7 +50,7 @@
                                         data-cupof="{{ $cupRaw }}"
                                         data-bs-toggle="modal"
                                         data-bs-target="#horarioCursoModal{{ $cup }}">
-                                    <i class="fas fa-tasks me-2"></i>Gestionar Tareas
+                                    <i class="fas fa-tasks me-2"></i>ver horario
                                 </button>
                             </div>
                         </div>
