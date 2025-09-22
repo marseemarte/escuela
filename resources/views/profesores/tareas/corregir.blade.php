@@ -89,7 +89,7 @@
                             @if($entrega['entrego'])
                                 <a href="#" class="text-blue-600 hover:underline cursor-pointer" 
                                    onclick="descargarRespuesta({{ $entrega['tarea_alumno_id'] }})">
-                                    📄 {{ $entrega['archivo'] }}
+                                    {{ $entrega['archivo'] }}
                                 </a>
                             @else
                                 <span class="text-gray-400 italic">Sin entrega</span>

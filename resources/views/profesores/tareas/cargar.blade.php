@@ -207,7 +207,7 @@
                                 {{ $tarea['archivo'] }}
                             </a>
                         </td>
-                        <td class="px-6 py-4">{{ $tarea['entregas'] }}/{{ $tarea['vistos'] }}</td>
+                        <td class="px-6 py-4">{{ $tarea['entregas'] }}</td>
                         <td class="px-6 py-4">
                             <button class="text-green-600 hover:underline seguimientoBtn mr-2 cursor-pointer" 
                                     data-tarea-id="{{ $tarea['id'] }}">

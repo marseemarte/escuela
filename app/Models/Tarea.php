@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\DB;
 
 class Tarea extends Model
 {
@@ -84,19 +85,73 @@ class Tarea extends Model
         );
     }
 
-    // Método para contar entregas
+    // Método para contar entregas realizadas (solo para tareas con fecha de entrega)
     public function contarEntregas()
     {
-        return $this->entregas()->where('borrado_fisico', 0)->count();
+        if (is_null($this->fecha_entrega)) {
+            return 0; // Los módulos no tienen entregas
+        }
+
+        return DB::table('tareas_alumnos')
+            ->where('id_tarea', $this->id)
+            ->where('borrado_fisico', 0)
+            ->count();
     }
 
     // Método para contar alumnos que vieron la tarea
     public function contarVistos()
     {
-        return $this->visualizaciones()
+        return DB::table('archivos_visto')
+            ->where('id_tarea', $this->id)
             ->where('visto', 1)
-            ->where('tipo', 'T')
             ->distinct('id_asignacionesalumnos')
             ->count();
+    }
+
+    // Método para obtener total de alumnos del curso
+    public function contarTotalAlumnosCurso()
+    {
+        // Obtener el curso a través de la revista
+        $revista = $this->revista;
+        if (!$revista) {
+            return 0;
+        }
+
+        $cupof = $revista->cupof;
+        if (!$cupof) {
+            return 0;
+        }
+
+        $cupofModel = Cupof::with('curso')->find($cupof);
+        if (!$cupofModel || !$cupofModel->curso) {
+            return 0;
+        }
+
+        return DB::table('asignacionesalumnos as aa')
+            ->join('cursociclolectivo as ccl', 'aa.id_cursosciclolectivo', '=', 'ccl.id')
+            ->where('ccl.id_cursos', $cupofModel->curso->id)
+            ->where('ccl.ciclolectivo', date('Y'))
+            ->where('aa.estado', 'A')
+            ->count();
+    }
+
+    // Método para obtener estadísticas formateadas
+    public function obtenerEstadisticas()
+    {
+        $totalAlumnos = $this->contarTotalAlumnosCurso();
+        $vistos = $this->contarVistos();
+        
+        if ($this->esModulo) {
+            return [
+                'vistos' => $vistos . '/' . $totalAlumnos,
+                'entregas' => null // Los módulos no tienen entregas
+            ];
+        } else {
+            $entregas = $this->contarEntregas();
+            return [
+                'vistos' => $vistos . '/' . $totalAlumnos,
+                'entregas' => $entregas . '/' . $totalAlumnos
+            ];
+        }
     }
 }
