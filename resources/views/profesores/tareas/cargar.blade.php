@@ -1,20 +1,18 @@
 
 <x-layouts.profesores.dashboard titulo="Tareas"> 
-    <h1 class="text-2xl font-semibold mb-2">{{ $cursos[0]['materia'] }} - {{ $cursos[0]['nombre'] }}</h1>
-    <p class="mb-6 text-gray-600">Gestiona las tareas de la materia {{ $cursos[0]['materia'] }} del curso {{ $cursos[0]['nombre'] }}.  
+    <h1 class="tareas-main-title">{{ $cursos[0]['materia'] }} - {{ $cursos[0]['nombre'] }}</h1>
+    <p class="tareas-main-description">Gestiona las tareas de la materia {{ $cursos[0]['materia'] }} del curso {{ $cursos[0]['nombre'] }}.  
         Aquí puedes subir modulos de teoria, tareas con fecha de entrega y hacer el seguimiento de respuestas.</p>
 
     @if(session('success'))
-        <div id="alert-success" 
-            class="mb-4 p-4 bg-green-100 border border-green-300 text-green-700 rounded transition-opacity duration-500">
+        <div id="alert-success" class="tareas-alert tareas-alert-success">
             {{ session('success') }}
         </div>
     @endif
 
-
     @if($errors->any())
-        <div class="mb-4 p-4 bg-red-100 border border-red-300 text-red-700 rounded">
-            <ul class="list-disc list-inside">
+        <div class="tareas-alert tareas-alert-error">
+            <ul class="tareas-error-list">
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -23,73 +21,65 @@
     @endif
 
     <!-- Botón para subir nueva tarea -->
-    <button class="btn btn-primary bg-blue-600 text-white px-4 py-2 rounded-lg shadow mb-3 cursor-pointer" id="openModalBtn">
+    <button class="tareas-btn-upload" id="openModalBtn">
         + Subir nuevo archivo
     </button>
 
     <!-- Modal para subir tareas--> 
-    <div id="tareaModal" class="fixed inset-0 z-50 backdrop-blur bg-black/50 hidden items-center justify-center overflow-auto">
-      <div id="tareaModalContent" 
-           class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative transform transition-all duration-300 scale-95 opacity-0">
+    <div id="tareaModal" class="tareas-modal">
+      <div id="tareaModalContent" class="tareas-modal-content">
 
         <!-- Botón cerrar -->
-        <button id="closeModalBtn" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 cursor-pointer">
+        <button id="closeModalBtn" class="tareas-modal-close">
           ✕
         </button>
 
         <!-- Pantalla de selección -->
-        <div id="modalSeleccion" class="text-center">
-          <h2 class="text-xl font-semibold mb-6">¿Qué deseas subir?</h2>
-          <div class="flex flex-col gap-3">
-            <button id="btnModulo" class="px-4 py-2 rounded bg-indigo-500 text-white hover:bg-indigo-600 cursor-pointer">
+        <div id="modalSeleccion" class="tareas-modal-selection">
+          <h2 class="tareas-modal-title">¿Qué deseas subir?</h2>
+          <div class="tareas-modal-buttons">
+            <button id="btnModulo" class="tareas-btn-modulo">
               📘 Módulo de teoría
             </button>
-            <button id="btnTarea" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 cursor-pointer">
+            <button id="btnTarea" class="tareas-btn-tarea">
               📝 Tarea con fecha de entrega
             </button>
           </div>
         </div>
 
         <!-- Formulario (oculto por defecto) -->
-        <div id="modalFormulario" class="hidden">
-          <h2 id="formTitulo" class="text-xl font-semibold mb-4"></h2>
+        <div id="modalFormulario" class="tareas-form-section hidden">
+          <h2 id="formTitulo" class="tareas-form-title"></h2>
 
           <form method="POST" action="{{ route('tareas.store') }}" enctype="multipart/form-data">
             @csrf
 
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Nombre</label>
-              <input type="text" name="nombre"
-                     class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-300"
-                     required>
+            <div class="tareas-form-group">
+              <label class="tareas-form-label">Nombre</label>
+              <input type="text" name="nombre" class="tareas-form-input" required>
             </div>
 
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Descripción (opcional)</label>
-              <textarea name="descripcion"
-                        class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-300"
-                        rows="3"></textarea>
+            <div class="tareas-form-group">
+              <label class="tareas-form-label">Descripción (opcional)</label>
+              <textarea name="descripcion" class="tareas-form-textarea" rows="3"></textarea>
             </div>
 
             <input type="hidden" name="cupof" value="{{ $cursos[0]['id'] ?? $cupof }}">
 
             <!-- Campo fecha de entrega (solo para tarea) -->
-            <div id="fechaEntrega" class="mb-4 hidden">
-              <label class="block text-sm font-medium text-gray-700">Fecha de entrega</label>
-              <input type="date" name="fecha_entrega"
-                     class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-300"
-                     min="{{ date('Y-m-d', strtotime('+1 day')) }}">
+            <div id="fechaEntrega" class="tareas-form-group hidden">
+              <label class="tareas-form-label">Fecha de entrega</label>
+              <input type="date" name="fecha_entrega" class="tareas-form-input" min="{{ date('Y-m-d', strtotime('+1 day')) }}">
             </div>
 
             <!-- Archivo -->
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700">Archivo (máx. 10MB)</label>
-              <div class="flex border rounded items-center overflow-hidden">
-                <label for="archivo"
-                       class="px-4 py-2 bg-gray-100 hover:bg-gray-200 cursor-pointer border-l">
+            <div class="tareas-form-group">
+              <label class="tareas-form-label">Archivo (máx. 10MB)</label>
+              <div class="tareas-file-input">
+                <label for="archivo" class="tareas-file-button">
                   Elegir archivo
                 </label>
-                <span id="archivoNombre" class="flex-1 px-3 py-2 text-gray-600 text-sm">
+                <span id="archivoNombre" class="tareas-file-name">
                   No se ha seleccionado ningún archivo
                 </span>
                 <input type="file" name="archivo" id="archivo" class="hidden" required
@@ -98,11 +88,11 @@
             </div>
 
             <!-- Boton Cerrar y Subir -->
-            <div class="flex justify-end space-x-2">
-              <button type="button" id="cancelModalBtn" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 cursor-pointer">
+            <div class="tareas-form-actions">
+              <button type="button" id="cancelModalBtn" class="tareas-btn-cancel">
                 Cancelar
               </button>
-              <button type="submit" id="btnSubir" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 cursor-pointer">
+              <button type="submit" id="btnSubir" class="tareas-btn-submit">
                 Subir
               </button>
             </div>
@@ -111,53 +101,51 @@
       </div>
     </div>
 
-    <div class="mb-4">
-        <nav class="flex space-x-2">
-            <button id="tabModulos" 
-                    class="tab-button px-4 py-2 rounded-t-lg font-medium border-none cursor-pointer transition-all duration-200">
+    <div class="tareas-tabs-section">
+        <nav class="tareas-tabs">
+            <button id="tabModulos" class="tareas-tab-button">
                 Módulos de teoría
             </button>
-            <button id="tabTareas" 
-                    class="tab-button px-4 py-2 rounded-t-lg font-medium border-none cursor-pointer transition-all duration-200">
+            <button id="tabTareas" class="tareas-tab-button">
                 Tareas con fecha de entrega
             </button>
         </nav>
     </div>
 
     <!-- Sección Módulos de teoría -->
-    <div id="modulosSection" class="overflow-x-auto shadow-md sm:rounded-lg">
-        <table class="w-full text-sm text-center text-gray-600 table-fixed">
-            <thead class="bg-gray-50 text-gray-700 uppercase text-xs">
+    <div id="modulosSection" class="tareas-table-container">
+        <table class="tareas-table">
+            <thead class="tareas-table-header">
                 <tr>
-                    <th class="px-6 py-3">Nombre</th>
-                    <th class="px-6 py-3">Materia</th>
-                    <th class="px-6 py-3">Curso</th>
-                    <th class="px-6 py-3">Fecha de subida</th>
-                    <th class="px-6 py-3">Archivo</th>
-                    <th class="px-6 py-3">Vistos</th>
-                    <th class="px-6 py-3">Acciones</th>
+                    <th class="tareas-table-th">Nombre</th>
+                    <th class="tareas-table-th">Materia</th>
+                    <th class="tareas-table-th">Curso</th>
+                    <th class="tareas-table-th">Fecha de subida</th>
+                    <th class="tareas-table-th">Archivo</th>
+                    <th class="tareas-table-th">Vistos</th>
+                    <th class="tareas-table-th">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($modulos as $modulo)
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 font-medium text-gray-900">{{ $modulo['titulo'] }}</td>
-                        <td class="px-6 py-4">{{ $modulo['materia'] }}</td>
-                        <td class="px-6 py-4">{{ $modulo['curso'] }}</td>
-                        <td class="px-6 py-4">{{ $modulo['fecha_subida'] }}</td>
-                        <td class="px-6 py-4">
+                    <tr class="tareas-table-row">
+                        <td class="tareas-table-td tareas-table-td-title">{{ $modulo['titulo'] }}</td>
+                        <td class="tareas-table-td">{{ $modulo['materia'] }}</td>
+                        <td class="tareas-table-td">{{ $modulo['curso'] }}</td>
+                        <td class="tareas-table-td">{{ $modulo['fecha_subida'] }}</td>
+                        <td class="tareas-table-td">
                             <a href="{{ route('profesores.tareas.descargar', $modulo['id']) }}" 
-                               class="text-blue-600 hover:underline">
+                               class="tareas-link">
                                 {{ $modulo['archivo'] }}
                             </a>
                         </td>
-                        <td class="px-6 py-4">{{ $modulo['vistos'] }}</td>
-                        <td class="px-6 py-4">
-                            <button class="text-green-600 hover:underline seguimientoBtn mr-2 cursor-pointer" 
+                        <td class="tareas-table-td">{{ $modulo['vistos'] }}</td>
+                        <td class="tareas-table-td">
+                            <button class="tareas-btn-seguimiento seguimientoBtn" 
                                     data-tarea-id="{{ $modulo['id'] }}">
                                 Seguimiento
                             </button>
-                            <button class="text-red-600 hover:underline eliminarBtn cursor-pointer" 
+                            <button class="tareas-btn-eliminar eliminarBtn" 
                                     data-tarea-id="{{ $modulo['id'] }}">
                                 Eliminar
                             </button>
@@ -165,7 +153,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-6 py-4 text-gray-500 italic">
+                        <td colspan="7" class="tareas-table-empty">
                             No hay módulos subidos aún.
                         </td>
                     </tr>
@@ -175,45 +163,45 @@
     </div>
 
     <!-- Sección Tareas con fecha de entrega -->
-    <div id="tareasSection" class="overflow-x-auto shadow-md sm:rounded-lg hidden">
-        <table class="w-full text-sm text-center text-gray-600 table-fixed">
-            <thead class="bg-gray-50 text-gray-700 uppercase text-xs">
+    <div id="tareasSection" class="tareas-table-container hidden">
+        <table class="tareas-table">
+            <thead class="tareas-table-header">
                 <tr>
-                    <th class="px-6 py-3">Nombre</th>
-                    <th class="px-6 py-3">Materia</th>
-                    <th class="px-6 py-3">Curso</th>
-                    <th class="px-6 py-3">Fecha de Subida</th>
-                    <th class="px-6 py-3">Fecha de entrega</th>
-                    <th class="px-6 py-3">Archivo</th>
-                    <th class="px-6 py-3">Entregas</th>
-                    <th class="px-6 py-3">Acciones</th>
+                    <th class="tareas-table-th">Nombre</th>
+                    <th class="tareas-table-th">Materia</th>
+                    <th class="tareas-table-th">Curso</th>
+                    <th class="tareas-table-th">Fecha de Subida</th>
+                    <th class="tareas-table-th">Fecha de entrega</th>
+                    <th class="tareas-table-th">Archivo</th>
+                    <th class="tareas-table-th">Entregas</th>
+                    <th class="tareas-table-th">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($tareas as $tarea)
-                    <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4 font-medium text-gray-900">{{ $tarea['titulo'] }}</td>
-                        <td class="px-6 py-4">{{ $tarea['materia'] }}</td>
-                        <td class="px-6 py-4">{{ $tarea['curso'] }}</td>
-                        <td class="px-6 py-4">{{ $tarea['fecha_subida'] }}</td>
-                        <td class="px-6 py-4">
-                            <span class="@if(strtotime($tarea['fecha_entrega']) < time()) text-red-600 font-semibold @endif">
+                    <tr class="tareas-table-row">
+                        <td class="tareas-table-td tareas-table-td-title">{{ $tarea['titulo'] }}</td>
+                        <td class="tareas-table-td">{{ $tarea['materia'] }}</td>
+                        <td class="tareas-table-td">{{ $tarea['curso'] }}</td>
+                        <td class="tareas-table-td">{{ $tarea['fecha_subida'] }}</td>
+                        <td class="tareas-table-td">
+                            <span class="@if(strtotime($tarea['fecha_entrega']) < time()) tareas-date-expired @endif">
                                 {{ $tarea['fecha_entrega'] }}
                             </span>
                         </td>
-                        <td class="px-6 py-4">
+                        <td class="tareas-table-td">
                             <a href="{{ route('profesores.tareas.descargar', $tarea['id']) }}" 
-                               class="text-blue-600 hover:underline">
+                               class="tareas-link">
                                 {{ $tarea['archivo'] }}
                             </a>
                         </td>
-                        <td class="px-6 py-4">{{ $tarea['entregas'] }}</td>
-                        <td class="px-6 py-4">
-                            <button class="text-green-600 hover:underline seguimientoBtn mr-2 cursor-pointer" 
+                        <td class="tareas-table-td">{{ $tarea['entregas'] }}</td>
+                        <td class="tareas-table-td">
+                            <button class="tareas-btn-seguimiento seguimientoBtn" 
                                     data-tarea-id="{{ $tarea['id'] }}">
                                 Seguimiento
                             </button>
-                            <button class="text-red-600 hover:underline eliminarBtn cursor-pointer" 
+                            <button class="tareas-btn-eliminar eliminarBtn" 
                                     data-tarea-id="{{ $tarea['id'] }}">
                                 Eliminar
                             </button>
@@ -221,7 +209,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="px-6 py-4 text-gray-500 italic">
+                        <td colspan="8" class="tareas-table-empty">
                             No hay tareas subidas aún.
                         </td>
                     </tr>
@@ -231,39 +219,511 @@
     </div>
 
     <!-- Modal de seguimiento -->
-    <div id="seguimientoModal" class="fixed inset-0 z-50 backdrop-blur bg-black/50 hidden items-center justify-center overflow-auto">
-      <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl p-6 relative transform transition-all duration-300 scale-95 opacity-0">
+        <!-- Modal de seguimiento -->
+    <div id="seguimientoModal" class="tareas-modal">
+      <div class="tareas-modal-content tareas-modal-large">
 
-        <button id="closeSeguimientoModal" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">✕</button>
+        <button id="closeSeguimientoModal" class="tareas-modal-close">✕</button>
 
-        <h2 class="text-xl font-semibold mb-4">Seguimiento de la tarea</h2>
+        <h2 class="tareas-modal-title">Seguimiento de la tarea</h2>
         
-        <div id="tareaInfo" class="mb-4 p-4 bg-gray-50 rounded">
+        <div id="tareaInfo" class="tareas-info-section">
             <!-- Info de la tarea se carga dinámicamente -->
         </div>
 
-        <div id="seguimientoContent" class="mb-4">
+        <div id="seguimientoContent" class="tareas-seguimiento-content">
             <!-- Contenido del seguimiento se carga via AJAX -->
         </div>
 
-        <div class="flex justify-end mt-4">
-          <a href="#" id="btnCorregir" 
-            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 hidden">
-            Corregir
+        <div class="tareas-modal-footer">
+          <a href="#" id="btnCorregir" class="tareas-btn-corregir hidden">
+              Ir a Corregir
           </a>
         </div>
       </div>
     </div>
 
+    <!-- Modal de confirmación eliminar -->
+    <div id="eliminarModal" class="tareas-modal">
+      <div class="tareas-modal-content">
+        <button id="closeEliminarModal" class="tareas-modal-close">✕</button>
+        <h2 class="tareas-modal-title">Confirmar eliminación</h2>
+        <p class="tareas-modal-text">¿Estás seguro de que quieres eliminar esta tarea? Esta acción no se puede deshacer.</p>
+        <div class="tareas-modal-actions">
+          <button id="cancelEliminar" class="tareas-btn-cancel">Cancelar</button>
+          <button id="confirmarEliminar" class="tareas-btn-danger">Eliminar</button>
+        </div>
+      </div>
+    </div>
+
+<style>
+/* Base styles */
+.tareas-main-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #111827;
+}
+
+.tareas-main-description {
+    margin-bottom: 1.5rem;
+    color: #4b5563;
+}
+
+/* Alerts */
+.tareas-alert {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 6px;
+    transition: opacity 0.5s;
+}
+
+.tareas-alert-success {
+    background-color: #dcfce7;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+}
+
+.tareas-alert-error {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+}
+
+.tareas-error-list {
+    list-style-type: disc;
+    list-style-position: inside;
+    margin: 0;
+    padding: 0;
+}
+
+/* Upload button */
+.tareas-btn-upload {
+    background-color: #2563eb;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    border: none;
+    font-weight: 500;
+}
+
+.tareas-btn-upload:hover {
+    background-color: #1d4ed8;
+}
+
+/* Modal styles */
+.tareas-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    backdrop-filter: blur(4px);
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+}
+
+.tareas-modal.flex {
+    display: flex;
+}
+
+.tareas-modal-content {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 28rem;
+    padding: 1.5rem;
+    position: relative;
+    transform: scale(0.95);
+    opacity: 0;
+    transition: all 0.3s;
+}
+
+.tareas-modal-large {
+    max-width: 56rem;
+}
+
+.tareas-modal-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    color: #6b7280;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+}
+
+.tareas-modal-close:hover {
+    color: #374151;
+}
+
+.tareas-modal-selection {
+    text-align: center;
+}
+
+.tareas-modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #111827;
+}
+
+.tareas-modal-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.tareas-btn-modulo {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    background-color: #6366f1;
+    color: white;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.tareas-btn-modulo:hover {
+    background-color: #4f46e5;
+}
+
+.tareas-btn-tarea {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    background-color: #2563eb;
+    color: white;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.tareas-btn-tarea:hover {
+    background-color: #1d4ed8;
+}
+
+/* Form styles */
+.tareas-form-section {
+    /* Already hidden by default */
+}
+
+.tareas-form-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #111827;
+}
+
+.tareas-form-group {
+    margin-bottom: 1rem;
+}
+
+.tareas-form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.25rem;
+}
+
+.tareas-form-input, .tareas-form-textarea {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 0.75rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.tareas-form-input:focus, .tareas-form-textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.tareas-file-input {
+    display: flex;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    align-items: center;
+    overflow: hidden;
+}
+
+.tareas-file-button {
+    padding: 0.5rem 1rem;
+    background-color: #f3f4f6;
+    cursor: pointer;
+    border-left: 1px solid #d1d5db;
+    transition: background-color 0.2s;
+}
+
+.tareas-file-button:hover {
+    background-color: #e5e7eb;
+}
+
+.tareas-file-name {
+    flex: 1;
+    padding: 0.75rem;
+    color: #4b5563;
+    font-size: 0.875rem;
+}
+
+.tareas-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.tareas-btn-cancel {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    background-color: #d1d5db;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.tareas-btn-cancel:hover {
+    background-color: #9ca3af;
+}
+
+.tareas-btn-submit {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    background-color: #2563eb;
+    color: white;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.tareas-btn-submit:hover {
+    background-color: #1d4ed8;
+}
+
+.tareas-btn-danger {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    background-color: #dc2626;
+    color: white;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.tareas-btn-danger:hover {
+    background-color: #b91c1c;
+}
+
+/* Tabs */
+.tareas-tabs-section {
+    margin-bottom: 1rem;
+}
+
+.tareas-tabs {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.tareas-tab-button {
+    padding: 0.5rem 1rem;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    background-color: #e5e5e5;
+    color: #666;
+    border-bottom: 3px solid transparent;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.tareas-tab-button.active {
+    background-color: #f9f9f9;
+    color: #111;
+    border-bottom: 3px solid #4f46e5;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Tables */
+.tareas-table-container {
+    overflow-x: auto;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.tareas-table {
+    width: 100%;
+    font-size: 0.875rem;
+    text-align: center;
+    color: #4b5563;
+    table-layout: fixed;
+}
+
+.tareas-table-header {
+    background-color: #f9fafb;
+    color: #374151;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+.tareas-table-th {
+    padding: 0.75rem 1.5rem;
+}
+
+.tareas-table-row {
+    background-color: white;
+    border-bottom: 1px solid #e5e7eb;
+    transition: background-color 0.2s;
+}
+
+.tareas-table-row:hover {
+    background-color: #f9fafb;
+}
+
+.tareas-table-td {
+    padding: 1rem 1.5rem;
+}
+
+.tareas-table-td-title {
+    font-weight: 500;
+    color: #111827;
+}
+
+.tareas-table-empty {
+    padding: 1rem 1.5rem;
+    color: #6b7280;
+    font-style: italic;
+}
+
+.tareas-link {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.tareas-link:hover {
+    text-decoration: underline;
+}
+
+.tareas-btn-seguimiento {
+    color: #059669;
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-right: 0.5rem;
+    text-decoration: none;
+}
+
+.tareas-btn-seguimiento:hover {
+    text-decoration: underline;
+}
+
+.tareas-btn-eliminar {
+    color: #dc2626;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.tareas-btn-eliminar:hover {
+    text-decoration: underline;
+}
+
+.tareas-date-expired {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+/* Info section */
+.tareas-info-section {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: #f9fafb;
+    border-radius: 6px;
+}
+
+.tareas-seguimiento-content {
+    margin-bottom: 1rem;
+}
+
+.tareas-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.tareas-btn-corregir {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    background-color: #059669;
+    color: white;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.tareas-btn-corregir:hover {
+    background-color: #047857;
+    color: white;
+    text-decoration: none;
+}
+
+.tareas-modal-text {
+    margin-bottom: 1.5rem;
+    color: #374151;
+}
+
+.tareas-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+/* Utility classes */
+.hidden {
+    display: none;
+}
+
+.mr-2 {
+    margin-right: 0.5rem;
+}
+
+.flex {
+    display: flex;
+}
+
+.scale-95 {
+    transform: scale(0.95);
+}
+
+.scale-100 {
+    transform: scale(1);
+}
+
+.opacity-0 {
+    opacity: 0;
+}
+
+.opacity-100 {
+    opacity: 1;
+}
+</style>
+
     <!-- Modal visual de eliminación -->
-    <div id="eliminarModal" class="fixed inset-0 z-50 backdrop-blur bg-black/50 hidden items-center justify-center overflow-auto">
-      <div class="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 relative transform transition-all duration-300 scale-95 opacity-0">
-        <button id="closeEliminarModal" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">✕</button>
-        <h2 class="text-xl font-semibold mb-4">Confirmar eliminación</h2>
-        <p class="mb-6 text-gray-700">¿Estás seguro de que quieres eliminar esta tarea? Esta acción no se puede deshacer.</p>
-        <div class="flex justify-end gap-2">
-          <button id="cancelEliminar" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400">Cancelar</button>
-          <button id="confirmarEliminar" class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">Eliminar</button>
+    <div id="eliminarModal" class="tareas-modal">
+      <div class="tareas-modal-content">
+        <button id="closeEliminarModal" class="tareas-modal-close">✕</button>
+        <h2 class="tareas-modal-title">Confirmar eliminación</h2>
+        <p class="tareas-modal-text">¿Estás seguro de que quieres eliminar esta tarea? Esta acción no se puede deshacer.</p>
+        <div class="tareas-modal-actions">
+          <button id="cancelEliminar" class="tareas-btn-cancel">Cancelar</button>
+          <button id="confirmarEliminar" class="tareas-btn-danger">Eliminar</button>
         </div>
       </div>
     </div>

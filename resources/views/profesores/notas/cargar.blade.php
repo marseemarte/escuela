@@ -40,12 +40,12 @@
             {{-- Formulario de Notas --}}
             <div class="card">
                 <div class="card-header">
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
                         <div>
                             <h2 class="h5 mb-1">Lista de Estudiantes</h2>
                             <p class="text-muted mb-0">Ingrese las notas para cada estudiante</p>
                         </div>
-                        <div class="btn-group" role="group">
+                        <div class="d-flex gap-2 mt-2 mt-md-0">
                             <button type="button" onclick="limpiarFormulario()" class="btn btn-secondary btn-sm">
                                 <i class="feather icon-trash-2 mr-1"></i> Limpiar Todo
                             </button>
@@ -61,7 +61,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="card-body">
                     @if (isset($alumnosConNotas) && count($alumnosConNotas) > 0)
                         {{-- Vista Desktop --}}
@@ -481,92 +480,104 @@
             calcularPromedio(asignacionId);
         }
 
-        // Sistema de mensajes mejorado para PCoded
-        function mostrarMensaje(mensaje, tipo = 'info', duracion = 5000) {
-            console.log('Mostrando mensaje:', mensaje, 'Tipo:', tipo);
+        // Sistema de mensajes copiado de asistencias
+        window.mostrarMensaje = function(mensaje, tipo) {
+            // Limpiar mensajes anteriores
+            const mensajesAnteriores = document.querySelectorAll('.mensaje-notas');
+            mensajesAnteriores.forEach(mensaje => mensaje.remove());
 
-            // Limpiar mensaje anterior si existe
-            if (mensajeTimeout) {
-                clearTimeout(mensajeTimeout);
-            }
-
-            // Remover mensajes existentes
-            const mensajesExistentes = document.querySelectorAll('.mensaje-notas');
-            mensajesExistentes.forEach(msg => msg.remove());
-
-            let iconClass = 'feather icon-info';
-            let alertClass = 'alert-info';
-            let bgClass = 'bg-info';
+            let alertClass, iconClass;
 
             switch (tipo) {
                 case 'success':
-                    iconClass = 'feather icon-check-circle';
-                    alertClass = 'alert-success';
-                    bgClass = 'bg-success';
+                    alertClass = 'alert alert-success';
+                    iconClass = 'fas fa-check-circle';
                     break;
                 case 'error':
-                    iconClass = 'feather icon-alert-triangle';
-                    alertClass = 'alert-danger';
-                    bgClass = 'bg-danger';
+                    alertClass = 'alert alert-danger';
+                    iconClass = 'fas fa-exclamation-circle';
                     break;
-                case 'warning':
-                    iconClass = 'feather icon-alert-triangle';
-                    alertClass = 'alert-warning';
-                    bgClass = 'bg-warning';
+                case 'info':
+                    alertClass = 'alert alert-info';
+                    iconClass = 'fas fa-info-circle';
                     break;
+                default:
+                    alertClass = 'alert alert-secondary';
+                    iconClass = 'fas fa-info-circle';
             }
 
-            const mensajeDiv = document.createElement('div');
-            mensajeDiv.className = `mensaje-notas alert ${alertClass} alert-dismissible fade show position-fixed`;
-            mensajeDiv.style.cssText = `
-                top: 20px;
-                right: 20px;
-                z-index: 9999;
-                min-width: 300px;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-                border-radius: 8px;
-                animation: slideInRight 0.3s ease-out;
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `${alertClass} position-fixed mensaje-notas`;
+            alertDiv.style.cssText = `
+                position: fixed !important;
+                top: 20px !important; 
+                right: 20px !important; 
+                z-index: 2147483647 !important; 
+                max-width: 380px !important; 
+                min-width: 280px !important;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.25) !important;
+                border-radius: 12px !important;
+                padding: 16px 20px !important;
+                animation: slideInRight 0.3s ease-out !important;
+                border: none !important;
+                font-weight: 600 !important;
+                font-size: 14px !important;
+                backdrop-filter: blur(10px) !important;
+                transform: translateZ(0) !important;
             `;
 
-            mensajeDiv.innerHTML = `
+            alertDiv.innerHTML = `
                 <div class="d-flex align-items-center">
-                    <i class="${iconClass} mr-2" style="font-size: 1.2em;"></i>
-                    <span class="flex-grow-1">${mensaje}</span>
-                    <button type="button" class="close" onclick="cerrarMensaje(this)" aria-label="Cerrar">
-                        <span aria-hidden="true">&times;</span>
+                    <i class="${iconClass} mr-2" style="font-size: 1.1rem;"></i>
+                    <span style="flex: 1;">${mensaje}</span>
+                    <button type="button" class="close ml-2" style="font-size: 1.2rem; opacity: 0.7; background: none; border: none; color: inherit;" onclick="this.parentElement.parentElement.remove()">
+                        <span>&times;</span>
                     </button>
                 </div>
             `;
 
-            document.body.appendChild(mensajeDiv);
-
-            // Auto-cerrar después de la duración especificada
-            mensajeTimeout = setTimeout(() => {
-                if (mensajeDiv && mensajeDiv.parentNode) {
-                    mensajeDiv.style.animation = 'slideOutRight 0.3s ease-in';
-                    setTimeout(() => {
-                        if (mensajeDiv.parentNode) {
-                            mensajeDiv.remove();
+            // Agregar animación CSS si no existe
+            if (!document.getElementById('mensaje-animations')) {
+                const style = document.createElement('style');
+                style.id = 'mensaje-animations';
+                style.textContent = `
+                    @keyframes slideInRight {
+                        from {
+                            transform: translateX(100%);
+                            opacity: 0;
                         }
-                    }, 300);
-                }
-            }, duracion);
-        }
+                        to {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                    }
+                    @keyframes slideOutRight {
+                        from {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                        to {
+                            transform: translateX(100%);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
 
-        // Función para cerrar mensaje manualmente
-        function cerrarMensaje(boton) {
-            const mensaje = boton.closest('.mensaje-notas');
-            if (mensaje) {
-                mensaje.style.animation = 'slideOutRight 0.3s ease-in';
+            document.body.appendChild(alertDiv);
+
+            console.log('📢 Mensaje mostrado:', mensaje, 'Tipo:', tipo);
+
+            // Remover después de 4 segundos con animación
+            setTimeout(() => {
+                alertDiv.style.animation = 'slideOutRight 0.3s ease-in';
                 setTimeout(() => {
-                    if (mensaje.parentNode) {
-                        mensaje.remove();
+                    if (alertDiv.parentNode) {
+                        alertDiv.remove();
                     }
                 }, 300);
-            }
-            if (mensajeTimeout) {
-                clearTimeout(mensajeTimeout);
-            }
+            }, 4000);
         }
 
         // Event Listeners
@@ -624,7 +635,7 @@
                 .then(data => {
                     console.log('Response data:', data);
                     if (data.success) {
-                        let mensaje = 'Cambios guardados correctamente';
+                        let mensaje = '✅ Notas guardadas correctamente';
                         if (data.notas_nuevas > 0 && data.notas_actualizadas_eliminadas > 0) {
                             mensaje +=
                                 ` (${data.notas_nuevas} nuevas, ${data.notas_actualizadas_eliminadas} actualizadas/eliminadas)`;
@@ -633,12 +644,13 @@
                         } else if (data.notas_actualizadas_eliminadas > 0) {
                             mensaje += ` (${data.notas_actualizadas_eliminadas} actualizadas/eliminadas)`;
                         }
-                        mostrarMensaje(mensaje, 'success', 3000);
+
+                        mostrarMensaje(mensaje, 'success');
 
                         // Recargar la página después de un breve delay
                         setTimeout(() => {
                             window.location.reload();
-                        }, 1500);
+                        }, 2000);
                     } else {
                         mostrarMensaje(data.message || data.error || 'Error al guardar las notas', 'error');
                     }
@@ -668,31 +680,8 @@
         }
     </script>
 
-    {{-- Estilos para las animaciones de mensajes --}}
+    {{-- Estilos para la vista móvil --}}
     <style>
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideOutRight {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-        }
 
         .mobile-notas-container .card {
             transition: transform 0.2s ease-in-out;
@@ -700,6 +689,45 @@
 
         .mobile-notas-container .card:hover {
             transform: translateY(-1px);
+        }
+
+        /* Mejoras para botones móviles */
+        .gap-2>*+* {
+            margin-left: 0.5rem;
+        }
+
+        @media (max-width: 767.98px) {
+            .card-header .d-flex {
+                flex-direction: column;
+                align-items: stretch !important;
+            }
+
+            .card-header .d-flex>div:first-child {
+                margin-bottom: 1rem;
+            }
+
+            .gap-2 {
+                gap: 0.5rem;
+            }
+
+            /* Remover margin-left en móvil para botones */
+            .gap-2>*+* {
+                margin-left: 0;
+            }
+
+            .btn-sm {
+                padding: 0.375rem 0.75rem;
+                font-size: 0.875rem;
+                line-height: 1.5;
+                min-height: 32px;
+                white-space: nowrap;
+            }
+
+            /* Asegurar que ambos botones tengan el mismo tamaño en móvil */
+            .card-header .d-flex .btn {
+                flex: 1;
+                max-width: none;
+            }
         }
     </style>
 </x-layouts.profesores.dashboard>

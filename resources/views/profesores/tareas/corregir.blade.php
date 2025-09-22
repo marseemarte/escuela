@@ -1,27 +1,27 @@
 <x-layouts.profesores.dashboard titulo="Corregir Tarea">
         <!-- Botón volver -->
     <a href="javascript:history.back()" 
-       class="mb-4 inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 cursor-pointer">
+       class="corregir-btn-volver">
         ← Volver
     </a>
     <!-- Título y descripción -->
-    <h1 class="text-2xl font-semibold mb-2">Corrección de: {{ $tarea->titulo }}</h1>
-    <p class="mb-4 text-gray-600">
+    <h1 class="corregir-main-title">Corrección de: {{ $tarea->titulo }}</h1>
+    <p class="corregir-info-text">
         <strong>Materia:</strong> {{ $materia }} | 
         <strong>Curso:</strong> {{ $curso }} | 
         <strong>Fecha de entrega:</strong> {{ $tarea->fecha_entrega ? $tarea->fecha_entrega->format('d/m/Y') : '-' }}
     </p>
-    <p class="mb-6 text-gray-600">Aquí podrás revisar y corregir las respuestas de los alumnos.</p>
+    <p class="corregir-description">Aquí podrás revisar y corregir las respuestas de los alumnos.</p>
 
     @if(session('success'))
         <div id="alert-success" 
-            class="mb-4 p-4 bg-green-100 border border-green-300 text-green-700 rounded transition-opacity duration-500">
+            class="corregir-alert corregir-alert-success">
             {{ session('success') }}
         </div>
     @endif
 
     @if(session('error'))
-        <div class="mb-4 p-4 bg-red-100 border border-red-300 text-red-700 rounded">
+        <div class="corregir-alert corregir-alert-error">
             {{ session('error') }}
         </div>
     @endif
@@ -29,135 +29,135 @@
 
     <!-- Estadísticas rápidas -->
     @if($entregas->count() > 0)
-        <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-blue-100 p-4 rounded-lg">
-                <h3 class="font-semibold text-blue-800">Total Alumnos</h3>
-                <p class="text-2xl font-bold text-blue-900">{{ $entregas->count() }}</p>
+        <div class="corregir-stats-grid">
+            <div class="corregir-stat-card corregir-stat-blue">
+                <h3 class="corregir-stat-title corregir-stat-title-blue">Total Alumnos</h3>
+                <p class="corregir-stat-number corregir-stat-number-blue">{{ $entregas->count() }}</p>
             </div>
-            <div class="bg-green-100 p-4 rounded-lg">
-                <h3 class="font-semibold text-green-800">Entregaron</h3>
-                <p class="text-2xl font-bold text-green-900">{{ $entregas->where('entrego', true)->count() }}</p>
+            <div class="corregir-stat-card corregir-stat-green">
+                <h3 class="corregir-stat-title corregir-stat-title-green">Entregaron</h3>
+                <p class="corregir-stat-number corregir-stat-number-green">{{ $entregas->where('entrego', true)->count() }}</p>
             </div>
-            <div class="bg-red-100 p-4 rounded-lg">
-                <h3 class="font-semibold text-red-800">No entregaron</h3>
-                <p class="text-2xl font-bold text-red-900">{{ $entregas->where('entrego', false)->count() }}</p>
+            <div class="corregir-stat-card corregir-stat-red">
+                <h3 class="corregir-stat-title corregir-stat-title-red">No entregaron</h3>
+                <p class="corregir-stat-number corregir-stat-number-red">{{ $entregas->where('entrego', false)->count() }}</p>
             </div>
         </div>
     @endif
 
     <!-- Tabla de alumnos -->
-    <div class="overflow-x-auto shadow-md sm:rounded-lg">
-        <table class="w-full text-sm text-center text-gray-600 table-fixed">
-            <thead class="bg-gray-50 text-gray-700 uppercase text-xs">
+    <div class="corregir-table-container">
+        <table class="corregir-table">
+            <thead class="corregir-table-header">
                 <tr>
-                    <th class="px-6 py-3 w-1/6">Alumno</th>
-                    <th class="px-6 py-3 w-1/6">Estado</th>
-                    <th class="px-6 py-3 w-2/6">Respuesta</th>
-                    <th class="px-6 py-3 w-1/6">Nota</th>
-                    <th class="px-6 py-3 w-2/6">Devolución</th>
-                    <th class="px-6 py-3 w-1/6">Acciones</th>
+                    <th class="corregir-table-th corregir-table-th-alumno">Alumno</th>
+                    <th class="corregir-table-th corregir-table-th-estado">Estado</th>
+                    <th class="corregir-table-th corregir-table-th-respuesta">Respuesta</th>
+                    <th class="corregir-table-th corregir-table-th-nota">Nota</th>
+                    <th class="corregir-table-th corregir-table-th-devolucion">Devolución</th>
+                    <th class="corregir-table-th corregir-table-th-acciones">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($entregas as $entrega)
-                    <tr class="bg-white border-b hover:bg-gray-50 {{ !$entrega['entrego'] ? 'bg-red-50' : '' }}">
-                        <td class="px-6 py-4 font-medium text-gray-900">
+                    <tr class="corregir-table-row {{ !$entrega['entrego'] ? 'corregir-table-row-error' : '' }}">
+                        <td class="corregir-table-td corregir-table-td-nombre">
                             {{ $entrega['nombre_completo'] }}
                             <br>
-                            <small class="text-gray-500">DNI: {{ $entrega['dni'] }}</small>
+                            <small class="corregir-table-small">DNI: {{ $entrega['dni'] }}</small>
                         </td>
                         
-                        <td class="px-6 py-4">
+                        <td class="corregir-table-td">
                             @if($entrega['entrego'])
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <span class="corregir-badge corregir-badge-success">
                                     Entregado
                                 </span>
                                 @if($entrega['fecha_entrega'])
                                     <br>
-                                    <small class="text-gray-500">
+                                    <small class="corregir-table-small">
                                         {{ date('d/m/Y H:i', strtotime($entrega['fecha_entrega'])) }}
                                     </small>
                                 @endif
                             @else
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                <span class="corregir-badge corregir-badge-danger">
                                     No entregó
                                 </span>
                             @endif
                         </td>
 
-                        <td class="px-6 py-4">
+                        <td class="corregir-table-td">
                             @if($entrega['entrego'])
-                                <a href="#" class="text-blue-600 hover:underline cursor-pointer" 
+                                <a href="#" class="corregir-link" 
                                    onclick="descargarRespuesta({{ $entrega['tarea_alumno_id'] }})">
                                     {{ $entrega['archivo'] }}
                                 </a>
                             @else
-                                <span class="text-gray-400 italic">Sin entrega</span>
+                                <span class="corregir-text-muted">Sin entrega</span>
                             @endif
                         </td>
 
-                        <td class="px-6 py-4">
+                        <td class="corregir-table-td">
                             @if($entrega['entrego'])
                                 <input type="number" 
                                        min="1" 
                                        max="10" 
                                        step="0.01"
                                        value="{{ $entrega['nota'] ?? '' }}"
-                                       class="nota w-20 border rounded px-2 py-1 text-center"
+                                       class="nota corregir-input-nota"
                                        data-asignacion="{{ $entrega['asignacion_id'] }}"
                                        placeholder="ej: 7.25">
                             @else
-                                <span class="text-gray-400">-</span>
+                                <span class="corregir-text-muted">-</span>
                             @endif
                         </td>
 
-                        <td class="px-6 py-4">
+                        <td class="corregir-table-td">
                             @if($entrega['entrego'])
-                                <div class="flex flex-col">
+                                <div class="corregir-devolucion-container">
                                     <textarea rows="2" 
                                             maxlength="200" 
-                                            class="devolucion w-full border rounded px-2 py-1 resize-none" 
+                                            class="devolucion corregir-textarea" 
                                             placeholder="Máximo 200 caracteres..."
                                             data-asignacion="{{ $entrega['asignacion_id'] }}"
                                             oninput="actualizarContador(this)">{{ $entrega['devolucion'] ?? '' }}</textarea>
-                                    <small class="contador text-gray-500 text-right">
+                                    <small class="contador corregir-text-counter">
                                         {{ strlen($entrega['devolucion'] ?? '') }}/200
                                     </small>
                                 </div>
                             @else
-                                <span class="text-gray-400">-</span>
+                                <span class="corregir-text-muted">-</span>
                             @endif
                         </td>
 
-                        <td class="px-6 py-4">
+                        <td class="corregir-table-td">
                             @if($entrega['entrego'])
                                 <!-- Botón Guardar (se muestra cuando NO tiene corrección) -->
-                                <button class="guardar-btn px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 cursor-pointer {{ (bool)$entrega['tiene_nota'] ? 'hidden' : '' }}"
+                                <button class="guardar-btn corregir-btn-guardar {{ (bool)$entrega['tiene_nota'] ? 'hidden' : '' }}"
                                         data-asignacion="{{ $entrega['asignacion_id'] }}"
                                         onclick="guardarCorreccion(this)">
                                     Guardar
                                 </button>
                                 
                                 <!-- Botón Eliminar (se muestra cuando YA tiene corrección) -->
-                                <button class="eliminar-btn px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 cursor-pointer {{ (bool)$entrega['tiene_nota'] ? '' : 'hidden' }}"
+                                <button class="eliminar-btn corregir-btn-eliminar {{ (bool)$entrega['tiene_nota'] ? '' : 'hidden' }}"
                                         data-asignacion="{{ $entrega['asignacion_id'] }}"
                                         onclick="eliminarCorreccion(this)">
                                     Eliminar
                                 </button>
                             @else
-                                <span class="text-gray-400">-</span>
+                                <span class="corregir-text-muted">-</span>
                             @endif
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-8 text-center">
-                            <div class="text-gray-500">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <td colspan="6" class="corregir-table-empty">
+                            <div class="corregir-empty-state">
+                                <svg class="corregir-empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                                <h3 class="mt-2 text-lg font-medium text-gray-900">No hay alumnos en este curso</h3>
-                                <p class="mt-1 text-gray-500">No se encontraron alumnos asignados a este curso para el ciclo lectivo actual.</p>
+                                <h3 class="corregir-empty-title">No hay alumnos en este curso</h3>
+                                <p class="corregir-empty-description">No se encontraron alumnos asignados a este curso para el ciclo lectivo actual.</p>
                             </div>
                         </td>
                     </tr>
@@ -167,35 +167,502 @@
     </div>
 
 <!-- Modal para confirmar eliminación de corrección -->
-        <div id="eliminarCorreccionModal" class="fixed inset-0 z-50 backdrop-blur bg-black/50 hidden items-center justify-center overflow-auto">
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 relative transform transition-all duration-300 scale-95 opacity-0">
-            <button id="closeEliminarCorreccionModal" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 cursor-pointer">✕</button>
-            <h2 class="text-xl font-semibold mb-4">Confirmar eliminación</h2>
-            <p class="mb-6 text-gray-700">¿Estás seguro de que quieres eliminar esta corrección? Esta acción no se puede deshacer.</p>
-            <div class="flex justify-end gap-2">
-                <button id="cancelEliminarCorreccion" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 cursor-pointer">Cancelar</button>
-                <button id="confirmarEliminarCorreccion" class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 cursor-pointer">Eliminar</button>
+        <div id="eliminarCorreccionModal" class="corregir-modal">
+        <div class="corregir-modal-content corregir-modal-content-small">
+            <button id="closeEliminarCorreccionModal" class="corregir-modal-close">✕</button>
+            <h2 class="corregir-modal-title">Confirmar eliminación</h2>
+            <p class="corregir-modal-text">¿Estás seguro de que quieres eliminar esta corrección? Esta acción no se puede deshacer.</p>
+            <div class="corregir-modal-actions">
+                <button id="cancelEliminarCorreccion" class="corregir-btn-cancel">Cancelar</button>
+                <button id="confirmarEliminarCorreccion" class="corregir-btn-danger">Eliminar</button>
             </div>
         </div>
     </div>
 
     <!-- Mostrar mensaje si no hay entregas -->
     @if($entregas->count() > 0 && $entregas->where('entrego', true)->count() == 0)
-        <div class="mt-6 bg-yellow-100 border-l-4 border-yellow-400 p-4">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+        <div class="corregir-warning-box">
+            <div class="corregir-warning-content">
+                <div class="corregir-warning-icon">
+                    <svg class="corregir-warning-svg" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                     </svg>
                 </div>
-                <div class="ml-3">
-                    <p class="text-sm text-yellow-700">
+                <div class="corregir-warning-text">
+                    <p class="corregir-warning-message">
                         <strong>Sin respuestas:</strong> Ningún alumno ha entregado respuesta para esta tarea aún.
                     </p>
                 </div>
             </div>
         </div>
     @endif
+
+<style>
+/* Base styles */
+.corregir-btn-volver {
+    margin-bottom: 1rem;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: #4b5563;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.corregir-btn-volver:hover {
+    background-color: #374151;
+    color: white;
+    text-decoration: none;
+}
+
+.corregir-main-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #111827;
+}
+
+.corregir-info-text {
+    margin-bottom: 1rem;
+    color: #4b5563;
+}
+
+.corregir-description {
+    margin-bottom: 1.5rem;
+    color: #4b5563;
+}
+
+/* Alerts */
+.corregir-alert {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 6px;
+    transition: opacity 0.5s;
+}
+
+.corregir-alert-success {
+    background-color: #dcfce7;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+}
+
+.corregir-alert-error {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+}
+
+/* Statistics grid */
+.corregir-stats-grid {
+    margin-bottom: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .corregir-stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.corregir-stat-card {
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.corregir-stat-blue {
+    background-color: #dbeafe;
+}
+
+.corregir-stat-green {
+    background-color: #dcfce7;
+}
+
+.corregir-stat-red {
+    background-color: #fef2f2;
+}
+
+.corregir-stat-title {
+    font-weight: 600;
+}
+
+.corregir-stat-title-blue {
+    color: #1e40af;
+}
+
+.corregir-stat-title-green {
+    color: #166534;
+}
+
+.corregir-stat-title-red {
+    color: #dc2626;
+}
+
+.corregir-stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.corregir-stat-number-blue {
+    color: #1e3a8a;
+}
+
+.corregir-stat-number-green {
+    color: #14532d;
+}
+
+.corregir-stat-number-red {
+    color: #b91c1c;
+}
+
+/* Table styles */
+.corregir-table-container {
+    overflow-x: auto;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.corregir-table {
+    width: 100%;
+    font-size: 0.875rem;
+    text-align: center;
+    color: #4b5563;
+    table-layout: fixed;
+}
+
+.corregir-table-header {
+    background-color: #f9fafb;
+    color: #374151;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+.corregir-table-th {
+    padding: 0.75rem 1.5rem;
+}
+
+.corregir-table-th-alumno {
+    width: 16.666667%;
+}
+
+.corregir-table-th-estado {
+    width: 16.666667%;
+}
+
+.corregir-table-th-respuesta {
+    width: 33.333333%;
+}
+
+.corregir-table-th-nota {
+    width: 16.666667%;
+}
+
+.corregir-table-th-devolucion {
+    width: 33.333333%;
+}
+
+.corregir-table-th-acciones {
+    width: 16.666667%;
+}
+
+.corregir-table-row {
+    background-color: white;
+    border-bottom: 1px solid #e5e7eb;
+    transition: background-color 0.2s;
+}
+
+.corregir-table-row:hover {
+    background-color: #f9fafb;
+}
+
+.corregir-table-row-error {
+    background-color: #fef2f2;
+}
+
+.corregir-table-td {
+    padding: 1rem 1.5rem;
+}
+
+.corregir-table-td-nombre {
+    font-weight: 500;
+    color: #111827;
+}
+
+.corregir-table-small {
+    color: #6b7280;
+}
+
+.corregir-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.corregir-badge-success {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.corregir-badge-danger {
+    background-color: #fef2f2;
+    color: #dc2626;
+}
+
+.corregir-link {
+    color: #2563eb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.corregir-link:hover {
+    text-decoration: underline;
+    color: #1d4ed8;
+}
+
+.corregir-text-muted {
+    color: #9ca3af;
+    font-style: italic;
+}
+
+.corregir-input-nota {
+    width: 5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 0.5rem;
+    text-align: center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.corregir-input-nota:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.corregir-devolucion-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.corregir-textarea {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 0.5rem;
+    resize: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.corregir-textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.corregir-text-counter {
+    color: #6b7280;
+    text-align: right;
+}
+
+/* Buttons */
+.corregir-btn-guardar {
+    padding: 0.25rem 0.75rem;
+    background-color: #059669;
+    color: white;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s, opacity 0.2s;
+}
+
+.corregir-btn-guardar:hover {
+    background-color: #047857;
+}
+
+.corregir-btn-guardar:disabled {
+    opacity: 0.5;
+}
+
+.corregir-btn-eliminar {
+    padding: 0.25rem 0.75rem;
+    background-color: #dc2626;
+    color: white;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s, opacity 0.2s;
+}
+
+.corregir-btn-eliminar:hover {
+    background-color: #b91c1c;
+}
+
+.corregir-btn-eliminar:disabled {
+    opacity: 0.5;
+}
+
+/* Empty state */
+.corregir-table-empty {
+    padding: 2rem 1.5rem;
+    text-align: center;
+}
+
+.corregir-empty-state {
+    color: #6b7280;
+}
+
+.corregir-empty-icon {
+    margin: 0 auto;
+    height: 3rem;
+    width: 3rem;
+    color: #9ca3af;
+}
+
+.corregir-empty-title {
+    margin-top: 0.5rem;
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #111827;
+}
+
+.corregir-empty-description {
+    margin-top: 0.25rem;
+    color: #6b7280;
+}
+
+/* Modal styles */
+.corregir-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    backdrop-filter: blur(4px);
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+}
+
+.corregir-modal-content {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 28rem;
+    padding: 1.5rem;
+    position: relative;
+    transform: scale(0.95);
+    opacity: 0;
+    transition: all 0.3s;
+}
+
+.corregir-modal-content-small {
+    max-width: 24rem;
+}
+
+.corregir-modal-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    color: #6b7280;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+}
+
+.corregir-modal-close:hover {
+    color: #374151;
+}
+
+.corregir-modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #111827;
+}
+
+.corregir-modal-text {
+    margin-bottom: 1.5rem;
+    color: #374151;
+}
+
+.corregir-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.corregir-btn-cancel {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    background-color: #d1d5db;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.corregir-btn-cancel:hover {
+    background-color: #9ca3af;
+}
+
+.corregir-btn-danger {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    background-color: #dc2626;
+    color: white;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.corregir-btn-danger:hover {
+    background-color: #b91c1c;
+}
+
+/* Warning box */
+.corregir-warning-box {
+    margin-top: 1.5rem;
+    background-color: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: 1rem;
+}
+
+.corregir-warning-content {
+    display: flex;
+}
+
+.corregir-warning-icon {
+    flex-shrink: 0;
+}
+
+.corregir-warning-svg {
+    height: 1.25rem;
+    width: 1.25rem;
+    color: #f59e0b;
+}
+
+.corregir-warning-text {
+    margin-left: 0.75rem;
+}
+
+.corregir-warning-message {
+    font-size: 0.875rem;
+    color: #92400e;
+}
+
+/* Utility classes */
+.hidden {
+    display: none;
+}
+</style>
 
 <script>
     // Función para actualizar contador de caracteres
