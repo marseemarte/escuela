@@ -1,4 +1,3 @@
-{{-- filepath: c:\wamp64\www\escuela\resources\views\cursos\index.blade.php --}}
 @extends('app')
 
 @section('content')
