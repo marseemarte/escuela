@@ -4,7 +4,6 @@ use App\Http\Controllers\Profesores\AlumnoController;
 use App\Http\Controllers\Profesores\NotaController;
 use App\Http\Controllers\Profesores\ProfesorController;
 use App\Http\Controllers\Profesores\TareaController;
-use App\Http\Controllers\Profesores\CorregirTareaController;
 use App\Http\Controllers\Profesores\HorariosController;
 use App\Http\Controllers\Cursos\CursoController;
 use App\Http\Controllers\Materias\MateriasController;
@@ -31,22 +30,19 @@ Route::middleware(['auth'])->group(function () {
 
 Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->group(function () {
 
+    // Ruta principal de profesores
+    Route::get('/', [ProfesorController::class, 'index'])->name('profesores.index');
+
     // Sección de Tareas
     Route::prefix('tareas')->name('profesores.tareas.')->group(function () {
         Route::get('/', [TareaController::class, 'index'])->name('index');
-        Route::get('/{cupof}', [TareaController::class, 'cargar'])->name('cargar');
         Route::post('/', [TareaController::class, 'store'])->name('store');
+        Route::get('/corregir', [TareaController::class, 'corregir'])->name('corregir');
         Route::get('/{id}/descargar', [TareaController::class, 'descargar'])->name('descargar');
         Route::get('/{id}/seguimiento', [TareaController::class, 'seguimiento'])->name('seguimiento');
         Route::delete('/{id}', [TareaController::class, 'destroy'])->name('destroy');
-        Route::get('{id}/corregir', [CorregirTareaController::class, 'index'])->name('corregir');
-        Route::post('guardar-correccion', [CorregirTareaController::class, 'guardar'])->name('guardar-correccion');
-        Route::post('eliminar-correccion', [CorregirTareaController::class, 'eliminar'])->name('eliminar-correccion');
-        Route::get('alumno/{tareaAlumnoId}/descargar', [CorregirTareaController::class, 'descargarRespuesta'])->name('descargar-respuesta');
+        Route::get('/{cupof}', [TareaController::class, 'cargar'])->name('cargar');
     });
-
-    // API de Profesores
-    Route::apiResource('/', ProfesorController::class);
 
 
 
@@ -55,9 +51,6 @@ Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->
     Route::get('notas/{cupof}', [NotaController::class, 'cargar'])->name('profesores.notas.cargar');
     Route::get('notas/totales/{cupof}', [NotaController::class, 'totales'])->name('profesores.notas.totales');
     Route::post('notas/guardar', [NotaController::class, 'guardarNotas'])->name('profesores.notas.guardar');
-    Route::get('/profesores/tareas/{id}/seguimiento', [TareaController::class, 'seguimiento'])
-    ->name('profesores.tareas.seguimiento');
-
 
     // Rutas específicas de asistencias (sin apiResource completo)
     Route::get('asistencias', [AsistenciaController::class, 'index'])->name('profesores.asistencias.index');
