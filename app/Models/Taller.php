@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Taller extends Model
 {
+    protected $table = 'talleres';
+
     protected $fillable = [
         'nombre',
         'abreviatura',
