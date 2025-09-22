@@ -661,6 +661,89 @@
         .hidden {
             display: none;
         }
+
+        /* Hacer los cuadros de estadísticas más pequeños */
+.corregir-stats-grid {
+    margin-bottom: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem; /* Reducido de 1rem */
+    max-width: 600px; /* Ancho máximo */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (min-width: 768px) {
+    .corregir-stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.corregir-stat-card {
+    padding: 1rem; /* Volver al original */
+    border-radius: 8px; /* Volver al original */
+    text-align: center;
+}
+
+.corregir-stat-title {
+    font-weight: 600;
+    font-size: 0.875rem; /* Un poco más grande que 0.75rem */
+    margin-bottom: 0.25rem;
+}
+
+.corregir-stat-number {
+    font-size: 1.5rem; /* Volver al tamaño original */
+    font-weight: 700;
+    margin: 0;
+}
+
+/* Centrar las tablas */
+.corregir-table-container {
+    overflow-x: auto;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin: 0 auto; /* Centrar */
+}
+
+.corregir-table {
+    width: 100%;
+    font-size: 0.875rem;
+    text-align: center !important;
+    color: #4b5563;
+    table-layout: fixed;
+}
+
+.corregir-table-th,
+.corregir-table-td {
+    text-align: center !important;
+}
+
+.corregir-table-td-nombre {
+    font-weight: 500;
+    color: #111827;
+    text-align: center !important;
+}
+
+/* Modal de eliminación - falta el flex */
+.corregir-modal.flex {
+    display: flex !important;
+}
+
+.corregir-modal-content.scale-100 {
+    transform: scale(1) !important;
+}
+
+.corregir-modal-content.opacity-100 {
+    opacity: 1 !important;
+}
+
+.corregir-modal-content.scale-95 {
+    transform: scale(0.95) !important;
+}
+
+.corregir-modal-content.opacity-0 {
+    opacity: 0 !important;
+}
     </style>
 
     <script>
@@ -772,13 +855,13 @@
             }
         }
 
-        // NUEVA FUNCIÓN: Eliminar corrección con modal
+        // Eliminar corrección con modal
         async function eliminarCorreccion(button) {
             const asignacionId = button.getAttribute('data-asignacion');
 
             // Mostrar modal de confirmación
             const modal = document.getElementById('eliminarCorreccionModal');
-            const modalContent = modal.querySelector('.bg-white');
+            const modalContent = modal.querySelector('.corregir-modal-content'); // Cambiar aquí
 
             // Mostrar modal
             modal.classList.remove('hidden');
@@ -834,16 +917,16 @@
                     cerrarModalEliminarCorreccion(modal, modalContent);
                 }
 
-            } catch (error) {
-                console.error('Error:', error);
-                mostrarMensaje('error', 'Error de conexión. Inténtalo nuevamente.');
-                cerrarModalEliminarCorreccion(modal, modalContent);
-            } finally {
-                // Restaurar botón
-                confirmarBtn.disabled = false;
-                confirmarBtn.textContent = 'Eliminar';
+                } catch (error) {
+                    console.error('Error:', error);
+                    mostrarMensaje('error', 'Error de conexión. Inténtalo nuevamente.');
+                    cerrarModalEliminarCorreccion(modal, modalContent);
+                } finally {
+                    // Restaurar botón
+                    confirmarBtn.disabled = false;
+                    confirmarBtn.textContent = 'Eliminar';
+                }
             }
-        }
 
         // Función para cerrar el modal de eliminación
         function cerrarModalEliminarCorreccion(modal, modalContent) {
@@ -858,7 +941,7 @@
         // Configurar eventos del modal al cargar la página
         document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById('eliminarCorreccionModal');
-            const modalContent = modal.querySelector('.bg-white');
+            const modalContent = modal.querySelector('.corregir-modal-content'); // Cambiar aquí también
             const closeBtn = document.getElementById('closeEliminarCorreccionModal');
             const cancelBtn = document.getElementById('cancelEliminarCorreccion');
 
@@ -874,26 +957,23 @@
             });
         });
 
-        // Función para mostrar mensajes (sin cambios)
-        function mostrarMensaje(tipo, mensaje) {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `mb-4 p-4 border rounded transition-opacity duration-500 ${
-            tipo === 'success' 
-                ? 'bg-green-100 border-green-300 text-green-700' 
-                : 'bg-red-100 border-red-300 text-red-700'
-        }`;
-            alertDiv.textContent = mensaje;
+function mostrarMensaje(tipo, mensaje) {
+    // Crear el contenedor
+    const alert = document.createElement('div');
+    alert.className = `corregir-alert ${tipo === 'success' ? 'corregir-alert-success' : 'corregir-alert-error'}`;
+    alert.textContent = mensaje;
 
-            // Insertar al inicio
-            const mainContent = document.querySelector('h1').parentElement;
-            mainContent.insertBefore(alertDiv, mainContent.children[2]); // Después de la descripción
+    // Insertar debajo del título principal
+    const container = document.querySelector('.corregir-main-title');
+    container.insertAdjacentElement('afterend', alert);
 
-            // Auto-ocultar después de 3 segundos
-            setTimeout(() => {
-                alertDiv.style.opacity = '0';
-                setTimeout(() => alertDiv.remove(), 500);
-            }, 3000);
-        }
+    // Auto eliminar después de 3s
+    setTimeout(() => {
+        alert.style.opacity = '0';
+        setTimeout(() => alert.remove(), 500);
+    }, 3000);
+}
+
 
         // Función para descargar respuesta del alumno (sin cambios)
         function descargarRespuesta(tareaAlumnoId) {
@@ -904,14 +984,7 @@
             }
         }
 
-        // Auto-ocultar alerta de éxito si existe (sin cambios)
-        const alertSuccess = document.getElementById('alert-success');
-        if (alertSuccess) {
-            setTimeout(() => {
-                alertSuccess.style.opacity = '0';
-                setTimeout(() => alertSuccess.remove(), 500);
-            }, 3000);
-        }
+
     </script>
 
 </x-layouts.profesores.dashboard>

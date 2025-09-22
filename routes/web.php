@@ -4,6 +4,7 @@ use App\Http\Controllers\Profesores\AlumnoController;
 use App\Http\Controllers\Profesores\NotaController;
 use App\Http\Controllers\Profesores\ProfesorController;
 use App\Http\Controllers\Profesores\TareaController;
+use App\Http\Controllers\Profesores\CorregirTareaController;
 use App\Http\Controllers\Profesores\HorariosController;
 use App\Http\Controllers\Cursos\CursoController;
 use App\Http\Controllers\Materias\MateriasController;
@@ -46,6 +47,10 @@ Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->
         Route::get('/{id}/seguimiento', [TareaController::class, 'seguimiento'])->name('seguimiento');
         Route::delete('/{id}', [TareaController::class, 'destroy'])->name('destroy');
         Route::get('/{cupof}', [TareaController::class, 'cargar'])->name('cargar');
+        Route::get('{id}/corregir', [CorregirTareaController::class, 'index'])->name('corregir');
+        Route::post('guardar-correccion', [CorregirTareaController::class, 'guardar'])->name('guardar-correccion');
+        Route::post('eliminar-correccion', [CorregirTareaController::class, 'eliminar'])->name('eliminar-correccion');
+        Route::get('alumno/{tareaAlumnoId}/descargar', [CorregirTareaController::class, 'descargarRespuesta'])->name('descargar-respuesta');
     });
 
 

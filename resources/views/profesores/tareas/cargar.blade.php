@@ -135,7 +135,9 @@
                         <td class="tareas-table-td">{{ $modulo['curso'] }}</td>
                         <td class="tareas-table-td">{{ $modulo['fecha_subida'] }}</td>
                         <td class="tareas-table-td">
-                            <a href="{{ route('profesores.tareas.descargar', $modulo['id']) }}" class="tareas-link">
+                            <a href="{{ route('profesores.tareas.descargar', $modulo['id']) }}" 
+                            class="tareas-link" 
+                            title="{{ $modulo['archivo'] }}">
                                 {{ $modulo['archivo'] }}
                             </a>
                         </td>
@@ -188,8 +190,10 @@
                             </span>
                         </td>
                         <td class="tareas-table-td">
-                            <a href="{{ route('profesores.tareas.descargar', $tarea['id']) }}" class="tareas-link">
-                                {{ $tarea['archivo'] }}
+                            <a href="{{ route('profesores.tareas.descargar', $modulo['id']) }}" 
+                            class="tareas-link" 
+                            title="{{ $modulo['archivo'] }}">
+                                {{ $modulo['archivo'] }}
                             </a>
                         </td>
                         <td class="tareas-table-td">{{ $tarea['entregas'] }}</td>
@@ -214,7 +218,6 @@
         </table>
     </div>
 
-    <!-- Modal de seguimiento -->
     <!-- Modal de seguimiento -->
     <div id="seguimientoModal" class="tareas-modal">
         <div class="tareas-modal-content tareas-modal-large">
@@ -712,6 +715,82 @@
         .opacity-100 {
             opacity: 1;
         }
+
+/* Centrado de tablas principales */
+.tareas-table,
+.tareas-table th,
+.tareas-table td {
+    text-align: center !important;
+}
+
+/* Quitar subrayado de botones */
+.tareas-btn-seguimiento,
+.tareas-btn-eliminar {
+    text-decoration: none !important;
+}
+
+.tareas-btn-seguimiento:hover,
+.tareas-btn-eliminar:hover {
+    text-decoration: none !important;
+}
+
+/* Forzar el modal de seguimiento a comportarse igual siempre */
+#seguimientoModal .tareas-modal-content {
+    max-width: 800px !important;
+    width: 90% !important;
+    margin: 2rem auto !important;
+}
+
+#seguimientoContent {
+    text-align: center !important;
+    width: 100% !important;
+}
+
+#seguimientoContent table {
+    width: 100% !important;
+    margin: 0 auto !important;
+    max-width: 700px !important;
+    border-collapse: collapse !important;
+}
+
+#seguimientoContent th,
+#seguimientoContent td {
+    text-align: center !important;
+    padding: 0.5rem !important;
+    border: none !important;
+}
+
+#seguimientoContent th {
+    background-color: #f3f4f6 !important;
+    font-weight: bold !important;
+}
+
+/* Controlar ancho de columnas de la tabla */
+.tareas-table {
+    table-layout: fixed !important;
+}
+
+.tareas-table-td {
+    word-wrap: break-word !important;
+    word-break: break-all !important;
+    overflow: hidden !important;
+}
+
+/* Ancho específico para la columna de archivo */
+.tareas-table th:nth-child(5),
+.tareas-table td:nth-child(5) {
+    width: 200px !important;
+    max-width: 200px !important;
+}
+
+/* Para enlaces largos en la columna archivo */
+.tareas-link {
+    display: block !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+}
     </style>
 
     <!-- Modal visual de eliminación -->
@@ -833,79 +912,68 @@
             const seguimientoModal = document.getElementById('seguimientoModal');
             const closeSeguimientoBtn = document.getElementById('closeSeguimientoModal');
 
-            seguimientoBtns.forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const tareaId = btn.getAttribute('data-tarea-id');
-
-                    try {
-                        const response = await fetch(
-                            `/profesores/tareas/${tareaId}/seguimiento`);
-                        const data = await response.json();
-
-                        // Llenar info de la tarea
-                        document.getElementById('tareaInfo').innerHTML = `
-                    <h3 class="font-semibold">${data.tarea.titulo}</h3>
-                    <p class="text-sm text-gray-600">Curso: ${data.tarea.curso} | Materia: ${data.tarea.materia}</p>
-                `;
-
-                        // Crear tabla de seguimiento
-                        let seguimientoHTML = `
-                    <table class="w-full text-sm text-center text-gray-600 table-fixed">
-                        <thead class="bg-gray-50 text-gray-700 uppercase text-xs">
-                            <tr>
-                                <th class="px-4 py-2">Alumno</th>
-                                <th class="px-4 py-2">Estado</th>
-                                ${data.tarea.es_tarea ? '<th class="px-4 py-2">Nota</th>' : ''}
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-
-                        data.alumnos.forEach(alumno => {
-                            const estadoClass = alumno.estado === 'No visto' ?
-                                'text-red-600' :
-                                alumno.estado === 'Visto y no respondido' ?
-                                'text-yellow-600' :
-                                'text-green-600';
-
-                            seguimientoHTML += `
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-4 py-2">${alumno.nombre_completo}</td>
-                            <td class="px-4 py-2 ${estadoClass}">${alumno.estado}</td>
-                            ${data.tarea.es_tarea ? `<td class="px-4 py-2">${alumno.nota || '-'}</td>` : ''}
+seguimientoBtns.forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const tareaId = btn.getAttribute('data-tarea-id');
+        try {
+            const response = await fetch(`/profesores/tareas/${tareaId}/seguimiento`);
+            const data = await response.json();
+            
+            // Info de la tarea
+            document.getElementById('tareaInfo').innerHTML = `
+                <h3>${data.tarea.titulo}</h3>
+                <p>Curso: ${data.tarea.curso} | Materia: ${data.tarea.materia}</p>
+            `;
+            
+            // Tabla simple
+            let seguimientoHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Alumno</th>
+                            <th>Estado</th>
+                            ${data.tarea.es_tarea ? '<th>Nota</th>' : ''}
                         </tr>
-                    `;
-                        });
-
-                        seguimientoHTML += '</tbody></table>';
-                        document.getElementById('seguimientoContent').innerHTML =
-                            seguimientoHTML;
-
-                        // Mostrar botón corregir solo para tareas
-                        const btnCorregir = document.getElementById('btnCorregir');
-                        if (data.tarea.es_tarea) {
-                            btnCorregir.classList.remove('hidden');
-                            btnCorregir.href = `/profesores/tareas/${tareaId}/corregir`;
-                        } else {
-                            btnCorregir.classList.add('hidden');
-                        }
-
-                        // Mostrar modal
-                        seguimientoModal.classList.remove('hidden');
-                        seguimientoModal.classList.add('flex');
-                        setTimeout(() => {
-                            seguimientoModal.firstElementChild.classList.remove(
-                                'scale-95', 'opacity-0');
-                            seguimientoModal.firstElementChild.classList.add(
-                                'scale-100', 'opacity-100');
-                        }, 20);
-
-                    } catch (error) {
-                        console.error('Error al cargar seguimiento:', error);
-                        alert('Error al cargar el seguimiento de la tarea');
-                    }
-                });
+                    </thead>
+                    <tbody>
+            `;
+            
+            data.alumnos.forEach(alumno => {
+                seguimientoHTML += `
+                    <tr>
+                        <td>${alumno.nombre_completo}</td>
+                        <td style="color: ${alumno.estado === 'No visto' ? '#dc2626' : alumno.estado === 'Visto y no respondido' ? '#d97706' : '#059669'};">${alumno.estado}</td>
+                        ${data.tarea.es_tarea ? `<td>${alumno.nota || '-'}</td>` : ''}
+                    </tr>
+                `;
             });
+            
+            seguimientoHTML += '</tbody></table>';
+            document.getElementById('seguimientoContent').innerHTML = seguimientoHTML;
+            
+            // Botón corregir
+            const btnCorregir = document.getElementById('btnCorregir');
+            if (data.tarea.es_tarea) {
+                btnCorregir.classList.remove('hidden');
+                btnCorregir.href = `/profesores/tareas/${tareaId}/corregir`;
+            } else {
+                btnCorregir.classList.add('hidden');
+            }
+            
+            // Mostrar modal
+            seguimientoModal.classList.remove('hidden');
+            seguimientoModal.classList.add('flex');
+            setTimeout(() => {
+                seguimientoModal.firstElementChild.classList.remove('scale-95', 'opacity-0');
+                seguimientoModal.firstElementChild.classList.add('scale-100', 'opacity-100');
+            }, 20);
+            
+        } catch (error) {
+            console.error('Error al cargar seguimiento:', error);
+            alert('Error al cargar el seguimiento de la tarea');
+        }
+    });
+});
 
             closeSeguimientoBtn.addEventListener('click', () => {
                 seguimientoModal.firstElementChild.classList.add('scale-95', 'opacity-0');
