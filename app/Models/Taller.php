@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Materia extends Model
+class Taller extends Model
 {
     protected $fillable = [
         'nombre',
@@ -14,23 +14,21 @@ class Materia extends Model
         'resumen',
         'orientacion_id',
         'anio',
-        'tipo',
     ];
+
     // Relaciones
-    public function cupof(): HasMany
-    {
-        return $this->hasMany(Cupof::class, 'id_materias');
-    }
-    public function orientacion()
+    public function orientacion(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Cursos\Orientacion::class, 'orientacion_id');
     }
+
     // Scopes y Accessors
-    public function scopeHabilitadas($query)
+    public function scopeHabilitados($query)
     {
         return $query->where('estado', 'H');
     }
-    public function scopeDeshabilitadas($query)
+
+    public function scopeDeshabilitados($query)
     {
         return $query->where('estado', 'D');
     }

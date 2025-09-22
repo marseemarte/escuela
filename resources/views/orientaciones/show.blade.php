@@ -96,7 +96,7 @@
                                         </thead>
                                         <tbody>
                                             @foreach ($materias->filter(function ($materia) use ($anio) {
-                                                return $materia->anio == $anio && $materia->tipo == 'materia';
+                                                return $materia->anio == $anio;
                                             }) as $materia)
                                                 <tr>
                                                     <td>{{ $materia->nombre }}</td>
@@ -150,15 +150,24 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($materias->filter(function ($materia) use ($anio) {
-                                            return $materia->anio == $anio && $materia->tipo == 'taller';
-                                        }) as $taller)
+                                            @foreach ($talleres->filter(function ($taller) use ($anio) {
+                                                return $taller->anio == $anio;
+                                            }) as $taller)
                                                 <tr>
                                                     <td>{{ $taller->nombre }}</td>
                                                     <td>{{ $taller->resumen }}</td>
                                                     <td>
                                                         <!--<a href="" class="btn btn-secondary btn-sm">Editar</a>-->
-                                                        <a href="#" class="btn btn-danger btn-sm">Eliminar</a>
+                                                        <form
+                                                            action="{{ route('orientaciones.updateTallerOrientacion') }}"
+                                                            method="POST" style="display:inline;">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <input type="hidden" name="taller_id" value="{{ $taller->id }}">
+                                                            <input type="hidden" name="orientacion_id" value="5">
+                                                            <input type="hidden" name="anio" value="{{ $taller->anio }}">
+                                                            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                                        </form>
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -233,6 +242,7 @@
                                     <th>Resumen</th>
                                     <th>Orientación</th>
                                     <th>Año</th>
+                                    <th>Tipo</th>
                                     <th>Acción</th>
                                 </tr>
                             </thead>
@@ -242,11 +252,13 @@
                                         class="materia-row"
                                         data-orientacion="{{ $materia->orientacion_id }}"
                                         data-anio="{{ $materia->anio }}"
+                                        data-tipo="{{ $materia->tipo ?? 'materia' }}"
                                     >
                                         <td>{{ $materia->nombre }}</td>
                                         <td>{{ $materia->resumen }}</td>
                                         <td>{{ $materia->orientacion->nombre ?? 'Sin clasificar' }}</td>
                                         <td>{{ $materia->anio }}° Año</td>
+                                        <td>{{ $materia->tipo ?? 'materia' }}</td>
                                         <td>
                                             <!-- Botón para agregar a la orientación actual -->
                                             <form method="POST" action="{{ route('materias.cambiar_orientacion', $materia->id) }}" style="display:inline;">
@@ -254,7 +266,7 @@
                                                 @method('PUT')
                                                 <input type="hidden" name="orientacion_id" value="" class="input-orientacion-id">
                                                 <input type="hidden" name="anio" value="" class="input-anio">
-                                                <input type="hidden" name="tipo" value="{{ $materia->tipo }}">
+                                                <input type="hidden" name="tipo" value="" class="input-tipo">
                                                 <button type="submit" class="btn btn-success btn-sm">
                                                     <i class="fas fa-check"></i> Seleccionar
                                                 </button>
@@ -265,7 +277,45 @@
                                                 @method('PUT')
                                                 <input type="hidden" name="orientacion_id" value="5">
                                                 <input type="hidden" name="anio" value="{{ $materia->anio }}">
-                                                <input type="hidden" name="tipo" value="{{ $materia->tipo }}">
+                                                <input type="hidden" name="tipo" value="{{ $materia->tipo ?? 'materia' }}">
+                                                <button type="submit" class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-ban"></i> Sin clasificar
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                @foreach ($allTalleres as $taller)
+                                    <tr
+                                        class="taller-row"
+                                        data-orientacion="{{ $taller->orientacion_id }}"
+                                        data-anio="{{ $taller->anio }}"
+                                        data-tipo="taller"
+                                    >
+                                        <td>{{ $taller->nombre }}</td>
+                                        <td>{{ $taller->resumen }}</td>
+                                        <td>{{ $taller->orientacion->nombre ?? 'Sin clasificar' }}</td>
+                                        <td>{{ $taller->anio }}° Año</td>
+                                        <td>taller</td>
+                                        <td>
+                                            <!-- Botón para agregar a la orientación actual -->
+                                            <form method="POST" action="{{ route('orientaciones.updateTallerOrientacion') }}" style="display:inline;">
+                                                @csrf
+                                                @method('PUT')
+                                                <input type="hidden" name="taller_id" value="{{ $taller->id }}">
+                                                <input type="hidden" name="orientacion_id" value="" class="input-orientacion-id">
+                                                <input type="hidden" name="anio" value="" class="input-anio">
+                                                <button type="submit" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-check"></i> Seleccionar
+                                                </button>
+                                            </form>
+                                            <!-- Botón para mover a Sin clasificar -->
+                                            <form method="POST" action="{{ route('orientaciones.updateTallerOrientacion') }}" style="display:inline;">
+                                                @csrf
+                                                @method('PUT')
+                                                <input type="hidden" name="taller_id" value="{{ $taller->id }}">
+                                                <input type="hidden" name="orientacion_id" value="5">
+                                                <input type="hidden" name="anio" value="{{ $taller->anio }}">
                                                 <button type="submit" class="btn btn-warning btn-sm">
                                                     <i class="fas fa-ban"></i> Sin clasificar
                                                 </button>
@@ -359,8 +409,10 @@ document.addEventListener('DOMContentLoaded', function() {
         var button = $(event.relatedTarget);
         var orientacionId = button.data('orientacion-id');
         var anio = button.data('anio');
+        var tipo = button.data('tipo');
         $(this).find('.input-orientacion-id').val(orientacionId);
         $(this).find('.input-anio').val(anio);
+        $(this).find('.input-tipo').val(tipo);
     });
 });
 </script>
@@ -371,7 +423,26 @@ document.addEventListener('DOMContentLoaded', function() {
         let orientacion = document.getElementById('filterOrientacion').value;
         let anio = document.getElementById('filterAnio').value;
 
+        // Filtrar materias
         document.querySelectorAll('#materiasSearchTable .materia-row').forEach(function(row) {
+            let nombre = row.children[0].textContent.toLowerCase();
+            let resumen = row.children[1].textContent.toLowerCase();
+            let rowOrientacion = row.getAttribute('data-orientacion');
+            let rowAnio = row.getAttribute('data-anio');
+
+            let coincideTexto = nombre.includes(texto) || resumen.includes(texto) || texto === '';
+            let coincideOrientacion = (orientacion === '' || rowOrientacion === orientacion);
+            let coincideAnio = (anio === '' || rowAnio === anio);
+
+            if (coincideTexto && coincideOrientacion && coincideAnio) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Filtrar talleres
+        document.querySelectorAll('#materiasSearchTable .taller-row').forEach(function(row) {
             let nombre = row.children[0].textContent.toLowerCase();
             let resumen = row.children[1].textContent.toLowerCase();
             let rowOrientacion = row.getAttribute('data-orientacion');
