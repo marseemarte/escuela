@@ -109,6 +109,7 @@ Route::get('/orientaciones/edit', [OrientacionesController::class, 'edit'])->nam
 Route::get('/orientaciones/{id}', [OrientacionesController::class, 'show'])->name('orientaciones.show');
 Route::get('/orientaciones/create', [OrientacionesController::class, 'create'])->name('orientaciones.create');
 Route::post('/orientaciones', [OrientacionesController::class, 'store'])->name('orientaciones.store');
+Route::put('/orientaciones/taller/update', [OrientacionesController::class, 'updateTallerOrientacion'])->name('orientaciones.updateTallerOrientacion');
 
 // CUPOF routes
 Route::get('/cupof', [CupofController::class, 'index'])->name('cupof.index');
@@ -245,3 +246,6 @@ Route::post('test-csrf', function () {
 
 // Incluir rutas de autenticación
 require __DIR__ . '/auth.php';
+
+Route::put('/materias/{materia}/cambiar-orientacion', [MateriasController::class, 'cambiarOrientacion'])->name('materias.cambiar_orientacion');
+Route::get('/materias/create', [MateriasController::class, 'create'])->name('materias.create');
