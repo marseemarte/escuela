@@ -96,7 +96,7 @@ Route::put('/cursos/{curso}', [CursoController::class, 'update'])->name('cursos.
 Route::delete('/cursos/{curso}', [CursoController::class, 'destroy'])->name('cursos.destroy');
 
 // Materias routes
-Route::get('/materias', [MateriasContro ller::class, 'index'])->name('materias.index');
+Route::get('/materias', [MateriasController::class, 'index'])->name('materias.index');
 Route::get('/materias/create', [MateriasController::class, 'create'])->name('materias.create');
 Route::get('/materias/{id}', [MateriasController::class, 'edit'])->name('materias.edit');
 Route::put('/materias/{materia}/cambiar-orientacion', [MateriasController::class, 'cambiarOrientacion'])->name('materias.cambiar_orientacion');
