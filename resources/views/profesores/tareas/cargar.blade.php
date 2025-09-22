@@ -120,7 +120,6 @@
                 <tr>
                     <th class="tareas-table-th">Nombre</th>
                     <th class="tareas-table-th">Materia</th>
-                    <th class="tareas-table-th">Curso</th>
                     <th class="tareas-table-th">Fecha de subida</th>
                     <th class="tareas-table-th">Archivo</th>
                     <th class="tareas-table-th">Vistos</th>
@@ -132,7 +131,6 @@
                     <tr class="tareas-table-row">
                         <td class="tareas-table-td tareas-table-td-title">{{ $modulo['titulo'] }}</td>
                         <td class="tareas-table-td">{{ $modulo['materia'] }}</td>
-                        <td class="tareas-table-td">{{ $modulo['curso'] }}</td>
                         <td class="tareas-table-td">{{ $modulo['fecha_subida'] }}</td>
                         <td class="tareas-table-td">
                             <a href="{{ route('profesores.tareas.descargar', $modulo['id']) }}" 
@@ -169,7 +167,6 @@
                 <tr>
                     <th class="tareas-table-th">Nombre</th>
                     <th class="tareas-table-th">Materia</th>
-                    <th class="tareas-table-th">Curso</th>
                     <th class="tareas-table-th">Fecha de Subida</th>
                     <th class="tareas-table-th">Fecha de entrega</th>
                     <th class="tareas-table-th">Archivo</th>
@@ -182,7 +179,6 @@
                     <tr class="tareas-table-row">
                         <td class="tareas-table-td tareas-table-td-title">{{ $tarea['titulo'] }}</td>
                         <td class="tareas-table-td">{{ $tarea['materia'] }}</td>
-                        <td class="tareas-table-td">{{ $tarea['curso'] }}</td>
                         <td class="tareas-table-td">{{ $tarea['fecha_subida'] }}</td>
                         <td class="tareas-table-td">
                             <span class="@if (strtotime($tarea['fecha_entrega']) < time()) tareas-date-expired @endif">
