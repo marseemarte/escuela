@@ -1,11 +1,11 @@
-{{-- Vista principal de notas - Lista de materias --}}
-<x-layouts.profesores.dashboard notas titulo="Notas">
+{{-- Vista principal de tareas - Lista de materias --}}
+<x-layouts.profesores.dashboard titulo="Tareas">
     <div class="bg-white rounded-lg shadow-sm p-6">
         {{-- Header --}}
         <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 space-y-4 sm:space-y-0">
             <div>
-                <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Notas</h1>
-                <p class="text-gray-600 mt-1 text-sm sm:text-base">Seleccione una materia para gestionar notas</p>
+                <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Tareas</h1>
+                <p class="text-gray-600 mt-1 text-sm sm:text-base">Seleccione una materia para gestionar tareas</p>
             </div>
             <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
                 <div class="flex items-center space-x-2 text-xs sm:text-sm text-gray-500">
@@ -20,7 +20,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 @foreach ($materias as $materia)
                     <div
-                        class="bg-gradient-to-br from-green-50 to-emerald-100 rounded-lg border border-gray-200 hover:border-green-300 transition-all duration-200 hover:shadow-md">
+                        class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg border border-gray-200 hover:border-blue-300 transition-all duration-200 hover:shadow-md">
                         <div class="p-4 sm:p-6">
                             {{-- Cabecera de la materia --}}
                             <div
@@ -50,10 +50,10 @@
 
                             {{-- Botón de acción --}}
                             <div class="pt-3 sm:pt-4 border-t border-gray-200">
-                                <a href="{{ route('profesores.notas.cargar', $materia->cupof) }}"
-                                    class="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200 shadow-sm">
-                                    <i class="fas fa-edit mr-2"></i>
-                                    Cargar Notas
+                                <a href="{{ route('profesores.tareas.cargar', $materia->cupof) }}"
+                                    class="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 shadow-sm">
+                                    <i class="fas fa-tasks mr-2"></i>
+                                    Gestionar Tareas
                                 </a>
                             </div>
                         </div>
@@ -64,11 +64,11 @@
             {{-- Estado vacío --}}
             <div class="text-center py-12">
                 <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gray-100">
-                    <i class="fas fa-graduation-cap text-gray-400 text-xl"></i>
+                    <i class="fas fa-tasks text-gray-400 text-xl"></i>
                 </div>
                 <h3 class="mt-4 text-lg font-medium text-gray-900">No hay materias asignadas</h3>
                 <p class="mt-2 text-gray-500">
-                    No tiene materias asignadas en este momento para gestionar notas.
+                    No tiene materias asignadas en este momento para gestionar tareas.
                 </p>
             </div>
         @endif

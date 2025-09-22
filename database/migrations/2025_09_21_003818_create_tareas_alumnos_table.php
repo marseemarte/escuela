@@ -18,6 +18,7 @@ return new class extends Migration {
 
             $table->date('fecha'); // Fecha en que el alumno entregó la tarea
             $table->string('nombre_archivo', 150); // Nombre del archivo que entregó el estudiante
+            $table->string('ruta_archivo', 255)->nullable();
             $table->tinyInteger('borrado_fisico')->default(0); // Marca para borrado lógico (0=Activo, 1=Eliminado)
 
             $table->timestamps();
@@ -29,3 +30,7 @@ return new class extends Migration {
         Schema::dropIfExists('tareas_alumnos');
     }
 };
+
+// Eliminar tabla tareas_alumnos y ejecutar este comando para recrearla con el campo ruta_archivo:: 
+// php artisan migrate --path=database/migrations/2025_09_21_003818_create_tareas_alumnos_table.php
+// Si no, eliminar la base de datos y ejecutar php artisan migrate para crearla de cero.
