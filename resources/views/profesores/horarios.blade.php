@@ -1,7 +1,6 @@
 <x-layouts.profesores.dashboard horarios="true" titulo="Horarios">
     <div class="container py-4">
         <h1 class="mb-1">Horarios</h1>
-        <h2 class="mb-4">Horarios 2025 de Prácticas Profesionalizantes</h2>
 
         {{-- Lista de cursos con botón para abrir modal --}}
         <div class="row g-3 mb-4">
