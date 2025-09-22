@@ -23,8 +23,9 @@ Route::get('/', function () {
     return view('app');
 })->name('home');
 
-Route::get('/cargar-horarios', [HorariosController::class, 'create'])->name('horarios.crearhorarios');
-Route::post('/cargar-horarios', [HorariosController::class, 'store'])->name('horarios.store');
+
+Route::get('/profesores/create', [HorariosSubidaController::class, 'create'])->name('profesores.create');
+Route::post('/horarios', [HorariosSubidaController::class, 'store'])->name('profesores.store');
 
 // Rutas de asistencias para usuarios generales (estudiantes/padres)
 Route::middleware(['auth'])->group(function () {
