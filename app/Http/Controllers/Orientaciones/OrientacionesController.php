@@ -44,6 +44,34 @@ class OrientacionesController extends Controller
         $orientacion = Orientacion::create($request->all());
         return redirect()->route('orientaciones.index')->with('success', 'Orientación creada correctamente.');
     }
+
+    public function edit($id)
+    {
+        $orientacion = Orientacion::findOrFail($id);
+        return view('orientaciones.edit', compact('orientacion'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'titulo' => 'required|string|max:255',
+            'color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
+        ]);
+        
+        $orientacion = Orientacion::findOrFail($id);
+        $orientacion->update($request->all());
+        
+        return redirect()->route('orientaciones.index')->with('success', 'Orientación actualizada correctamente.');
+    }
+
+    public function destroy($id)
+    {
+        $orientacion = Orientacion::findOrFail($id);
+        $orientacion->delete();
+        
+        return redirect()->route('orientaciones.index')->with('success', 'Orientación eliminada correctamente.');
+    }
     /**
      * Obtener todas las materias disponibles
      */
@@ -70,6 +98,14 @@ class OrientacionesController extends Controller
     public function updateMateriaOrientacion(Request $request)
     {
         try {
+            \Log::info('Datos recibidos en updateMateriaOrientacion', [
+                'materia_id' => $request->materia_id,
+                'orientacion_id' => $request->orientacion_id,
+                'anio' => $request->anio,
+                'tipo' => $request->tipo,
+                'all_data' => $request->all()
+            ]);
+
             $request->validate([
                 'materia_id' => 'required|exists:materias,id',
                 'orientacion_id' => 'required|exists:orientaciones,id',
@@ -81,7 +117,15 @@ class OrientacionesController extends Controller
             
             // Si el tipo es 'taller', crear un registro en la tabla talleres
             if ($request->tipo === 'taller') {
-                Taller::create([
+                \Log::info('Creando taller', [
+                    'materia_id' => $materia->id,
+                    'nombre' => $materia->nombre,
+                    'orientacion_id' => $request->orientacion_id,
+                    'anio' => $request->anio,
+                    'tipo' => $request->tipo
+                ]);
+                
+                $taller = Taller::create([
                     'nombre' => $materia->nombre,
                     'abreviatura' => $materia->abreviatura,
                     'estado' => $materia->estado,
@@ -90,19 +134,28 @@ class OrientacionesController extends Controller
                     'anio' => $request->anio,
                 ]);
                 
+                \Log::info('Taller creado', ['taller_id' => $taller->id]);
+                
                 // Eliminar la materia de la tabla materias
                 $materia->delete();
+                
+                \Log::info('Materia eliminada', ['materia_id' => $materia->id]);
+                
+                return redirect()->route('orientaciones.show', $request->orientacion_id)
+                    ->with('success', 'Taller agregado correctamente a la orientación.');
             } else {
                 // Si es materia, actualizar normalmente
                 $materia->orientacion_id = $request->orientacion_id;
                 $materia->anio = $request->anio;
                 $materia->tipo = $request->tipo;
                 $materia->save();
+                
+                return redirect()->route('orientaciones.show', $request->orientacion_id)
+                    ->with('success', 'Materia actualizada correctamente.');
             }
-
-            return response()->json(['success' => true]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'error' => $e->getMessage()], 400);
+            return redirect()->back()
+                ->with('error', 'Error al agregar el elemento: ' . $e->getMessage());
         }
     }
 
@@ -143,9 +196,15 @@ class OrientacionesController extends Controller
             $taller->anio = $request->anio;
             $taller->save();
 
-            return response()->json(['success' => true]);
+            $mensaje = $request->orientacion_id == 5 ? 
+                'Taller movido a Sin clasificar correctamente.' : 
+                'Taller actualizado correctamente.';
+                
+            return redirect()->route('orientaciones.show', $request->orientacion_id)
+                ->with('success', $mensaje);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'error' => $e->getMessage()], 400);
+            return redirect()->back()
+                ->with('error', 'Error al actualizar el taller: ' . $e->getMessage());
         }
     }
 }

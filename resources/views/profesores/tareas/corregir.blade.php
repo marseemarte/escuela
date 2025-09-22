@@ -1,4 +1,4 @@
-<x-layouts.profesores.dashboard titulo="Corregir Tarea">
+<x-layouts.profesores.dashboard tareas titulo="Corregir Tarea">
     <!-- Botón volver -->
     <a href="javascript:history.back()" class="corregir-btn-volver">
         ← Volver

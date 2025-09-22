@@ -18,7 +18,9 @@
     @if(session('error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
         </div>
     @endif
     @if($errors->any())
@@ -41,13 +43,43 @@
                     <strong>Cupof:</strong> {{ $cupo->cupof }}
                 </div>
                 <div class="col-md-3">
-                    <strong>Materia:</strong> {{ $cupo->id_materias }}
+                    <strong>Materia:</strong> {{ $cupo->materia_nombre ?? 'N/A' }}
                 </div>
                 <div class="col-md-3">
-                    <strong>Curso:</strong> {{ $cupo->id_cursos }}
+                    <strong>Curso:</strong> {{ $cupo->curso_ano ?? 'N/A' }}° {{ $cupo->curso_division ?? '' }}
                 </div>
                 <div class="col-md-3">
-                    <strong>Turno:</strong> {{ $cupo->turno }}
+                    <strong>Turno:</strong> 
+                    @if($cupo->turno == 'M')
+                        Mañana
+                    @elseif($cupo->turno == 'T')
+                        Tarde
+                    @elseif($cupo->turno == 'V')
+                        Noche
+                    @else
+                        {{ $cupo->turno }}
+                    @endif
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-3">
+                    <strong>Horas:</strong> {{ $cupo->hsmodcar }}
+                </div>
+                <div class="col-md-3">
+                    <strong>Función:</strong> {{ $cupo->funcion }}
+                </div>
+                <div class="col-md-3">
+                    <strong>Cargo:</strong> {{ $cupo->cargo }}
+                </div>
+                <div class="col-md-3">
+                    <strong>Estado:</strong> 
+                    @if($cupo->estado == 'h')
+                        <span class="badge bg-success">Activo</span>
+                    @elseif($cupo->estado == 'd')
+                        <span class="badge bg-danger">Inactivo</span>
+                    @else
+                        <span class="badge bg-secondary">{{ $cupo->estado }}</span>
+                    @endif
                 </div>
             </div>
         </div>

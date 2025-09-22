@@ -1,4 +1,4 @@
-<x-layouts.profesores.dashboard titulo="Tareas">
+<x-layouts.profesores.dashboard tareas titulo="Tareas">
     <h1 class="tareas-main-title">{{ $cursos[0]['materia'] }} - {{ $cursos[0]['nombre'] }}</h1>
     <p class="tareas-main-description">Gestiona las tareas de la materia {{ $cursos[0]['materia'] }} del curso
         {{ $cursos[0]['nombre'] }}.
@@ -51,7 +51,7 @@
             <div id="modalFormulario" class="tareas-form-section hidden">
                 <h2 id="formTitulo" class="tareas-form-title"></h2>
 
-                <form method="POST" action="{{ route('tareas.store') }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('profesores.tareas.store') }}" enctype="multipart/form-data">
                     @csrf
 
                     <div class="tareas-form-group">

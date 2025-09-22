@@ -20,14 +20,18 @@
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
         </div>
     @endif
 
     @if(session('error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
         </div>
     @endif
 
@@ -48,7 +52,16 @@
                         <strong>Curso:</strong> {{ $cupo->curso_ano }}° {{ $cupo->curso_division }}
                     </div>
                     <div class="col-md-3">
-                        <strong>Turno:</strong> {{ $cupo->turno }}
+                        <strong>Turno:</strong> 
+                        @if($cupo->turno == 'M')
+                            Mañana
+                        @elseif($cupo->turno == 'T')
+                            Tarde
+                        @elseif($cupo->turno == 'V')
+                            Noche
+                        @else
+                            {{ $cupo->turno }}
+                        @endif
                     </div>
                 </div>
                 <div class="row mt-2">
@@ -62,13 +75,18 @@
                         <strong>Horas:</strong> {{ $cupo->hsmodcar }}
                     </div>
                     <div class="col-md-3">
+                        <strong>Grupo:</strong> {{ $cupo->grupo_nombre ?? 'Sin grupo' }}
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-3">
                         <strong>Estado:</strong> 
                         @if($cupo->estado == 'h')
-                            Activo
+                            <span class="badge bg-success">Activo</span>
                         @elseif($cupo->estado == 'd')
-                            Inactivo
+                            <span class="badge bg-danger">Inactivo</span>
                         @else
-                            {{ $cupo->estado }}
+                            <span class="badge bg-secondary">{{ $cupo->estado }}</span>
                         @endif
                     </div>
                 </div>

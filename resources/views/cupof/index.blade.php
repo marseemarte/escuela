@@ -15,7 +15,25 @@
             + Crear Cupof 
         </button>
     </div>
-    <i> Los cupos de materias que están disponibles en la escuela actualmente </i>     
+    <i> Los cupos de materias que están disponibles en la escuela actualmente </i>
+
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif     
 
     <link rel="stylesheet" href="//cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css" />
 
@@ -39,23 +57,33 @@
             @forelse($cupof as $cupo)
                 <tr>
                     <td>{{ $cupo->cupof }}</td>
+                    <td>{{ $cupo->materia_nombre ?? 'N/A' }}</td>
+                    <td>{{ $cupo->curso_ano ?? 'N/A' }}</td>
+                    <td>{{ $cupo->curso_division ?? '-' }}</td>
                     <td>
-                        {{ $materias->firstWhere('id', $cupo->id_materias)->nombre ?? $cupo->id_materias }}
-                    </td>
-                    <td>
-                        {{ $cursos->firstWhere('id', $cupo->id_cursos)->ano ?? $cupo->id_cursos }}
-                    </td>
-                    <td>
-                        {{ $cursos->firstWhere('id', $cupo->id_cursos)->division ?? '-' }}
-                    </td>
-                    <td>
-                        {{ $cursos->firstWhere('id', $cupo->id_cursos)->turno ?? $cupo->turno }}
+                        @if($cupo->turno == 'M')
+                            Mañana
+                        @elseif($cupo->turno == 'T')
+                            Tarde
+                        @elseif($cupo->turno == 'V')
+                            Noche
+                        @else
+                            {{ $cupo->turno }}
+                        @endif
                     </td>
                     <td>{{ $cupo->hsmodcar }}</td>
-                    <td>{{ $cupo->id_grupos }}</td>
+                    <td>{{ $cupo->grupo_nombre ?? 'Sin grupo' }}</td>
                     <td>{{ $cupo->funcion }}</td>
                     <td>{{ $cupo->cargo }}</td>
-                    <td>{{ $cupo->estado }}</td>
+                    <td>
+                        @if($cupo->estado == 'h')
+                            <span class="badge bg-success">Activo</span>
+                        @elseif($cupo->estado == 'd')
+                            <span class="badge bg-danger">Inactivo</span>
+                        @else
+                            <span class="badge bg-secondary">{{ $cupo->estado }}</span>
+                        @endif
+                    </td>
                     <td>    
                         <a href="{{ route('cupof.show', $cupo->cupof) }}" class="btn btn-primary btn-sm">Ver Revista</a>
                         <a href="{{ route('cupof.edit', $cupo->cupof) }}" class="btn btn-secondary btn-sm">Editar</a>

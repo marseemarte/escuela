@@ -10,9 +10,26 @@
     </nav>
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1>{{ $orientacion->nombre }}</h1>
-
     </div>
     <i>Plan de estudio de la orientación de {{ $orientacion->nombre }}</i>
+
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
 
     <ul class="nav nav-tabs justify-content-center mb-4 border-0" id="anioTabs" role="tablist">
         @php
@@ -105,7 +122,7 @@
                                                         <!--<a href="" class="btn btn-secondary btn-sm">Editar</a>-->
                                                         <form
                                                             action="{{ route('materias.cambiar_orientacion', $materia->id) }}"
-                                                            method="POST" style="display:inline;">
+                                                            method="POST" style="display:inline;" onsubmit="return confirm('¿Está seguro de que desea eliminar esta materia?')">
                                                             @csrf
                                                             @method('PUT')
                                                             <input type="hidden" name="orientacion_id" value="5">
@@ -160,7 +177,7 @@
                                                         <!--<a href="" class="btn btn-secondary btn-sm">Editar</a>-->
                                                         <form
                                                             action="{{ route('orientaciones.updateTallerOrientacion') }}"
-                                                            method="POST" style="display:inline;">
+                                                            method="POST" style="display:inline;" onsubmit="return confirm('¿Está seguro de que desea eliminar este taller?')">
                                                             @csrf
                                                             @method('PUT')
                                                             <input type="hidden" name="taller_id" value="{{ $taller->id }}">
@@ -261,18 +278,18 @@
                                         <td>{{ $materia->tipo ?? 'materia' }}</td>
                                         <td>
                                             <!-- Botón para agregar a la orientación actual -->
-                                            <form method="POST" action="{{ route('materias.cambiar_orientacion', $materia->id) }}" style="display:inline;">
+                                            <form method="POST" action="{{ route('materias.cambiar_orientacion', $materia->id) }}" style="display:inline;" onsubmit="return confirm('¿Está seguro de que desea agregar este elemento?')">
                                                 @csrf
                                                 @method('PUT')
                                                 <input type="hidden" name="orientacion_id" value="" class="input-orientacion-id">
                                                 <input type="hidden" name="anio" value="" class="input-anio">
-                                                <input type="hidden" name="tipo" value="" class="input-tipo">
+                                                <input type="hidden" name="tipo" value="{{ $materia->tipo ?? 'materia' }}" class="input-tipo">
                                                 <button type="submit" class="btn btn-success btn-sm">
                                                     <i class="fas fa-check"></i> Seleccionar
                                                 </button>
                                             </form>
                                             <!-- Botón para mover a Sin clasificar -->
-                                            <form method="POST" action="{{ route('materias.cambiar_orientacion', $materia->id) }}" style="display:inline;">
+                                            <form method="POST" action="{{ route('materias.cambiar_orientacion', $materia->id) }}" style="display:inline;" onsubmit="return confirm('¿Está seguro de que desea mover este elemento a Sin clasificar?')">
                                                 @csrf
                                                 @method('PUT')
                                                 <input type="hidden" name="orientacion_id" value="5">
@@ -299,7 +316,7 @@
                                         <td>taller</td>
                                         <td>
                                             <!-- Botón para agregar a la orientación actual -->
-                                            <form method="POST" action="{{ route('orientaciones.updateTallerOrientacion') }}" style="display:inline;">
+                                            <form method="POST" action="{{ route('orientaciones.updateTallerOrientacion') }}" style="display:inline;" onsubmit="return confirm('¿Está seguro de que desea agregar este taller?')">
                                                 @csrf
                                                 @method('PUT')
                                                 <input type="hidden" name="taller_id" value="{{ $taller->id }}">
@@ -310,7 +327,7 @@
                                                 </button>
                                             </form>
                                             <!-- Botón para mover a Sin clasificar -->
-                                            <form method="POST" action="{{ route('orientaciones.updateTallerOrientacion') }}" style="display:inline;">
+                                            <form method="POST" action="{{ route('orientaciones.updateTallerOrientacion') }}" style="display:inline;" onsubmit="return confirm('¿Está seguro de que desea mover este taller a Sin clasificar?')">
                                                 @csrf
                                                 @method('PUT')
                                                 <input type="hidden" name="taller_id" value="{{ $taller->id }}">
@@ -410,9 +427,14 @@ document.addEventListener('DOMContentLoaded', function() {
         var orientacionId = button.data('orientacion-id');
         var anio = button.data('anio');
         var tipo = button.data('tipo');
+        
         $(this).find('.input-orientacion-id').val(orientacionId);
         $(this).find('.input-anio').val(anio);
         $(this).find('.input-tipo').val(tipo);
+        
+        // Actualizar todos los campos tipo en los formularios del modal
+        $(this).find('input[name="tipo"]').val(tipo);
+        
     });
 });
 </script>

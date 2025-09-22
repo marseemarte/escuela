@@ -64,14 +64,9 @@
             <div class="pcoded-main-container">
                 <div class="pcoded-wrapper">
                     <!-- Sidebar -->
-                    <x-layouts.profesores.sidebar 
-                        :inicio="$inicio" 
-                        :asistencias="$asistencias" 
-                        :tareas="$tareas" 
-                        :alumnos="$alumnos" 
-                        :notas="$notas" 
-                        :horarios="$horarios" />
-                    
+                    <x-layouts.profesores.sidebar :inicio="$inicio" :asistencias="$asistencias" :tareas="$tareas"
+                        :alumnos="$alumnos" :notas="$notas" :horarios="$horarios" />
+
                     <div class="pcoded-content">
                         <div class="pcoded-inner-content">
                             <!-- Main-body start -->
@@ -95,7 +90,9 @@
     <script src="{{ asset('libraries/bower_components/modernizr/js/css-scrollbars.js') }}"></script>
     <script src="{{ asset('libraries/bower_components/i18next/js/i18next.min.js') }}"></script>
     <script src="{{ asset('libraries/bower_components/i18next-xhr-backend/js/i18nextXHRBackend.min.js') }}"></script>
-    <script src="{{ asset('libraries/bower_components/i18next-browser-languagedetector/js/i18nextBrowserLanguageDetector.min.js') }}"></script>
+    <script
+        src="{{ asset('libraries/bower_components/i18next-browser-languagedetector/js/i18nextBrowserLanguageDetector.min.js') }}">
+    </script>
     <script src="{{ asset('libraries/bower_components/jquery-i18next/js/jquery-i18next.min.js') }}"></script>
     <script src="{{ asset('libraries/assets/js/pcoded.min.js') }}"></script>
     <script src="{{ asset('libraries/assets/js/vartical-layout.min.js') }}"></script>
@@ -132,7 +129,8 @@
         var currentDate = new Date();
         var utcDate = new Date(currentDate.getTime() + (currentDate.getTimezoneOffset() * 60000));
         var localDate = new Date(utcDate.getTime() + (timezoneOffset * 60000));
-        document.write("<script>var currentTime = '" + localDate.toISOString().slice(0, 19).replace('T', ' ') + "';</" + "script>");
+        document.write("<script>var currentTime = '" + localDate.toISOString().slice(0, 19).replace('T', ' ') + "';</" +
+            "script>");
 
         // Asegurar que el pre-loader se oculte después de cargar
         $(document).ready(function() {

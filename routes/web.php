@@ -16,7 +16,7 @@ use App\Http\Controllers\CupofController;
 use App\Http\Controllers\Profesores\AsistenciaController;
 use App\Http\Middleware\EnsureUserIsProfesor;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HorariosSubidaController;
+use App\Http\Controllers\Profesores\HorariosSubidaController;
 
 use Livewire\Volt\Volt;
 
@@ -25,9 +25,12 @@ Route::get('/', function () {
 })->name('home');
 
 
-Route::get('/profesores/create', [HorariosSubidaController::class, 'create'])->name('profesores.create');
-Route::post('/horarios', [HorariosSubidaController::class, 'store'])->name('profesores.store');
 
+Route::get('/profesores/horarios/create', [HorariosController::class, 'create'])
+    ->name('horarios.create');
+
+Route::post('/profesores/horarios', [HorariosController::class, 'store'])
+    ->name('horarios.store');
 // Rutas de asistencias para usuarios generales (estudiantes/padres)
 Route::middleware(['auth'])->group(function () {
     Route::get('asistencias', [AsistenciaController::class, 'index'])->name('asistencias.index');
@@ -72,7 +75,6 @@ Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->
         ->name('profesores.asistencias.guardar')
         ->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class);
 
-    Route::apiResource('tareas', TareaController::class);
     Route::apiResource('alumnos', AlumnoController::class);
     Route::apiResource('horarios', HorariosController::class);
 });
@@ -109,11 +111,6 @@ Route::put('/materias/{materia}/cambiar-orientacion', [MateriasController::class
 
 // Orientaciones routes
 Route::resource('orientaciones', OrientacionesController::class);
-Route::get('/orientaciones', [OrientacionesController::class, 'index'])->name('orientaciones.index');
-Route::get('/orientaciones/edit', [OrientacionesController::class, 'edit'])->name('orientaciones.edit');
-Route::get('/orientaciones/{id}', [OrientacionesController::class, 'show'])->name('orientaciones.show');
-Route::get('/orientaciones/create', [OrientacionesController::class, 'create'])->name('orientaciones.create');
-Route::post('/orientaciones', [OrientacionesController::class, 'store'])->name('orientaciones.store');
 Route::put('/orientaciones/taller/update', [OrientacionesController::class, 'updateTallerOrientacion'])->name('orientaciones.updateTallerOrientacion');
 
 // CUPOF routes

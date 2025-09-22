@@ -9,19 +9,31 @@ class CupofController extends Controller
 {
     public function index()
     {
-        $cupof = DB::table('cupof')->get();
-        $materias = DB::table('materias')->get();
-        $cursos = DB::table('cursos')->get();
+        $cupof = DB::table('cupof')
+            ->leftJoin('materias', 'cupof.id_materias', '=', 'materias.id')
+            ->leftJoin('cursos', 'cupof.id_cursos', '=', 'cursos.id')
+            ->leftJoin('grupos', 'cupof.id_grupos', '=', 'grupos.id')
+            ->select(
+                'cupof.*',
+                'materias.nombre as materia_nombre',
+                'cursos.ano as curso_ano',
+                'cursos.division as curso_division',
+                'cursos.turno as curso_turno',
+                'grupos.nombre as grupo_nombre'
+            )
+            ->orderBy('cupof.cupof', 'desc')
+            ->get();
 
-        return view('cupof.index', compact('cupof', 'materias', 'cursos'));
+        return view('cupof.index', compact('cupof'));
     }
 
     public function show($cupof)
     {
         // Obtener información del cupof
         $cupo = DB::table('cupof')
-            ->join('materias', 'cupof.id_materias', '=', 'materias.id')
-            ->join('cursos', 'cupof.id_cursos', '=', 'cursos.id')
+            ->leftJoin('materias', 'cupof.id_materias', '=', 'materias.id')
+            ->leftJoin('cursos', 'cupof.id_cursos', '=', 'cursos.id')
+            ->leftJoin('grupos', 'cupof.id_grupos', '=', 'grupos.id')
             ->where('cupof.cupof', $cupof)
             ->select(
                 'cupof.cupof',
@@ -33,7 +45,8 @@ class CupofController extends Controller
                 'cupof.id_grupos',
                 'materias.nombre as materia_nombre',
                 'cursos.ano as curso_ano',
-                'cursos.division as curso_division'
+                'cursos.division as curso_division',
+                'grupos.nombre as grupo_nombre'
             )
             ->first();
 
@@ -74,8 +87,8 @@ class CupofController extends Controller
         $request->validate([
             'id_materias' => 'required|exists:materias,id',
             'id_cursos' => 'required|exists:cursos,id',
-            'turno' => 'required|string|max:50',
-            'hsmodcar' => 'required|integer|min:1',
+            'turno' => 'required|string|in:M,T,V',
+            'hsmodcar' => 'required|integer|min:1|max:40',
             'funcion' => 'required|string|max:100',
             'cargo' => 'required|string|max:100',
             'id_grupos' => 'nullable|exists:grupos,id',
@@ -86,17 +99,21 @@ class CupofController extends Controller
         $maxCupof = DB::table('cupof')->max('cupof');
         $nuevoCupof = $maxCupof + 1;
 
-        DB::table('cupof')->insert([
-            'cupof' => $nuevoCupof,
-            'turno' => $request->turno,
-            'hsmodcar' => $request->hsmodcar,
-            'id_materias' => $request->id_materias,
-            'id_cursos' => $request->id_cursos,
-            'estado' => $request->estado,
-            'funcion' => $request->funcion,
-            'cargo' => $request->cargo,
-            'id_grupos' => $request->id_grupos
-        ]);
+        try {
+            DB::table('cupof')->insert([
+                'cupof' => $nuevoCupof,
+                'turno' => $request->turno,
+                'hsmodcar' => $request->hsmodcar,
+                'id_materias' => $request->id_materias,
+                'id_cursos' => $request->id_cursos,
+                'estado' => $request->estado,
+                'funcion' => $request->funcion,
+                'cargo' => $request->cargo,
+                'id_grupos' => $request->id_grupos ?: null
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error al crear el cupof: ' . $e->getMessage())->withInput();
+        }
 
         return redirect()->route('cupof.index')->with('success', 'Cupof creado exitosamente.');
     }
@@ -121,26 +138,30 @@ class CupofController extends Controller
         $request->validate([
             'id_materias' => 'required|exists:materias,id',
             'id_cursos' => 'required|exists:cursos,id',
-            'turno' => 'required|string|max:50',
-            'hsmodcar' => 'required|integer|min:1',
+            'turno' => 'required|string|in:M,T,V',
+            'hsmodcar' => 'required|integer|min:1|max:40',
             'funcion' => 'required|string|max:100',
             'cargo' => 'required|string|max:100',
             'id_grupos' => 'nullable|exists:grupos,id',
             'estado' => 'required|in:h,d'
         ]);
 
-        DB::table('cupof')
-            ->where('cupof', $cupof)
-            ->update([
-                'turno' => $request->turno,
-                'hsmodcar' => $request->hsmodcar,
-                'id_materias' => $request->id_materias,
-                'id_cursos' => $request->id_cursos,
-                'estado' => $request->estado,
-                'funcion' => $request->funcion,
-                'cargo' => $request->cargo,
-                'id_grupos' => $request->id_grupos
-            ]);
+        try {
+            DB::table('cupof')
+                ->where('cupof', $cupof)
+                ->update([
+                    'turno' => $request->turno,
+                    'hsmodcar' => $request->hsmodcar,
+                    'id_materias' => $request->id_materias,
+                    'id_cursos' => $request->id_cursos,
+                    'estado' => $request->estado,
+                    'funcion' => $request->funcion,
+                    'cargo' => $request->cargo,
+                    'id_grupos' => $request->id_grupos ?: null
+                ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error al actualizar el cupof: ' . $e->getMessage())->withInput();
+        }
 
         return redirect()->route('cupof.index')->with('success', 'Cupof actualizado exitosamente.');
     }
@@ -162,7 +183,19 @@ class CupofController extends Controller
     // Métodos para gestionar profesores en el cupof
     public function agregarProfesor($cupof)
     {
-        $cupo = DB::table('cupof')->where('cupof', $cupof)->first();
+        $cupo = DB::table('cupof')
+            ->leftJoin('materias', 'cupof.id_materias', '=', 'materias.id')
+            ->leftJoin('cursos', 'cupof.id_cursos', '=', 'cursos.id')
+            ->leftJoin('grupos', 'cupof.id_grupos', '=', 'grupos.id')
+            ->where('cupof.cupof', $cupof)
+            ->select(
+                'cupof.*',
+                'materias.nombre as materia_nombre',
+                'cursos.ano as curso_ano',
+                'cursos.division as curso_division',
+                'grupos.nombre as grupo_nombre'
+            )
+            ->first();
         
         if (!$cupo) {
             return redirect()->route('cupof.index')->with('error', 'Cupof no encontrado.');
@@ -238,7 +271,19 @@ class CupofController extends Controller
 
     public function editarProfesor($cupof, $profesorId)
     {
-        $cupo = DB::table('cupof')->where('cupof', $cupof)->first();
+        $cupo = DB::table('cupof')
+            ->leftJoin('materias', 'cupof.id_materias', '=', 'materias.id')
+            ->leftJoin('cursos', 'cupof.id_cursos', '=', 'cursos.id')
+            ->leftJoin('grupos', 'cupof.id_grupos', '=', 'grupos.id')
+            ->where('cupof.cupof', $cupof)
+            ->select(
+                'cupof.*',
+                'materias.nombre as materia_nombre',
+                'cursos.ano as curso_ano',
+                'cursos.division as curso_division',
+                'grupos.nombre as grupo_nombre'
+            )
+            ->first();
         
         if (!$cupo) {
             return redirect()->route('cupof.index')->with('error', 'Cupof no encontrado.');

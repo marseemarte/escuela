@@ -1,299 +1,150 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Profesores;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Carbon;
 
 class HorariosController extends Controller
 {
+    /**
+     * Mostrar formulario de creación de horarios
+     */
     public function create()
     {
-        // puedes pasar datos para selects si quieres (por ejemplo dias y turnos)
-        $dias = ['LUN','MAR','MIE','JUE','VIE','SAB','DOM'];
-        $turnos = ['D' => 'Diurno', 'T' => 'Tarde', 'N' => 'Nocturno'];
-        return view('horarios.create', compact('dias','turnos'));
+        $horas = DB::table('horas')->where('activo', 1)->orderBy('hd', 'asc')->get();
+        $cursos = DB::table('cursos')->orderBy('ano')->orderBy('division')->get();
+        $grupos = DB::table('grupos')->orderBy('nombre')->get();
+        $materias = DB::table('materias')->orderBy('nombre')->get();
+        $salones = DB::table('salones')->orderBy('numero')->get();
+
+        $turnos = ['Mañana' => 'M', 'Tarde' => 'T', 'Noche' => 'N'];
+
+        $dias = [
+            'L' => 'Lunes',
+            'M' => 'Martes',
+            'X' => 'Miércoles',
+            'J' => 'Jueves',
+            'V' => 'Viernes',
+            'S' => 'Sábado'
+        ];
+
+        return view('profesores.create', compact('horas','cursos','grupos','materias','salones','turnos','dias'));
     }
 
+    /**
+     * Guardar horarios
+     */
     public function store(Request $request)
     {
-        // Validación básica (puedes extenderla)
-        $request->validate([
-            'horas' => 'array',
-            'horas.*.nombre' => 'required|string',
-            'horas.*.turno' => 'required|string|size:1',
-            'horas.*.hd' => 'required|date_format:H:i:s',
-            'horas.*.hh' => 'required|date_format:H:i:s',
-            'horas.*.activo' => 'nullable|in:0,1',
+        $rules = [
+            'turno' => ['required', 'string'],
+            'id_cursos' => ['required', 'integer'],
+            'id_grupos' => ['required', 'integer'],
+            'id_materias' => ['required', 'integer'],
+            'id_salones' => ['required', 'integer'],
+            'dias' => ['required', 'array', 'min:1'],
+            'dias.*' => ['string'],
+            'horas' => ['required', 'array', 'min:1'],
+            'horas.*' => ['integer'],
+            'estado' => ['nullable', Rule::in(['A','I'])],
+        ];
 
-            'materias' => 'array',
-            'materias.*.nombre' => 'required|string',
-            'materias.*.abreviatura' => 'required|string',
-            'materias.*.estado' => 'nullable|string',
-            'materias.*.resumen' => 'nullable|string',
-
-            'salones' => 'array',
-            'salones.*.piso' => 'required|integer',
-            'salones.*.numero' => 'required',
-            'salones.*.tipo' => 'nullable|string',
-            'salones.*.capacidad' => 'nullable|integer',
-            'salones.*.corriente' => 'nullable|string',
-            'salones.*.televisor' => 'nullable|string',
-            'salones.*.pizarron' => 'nullable|string',
-            'salones.*.ubicacion' => 'nullable|string',
-            'salones.*.activo' => 'nullable|in:0,1',
-
-            'curso.division' => 'required|string',
-            'curso.ano' => 'required|integer',
-            'curso.turno' => 'required|string|size:1',
-
-            'grupos' => 'array|nullable',
-            'grupos.*.nombre' => 'required',
-
-            'cupof' => 'array|nullable', // lista de abreviaturas a vincular
-            'cupof.*' => 'string',
-
-            'horarios' => 'array|nullable',
-            'horarios.*.dia' => 'required|string',
-            'horarios.*.hora' => 'required|string',
-            'horarios.*.salon' => 'required',
-            'horarios.*.materia' => 'required|string',
-
-            'persona.dni' => 'nullable|numeric',
-            'persona.apellido' => 'nullable|string',
-            'persona.nombre' => 'nullable|string',
-            'persona.fechan' => 'nullable|date',
-            'persona.sexo' => 'nullable|string',
-            'persona.domicilio' => 'nullable|string',
-            'persona.id_localidad' => 'nullable|integer',
-            'persona.pass' => 'nullable|string',
-            'persona.telefono' => 'nullable|string',
-            'persona.mail' => 'nullable|email',
+        $validator = Validator::make($request->all(), $rules, [
+            'dias.required' => 'Debes seleccionar al menos un día.',
+            'horas.required' => 'Debes seleccionar al menos una hora.',
         ]);
 
-        DB::transaction(function() use ($request) {
-            $now = Carbon::now();
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
-            // 1) Horas
-            $horas = $request->input('horas', []);
-            foreach ($horas as $h) {
-                $data = [
-                    'nombre' => $h['nombre'],
-                    'turno' => $h['turno'],
-                    'hd' => $h['hd'],
-                    'hh' => $h['hh'],
-                    'activo' => isset($h['activo']) ? $h['activo'] : 1,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ];
-                if (!DB::table('horas')->where('nombre', $data['nombre'])->exists()) {
-                    DB::table('horas')->insert($data);
+        $turno = $request->input('turno');
+        $idCurso = $request->input('id_cursos');
+        $idGrupo = $request->input('id_grupos');
+        $idMateria = $request->input('id_materias');
+        $idSalon = $request->input('id_salones');
+        $dias = $request->input('dias');
+        $horas = $request->input('horas');
+        $estado = $request->input('estado', 'A');
+
+        // validar existencia cupof
+        $cupof = DB::table('cupof')
+            ->where('id_cursos', $idCurso)
+            ->where('id_grupos', $idGrupo)
+            ->where('id_materias', $idMateria)
+            ->where('turno', $turno)
+            ->first();
+
+        if (!$cupof) {
+            return redirect()->back()
+                ->withErrors(['cupof' => 'No se encontró una asignación (cupof) para el curso/grupo/materia/turno seleccionados. Crea primero la entrada en cupof.'])
+                ->withInput();
+        }
+
+        $cupofKey = $cupof->cupof ?? $cupof->id ?? null;
+
+        // validar conflictos de horarios
+        $conflictos = [];
+        foreach ($dias as $dia) {
+            foreach ($horas as $horaId) {
+                $existe = DB::table('horarios')
+                    ->where('dia', $dia)
+                    ->where('id_horas', $horaId)
+                    ->where('id_salones', $idSalon)
+                    ->where('estado','A')
+                    ->first();
+
+                if ($existe) {
+                    $conflictos[] = [
+                        'dia' => $dia,
+                        'hora_id' => $horaId,
+                        'salon_id' => $idSalon
+                    ];
                 }
             }
+        }
 
-            // 2) Materias
-            $materias = $request->input('materias', []);
-            foreach ($materias as $m) {
-                $data = [
-                    'nombre' => $m['nombre'],
-                    'abreviatura' => $m['abreviatura'],
-                    'estado' => $m['estado'] ?? 'H',
-                    'resumen' => $m['resumen'] ?? null,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ];
-                if (!DB::table('materias')->where('abreviatura', $data['abreviatura'])->exists()) {
-                    DB::table('materias')->insert($data);
-                }
+        if (!empty($conflictos)) {
+            $mensajes = [];
+            foreach ($conflictos as $c) {
+                $hora = DB::table('horas')->where('id', $c['hora_id'])->first();
+                $salon = DB::table('salones')->where('id', $c['salon_id'])->first();
+                $mensajes[] = "Conflicto: día {$c['dia']}, hora " . ($hora->nombre ?? $c['hora_id']) . ", salón " . ($salon->numero ?? $c['salon_id']);
             }
+            return redirect()->back()->withErrors(['conflictos' => $mensajes])->withInput();
+        }
 
-            // 3) Salones
-            $salones = $request->input('salones', []);
-            foreach ($salones as $s) {
-                $data = [
-                    'piso' => $s['piso'],
-                    'numero' => $s['numero'],
-                    'tipo' => $s['tipo'] ?? null,
-                    'capacidad' => $s['capacidad'] ?? null,
-                    'corriente' => $s['corriente'] ?? null,
-                    'televisor' => $s['televisor'] ?? 'No',
-                    'pizarron' => $s['pizarron'] ?? null,
-                    'ubicacion' => $s['ubicacion'] ?? null,
-                    'activo' => isset($s['activo']) ? $s['activo'] : 1,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ];
-                if (!DB::table('salones')->where('numero', $data['numero'])->exists()) {
-                    DB::table('salones')->insert($data);
-                }
-            }
-
-            // 4) Cursos y Grupos (único ejemplo: se asume un curso por formulario)
-            $cursoInput = $request->input('curso');
-            $cursoId = DB::table('cursos')->where([
-                ['division', $cursoInput['division']],
-                ['ano', $cursoInput['ano']],
-                ['turno', $cursoInput['turno']],
-            ])->value('id');
-
-            if (!$cursoId) {
-                $cursoId = DB::table('cursos')->insertGetId([
-                    'division' => $cursoInput['division'],
-                    'ano' => $cursoInput['ano'],
-                    'turno' => $cursoInput['turno'],
-                    'estado' => 'A',
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ]);
-            }
-
-            // grupos: si envías varios, se crearán y vincularán al curso
-            $grupoId = null;
-            $grupos = $request->input('grupos', []);
-            if (!empty($grupos)) {
-                // creamos el primero (o el que quieras)
-                $g = $grupos[0];
-                $grupoId = DB::table('grupos')->where('id_cursos', $cursoId)->value('id');
-                if (!$grupoId) {
-                    $grupoId = DB::table('grupos')->insertGetId([
-                        'nombre' => $g['nombre'],
-                        'id_cursos' => $cursoId,
-                        'estado' => 'A',
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ]);
-                }
-            } else {
-                // fallback: si ya existe un grupo para el curso, lo tomamos
-                $grupoId = DB::table('grupos')->where('id_cursos', $cursoId)->value('id');
-            }
-
-            // 5) Cupof (vincula materia + curso + grupo)
-            $cupofMaterias = $request->input('cupof', []);
-            foreach ($cupofMaterias as $abre) {
-                $materiaId = DB::table('materias')->where('abreviatura', $abre)->value('id');
-                if (!$materiaId) continue;
-
-                $exists = DB::table('cupof')->where([['id_materias', $materiaId], ['id_cursos', $cursoId], ['id_grupos', $grupoId]])->exists();
-                if (!$exists) {
-                    $nextCup = DB::table('cupof')->max('cupof');
-                    $nextCup = $nextCup ? $nextCup + 1 : 1;
-
-                    DB::table('cupof')->insert([
-                        'cupof' => $nextCup,
-                        'turno' => in_array($abre, ['MOD-SIS','PDI-SYS']) ? 'N' : 'D',
-                        'hsmodcar' => 4,
-                        'id_materias' => $materiaId,
-                        'id_cursos' => $cursoId,
-                        'id_grupos' => $grupoId,
-                        'estado' => 'A',
-                        'funcion' => '0',
-                        'cargo' => 'PF',
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ]);
-                }
-            }
-
-            // 6) Horarios (resolviendo ids)
-            $getHoraId = function($nombre) {
-                return DB::table('horas')->where('nombre', $nombre)->value('id');
-            };
-            $getSalonId = function($numero) {
-                return DB::table('salones')->where('numero', $numero)->value('id');
-            };
-            $getCupofByAbre = function($abre) use ($cursoId, $grupoId) {
-                $matId = DB::table('materias')->where('abreviatura', $abre)->value('id');
-                if (!$matId) return null;
-                return DB::table('cupof')->where([['id_materias', $matId], ['id_cursos', $cursoId], ['id_grupos', $grupoId]])->value('cupof');
-            };
-
-            $horarios = $request->input('horarios', []);
-            foreach ($horarios as $h) {
-                $idHora = $getHoraId($h['hora']);
-                $idSalon = $getSalonId($h['salon']);
-                $cupId = $getCupofByAbre($h['materia']);
-                if (!$idHora || !$idSalon || !$cupId) continue;
-
-                $exists = DB::table('horarios')->where([['dia', $h['dia']], ['id_horas', $idHora], ['id_salones', $idSalon], ['cupof', $cupId]])->exists();
-                if (!$exists) {
-                    DB::table('horarios')->insert([
-                        'dia' => $h['dia'],
-                        'id_horas' => $idHora,
+        // inserción
+        DB::beginTransaction();
+        try {
+            $insertData = [];
+            $now = now();
+            foreach ($dias as $dia) {
+                foreach ($horas as $horaId) {
+                    $insertData[] = [
+                        'cupof' => $cupofKey,
+                        'id_horas' => $horaId,
+                        'dia' => $dia,
                         'id_salones' => $idSalon,
-                        'cupof' => $cupId,
-                        'estado' => 'A',
+                        'estado' => $estado,
                         'created_at' => $now,
-                        'updated_at' => $now,
-                    ]);
+                        'updated_at' => $now
+                    ];
                 }
             }
 
-            // ----- Tipopersona, persona, tipousuario, revista -----
-            $persona = $request->input('persona', []);
-            if (!empty($persona) && isset($persona['dni'])) {
-                $tipopersonaId = DB::table('tipopersona')->where('tipo','DOCENTE')->value('id');
-                if (!$tipopersonaId) {
-                    $tipopersonaId = DB::table('tipopersona')->insertGetId([
-                        'tipo' => 'DOCENTE',
-                        'estado' => 'A',
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ]);
-                }
+            DB::table('horarios')->insert($insertData);
+            DB::commit();
 
-                $personaExists = DB::table('persona')->where('dni', $persona['dni'])->exists();
-                if (!$personaExists) {
-                    $personaId = DB::table('persona')->insertGetId([
-                        'dni' => $persona['dni'],
-                        'apellido' => $persona['apellido'] ?? 'PEREZ',
-                        'nombre' => $persona['nombre'] ?? 'JUAN',
-                        'fechan' => $persona['fechan'] ?? '1980-01-01',
-                        'sexo' => $persona['sexo'] ?? 'M',
-                        'domicilio' => $persona['domicilio'] ?? 'Calle Falsa 123',
-                        'id_localidad' => $persona['id_localidad'] ?? 1,
-                        'pass' => $persona['pass'] ?? 'changeme',
-                        'telefono' => $persona['telefono'] ?? '123456789',
-                        'mail' => $persona['mail'] ?? 'juan.perez@example.com',
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ]);
-                } else {
-                    $personaId = DB::table('persona')->where('dni', $persona['dni'])->value('id');
-                }
-
-                if (!DB::table('tipousuario')->where('id_persona', $personaId)->exists()) {
-                    $tipousuarioId = DB::table('tipousuario')->insertGetId([
-                        'id_persona' => $personaId,
-                        'id_tipopersona' => $tipopersonaId,
-                        'estado' => 'A',
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ]);
-                } else {
-                    $tipousuarioId = DB::table('tipousuario')->where('id_persona', $personaId)->value('id');
-                }
-
-                // ponemos en revista el primer cupof de la tabla horarios (si hay)
-                $primerCupEnHorarios = DB::table('horarios')->distinct()->pluck('cupof')->first();
-                if ($primerCupEnHorarios) {
-                    DB::table('revista')->insert([
-                        'cupof' => $primerCupEnHorarios,
-                        'id_tipousuario' => $tipousuarioId,
-                        'fd' => Carbon::now()->toDateString(),
-                        'fh' => Carbon::now()->toDateString(),
-                        'secuencia' => 1,
-                        'situacion' => 'DOCENTE TITULAR',
-                        'estado' => 'A',
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ]);
-                }
-            }
-
-        }); // transaction
-
-        return redirect()->route('horarios.create')->with('success', 'Datos cargados correctamente (si no existían).');
+            return redirect()->route('horarios.create')->with('success', 'Horarios cargados correctamente.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withErrors(['db' => 'Error al guardar: ' . $e->getMessage()])->withInput();
+        }
     }
 }
