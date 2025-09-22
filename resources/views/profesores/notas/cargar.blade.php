@@ -682,7 +682,6 @@
 
     {{-- Estilos para la vista móvil --}}
     <style>
-
         .mobile-notas-container .card {
             transition: transform 0.2s ease-in-out;
         }
