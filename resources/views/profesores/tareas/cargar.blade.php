@@ -1,105 +1,358 @@
-<x-layouts.profesores.dashboard tareas titulo="Tareas">
-    <h1 class="tareas-main-title">{{ $cursos[0]['materia'] }} - {{ $cursos[0]['nombre'] }}</h1>
-    <p class="tareas-main-description">Gestiona las tareas de la materia {{ $cursos[0]['materia'] }} del curso
-        {{ $cursos[0]['nombre'] }}.
-        Aquí puedes subir modulos de teoria, tareas con fecha de entrega y hacer el seguimiento de respuestas.</p>
+{{-- Vista para gestionar tareas de una materia específica --}}
+<x-layouts.profesores.dashboard tareas titulo="Gestión de Tareas">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    @if (session('success'))
-        <div id="alert-success" class="tareas-alert tareas-alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
+    <div class="row">
+        <div class="col-12">
+            {{-- Header con información de la materia --}}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-0">
+                            {{-- Botón de regreso --}}
+                            <a href="{{ route('profesores.tareas.index') }}"
+                                class="btn btn-outline-secondary btn-sm mb-3 mb-md-0 mr-md-3">
+                                <i class="fas fa-arrow-left mr-1"></i>
+                                Volver
+                            </a>
 
-    @if ($errors->any())
-        <div class="tareas-alert tareas-alert-error">
-            <ul class="tareas-error-list">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+                            {{-- Información de la materia --}}
+                            <div class="text-center text-md-left">
+                                <h1 class="h4 mb-1">{{ $cursos[0]['materia'] }} - {{ $cursos[0]['nombre'] }}</h1>
+                                <p class="text-muted mb-0">
+                                    Gestión de contenido académico y tareas con seguimiento de entregas
+                                </p>
+                            </div>
+                        </div>
 
-    <!-- Botón para subir nueva tarea -->
-    <button class="tareas-btn-upload" id="openModalBtn">
-        + Subir nuevo archivo
-    </button>
-
-    <!-- Modal para subir tareas-->
-    <div id="tareaModal" class="tareas-modal">
-        <div id="tareaModalContent" class="tareas-modal-content">
-
-            <!-- Botón cerrar -->
-            <button id="closeModalBtn" class="tareas-modal-close">
-                ✕
-            </button>
-
-            <!-- Pantalla de selección -->
-            <div id="modalSeleccion" class="tareas-modal-selection">
-                <h2 class="tareas-modal-title">¿Qué deseas subir?</h2>
-                <div class="tareas-modal-buttons">
-                    <button id="btnModulo" class="tareas-btn-modulo">
-                        📘 Módulo de teoría
-                    </button>
-                    <button id="btnTarea" class="tareas-btn-tarea">
-                        📝 Tarea con fecha de entrega
-                    </button>
+                        {{-- Información adicional --}}
+                        <div class="text-center text-md-right">
+                            <small class="text-muted">
+                                {{ now()->format('d/m/Y') }}
+                            </small>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Formulario (oculto por defecto) -->
-            <div id="modalFormulario" class="tareas-form-section hidden">
-                <h2 id="formTitulo" class="tareas-form-title"></h2>
+            {{-- Alertas --}}
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="feather icon-check-circle mr-2"></i>
+                    {{ session('success') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
 
-                <form method="POST" action="{{ route('profesores.tareas.store') }}" enctype="multipart/form-data">
-                    @csrf
+            @if ($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="feather icon-alert-circle mr-2"></i>
+                    <strong>Error:</strong>
+                    <ul class="mb-0 mt-2">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
 
-                    <div class="tareas-form-group">
-                        <label class="tareas-form-label">Nombre</label>
-                        <input type="text" name="nombre" class="tareas-form-input" required>
+            {{-- Contenido principal --}}
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <div>
+                            <h2 class="h5 mb-1">Gestión de Material Académico</h2>
+                            <p class="text-muted mb-0">Administre módulos de teoría y tareas con fecha de entrega</p>
+                        </div>
+                        <div class="mt-2 mt-md-0">
+                            <button class="btn btn-primary btn-sm" id="openModalBtn">
+                                <i class="feather icon-plus mr-1"></i>
+                                Subir nuevo archivo
+                            </button>
+                        </div>
                     </div>
+                </div>
 
-                    <div class="tareas-form-group">
-                        <label class="tareas-form-label">Descripción (opcional)</label>
-                        <textarea name="descripcion" class="tareas-form-textarea" rows="3"></textarea>
-                    </div>
+                {{-- Navegación por pestañas --}}
+                <div class="card-body pb-0">
+                    <ul class="nav nav-tabs" id="tareasTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" id="modulos-tab" data-toggle="tab" href="#modulos" role="tab"
+                                aria-controls="modulos" aria-selected="true">
+                                <i class="feather icon-book-open mr-1"></i>
+                                Módulos de Teoría
+                            </a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="tareas-tab" data-toggle="tab" href="#tareas" role="tab"
+                                aria-controls="tareas" aria-selected="false">
+                                <i class="feather icon-calendar mr-1"></i>
+                                Tareas con Entrega
+                            </a>
+                        </li>
+                    </ul>
+                </div>
 
-                    <input type="hidden" name="cupof" value="{{ $cursos[0]['id'] ?? $cupof }}">
-
-                    <!-- Campo fecha de entrega (solo para tarea) -->
-                    <div id="fechaEntrega" class="tareas-form-group hidden">
-                        <label class="tareas-form-label">Fecha de entrega</label>
-                        <input type="date" name="fecha_entrega" class="tareas-form-input"
-                            min="{{ date('Y-m-d', strtotime('+1 day')) }}">
-                    </div>
-
-                    <!-- Archivo -->
-                    <div class="tareas-form-group">
-                        <label class="tareas-form-label">Archivo (máx. 10MB)</label>
-                        <div class="tareas-file-input">
-                            <label for="archivo" class="tareas-file-button">
-                                Elegir archivo
-                            </label>
-                            <span id="archivoNombre" class="tareas-file-name">
-                                No se ha seleccionado ningún archivo
-                            </span>
-                            <input type="file" name="archivo" id="archivo" class="hidden" required
-                                accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png">
+                {{-- Contenido de pestañas --}}
+                <div class="tab-content" id="tareasTabContent">
+                    {{-- Módulos de teoría --}}
+                    <div class="tab-pane fade show active" id="modulos" role="tabpanel" aria-labelledby="modulos-tab">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="thead-light">
+                                    <tr class="text-center">
+                                        <th width="30%">Título</th>
+                                        <th width="30%">Descripción</th>
+                                        <th width="15%">Fecha</th>
+                                        <th width="15%">Archivo</th>
+                                        <th width="10%">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($tareas->where('tipo', 'modulo') as $tarea)
+                                        <tr class="text-center">
+                                            <td class="font-weight-medium">{{ $tarea->titulo }}</td>
+                                            <td class="text-muted">{{ $tarea->descripcion ?? '-' }}</td>
+                                            <td>
+                                                <small class="text-muted">
+                                                    {{ $tarea->created_at ? $tarea->created_at->format('d/m/Y') : '-' }}
+                                                </small>
+                                            </td>
+                                            <td>
+                                                @if ($tarea->archivo_path)
+                                                    <a href="{{ route('profesores.tareas.descargar', $tarea->id) }}"
+                                                        class="btn btn-outline-primary btn-sm" target="_blank">
+                                                        <i class="feather icon-download mr-1"></i>
+                                                        Ver archivo
+                                                    </a>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-outline-danger btn-sm eliminarBtn"
+                                                    data-tarea-id="{{ $tarea->id }}"
+                                                    data-tarea-titulo="{{ $tarea->titulo }}">
+                                                    <i class="feather icon-trash-2"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center py-4">
+                                                <div class="text-muted">
+                                                    <i class="feather icon-book-open mb-2" style="font-size: 2rem;"></i>
+                                                    <p class="mb-0">No hay módulos de teoría disponibles</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
-                    <!-- Boton Cerrar y Subir -->
-                    <div class="tareas-form-actions">
-                        <button type="button" id="cancelModalBtn" class="tareas-btn-cancel">
-                            Cancelar
-                        </button>
-                        <button type="submit" id="btnSubir" class="tareas-btn-submit">
-                            Subir
-                        </button>
+                    {{-- Tareas con fecha de entrega --}}
+                    <div class="tab-pane fade" id="tareas" role="tabpanel" aria-labelledby="tareas-tab">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="thead-light">
+                                    <tr class="text-center">
+                                        <th width="25%">Título</th>
+                                        <th width="25%">Descripción</th>
+                                        <th width="15%">Fecha Entrega</th>
+                                        <th width="15%">Archivo</th>
+                                        <th width="20%">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($tareas->where('tipo', 'tarea') as $tarea)
+                                        <tr class="text-center">
+                                            <td class="font-weight-medium">{{ $tarea->titulo }}</td>
+                                            <td class="text-muted">{{ $tarea->descripcion ?? '-' }}</td>
+                                            <td>
+                                                @if ($tarea->fecha_entrega)
+                                                    <span
+                                                        class="badge {{ $tarea->fecha_entrega->isPast() ? 'badge-danger' : 'badge-success' }}">
+                                                        {{ $tarea->fecha_entrega->format('d/m/Y') }}
+                                                    </span>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if ($tarea->archivo_path)
+                                                    <a href="{{ route('profesores.tareas.descargar', $tarea->id) }}"
+                                                        class="btn btn-outline-primary btn-sm" target="_blank">
+                                                        <i class="feather icon-download mr-1"></i>
+                                                        Ver archivo
+                                                    </a>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <button class="btn btn-outline-info btn-sm seguimientoBtn"
+                                                        data-tarea-id="{{ $tarea->id }}">
+                                                        <i class="feather icon-eye mr-1"></i>
+                                                        Seguimiento
+                                                    </button>
+                                                    <button class="btn btn-outline-danger btn-sm eliminarBtn"
+                                                        data-tarea-id="{{ $tarea->id }}"
+                                                        data-tarea-titulo="{{ $tarea->titulo }}">
+                                                        <i class="feather icon-trash-2"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center py-4">
+                                                <div class="text-muted">
+                                                    <i class="feather icon-calendar mb-2"
+                                                        style="font-size: 2rem;"></i>
+                                                    <p class="mb-0">No hay tareas con fecha de entrega</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
+    </div>
+
+    {{-- Modal para subir tareas --}}
+    <div class="modal fade" id="tareaModal" tabindex="-1" aria-labelledby="tareaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tareaModalLabel">Subir Nuevo Archivo</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    {{-- Selección de tipo --}}
+                    <div id="modalSeleccion">
+                        <div class="text-center mb-4">
+                            <h6 class="mb-3">¿Qué tipo de archivo deseas subir?</h6>
+                            <div class="row">
+                                <div class="col-6">
+                                    <button type="button" id="btnModulo"
+                                        class="btn btn-outline-primary btn-block h-100 py-3">
+                                        <i class="feather icon-book-open mb-2" style="font-size: 2rem;"></i>
+                                        <br>
+                                        <strong>Módulo de Teoría</strong>
+                                        <br>
+                                        <small class="text-muted">Material de estudio</small>
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button type="button" id="btnTarea"
+                                        class="btn btn-outline-success btn-block h-100 py-3">
+                                        <i class="feather icon-calendar mb-2" style="font-size: 2rem;"></i>
+                                        <br>
+                                        <strong>Tarea con Entrega</strong>
+                                        <br>
+                                        <small class="text-muted">Con fecha límite</small>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Formulario --}}
+                    <div id="modalFormulario" class="d-none">
+                        <form method="POST" action="{{ route('profesores.tareas.store') }}"
+                            enctype="multipart/form-data">
+                            @csrf
+                            <input type="hidden" name="cupof" value="{{ $cursos[0]['id'] ?? $cupof }}">
+                            <input type="hidden" name="tipo" id="tipoArchivo">
+
+                            <div class="form-group">
+                                <label for="nombreArchivo">Título <span class="text-danger">*</span></label>
+                                <input type="text" name="titulo" id="nombreArchivo" class="form-control"
+                                    required>
+                                <small class="form-text text-muted">Ingrese un título descriptivo para el
+                                    archivo</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="descripcionArchivo">Descripción</label>
+                                <textarea name="descripcion" id="descripcionArchivo" class="form-control" rows="3"
+                                    placeholder="Descripción opcional del contenido"></textarea>
+                            </div>
+
+                            <div class="form-group" id="fechaEntregaGroup" style="display: none;">
+                                <label for="fechaEntrega">Fecha de Entrega <span class="text-danger">*</span></label>
+                                <input type="date" name="fecha_entrega" id="fechaEntrega" class="form-control"
+                                    min="{{ date('Y-m-d', strtotime('+1 day')) }}">
+                                <small class="form-text text-muted">Seleccione la fecha límite para la entrega</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="archivoInput">Archivo <span class="text-danger">*</span></label>
+                                <div class="custom-file">
+                                    <input type="file" name="archivo" id="archivoInput" class="custom-file-input"
+                                        required>
+                                    <label class="custom-file-label" for="archivoInput">Seleccionar archivo (máx.
+                                        10MB)</label>
+                                </div>
+                                <small class="form-text text-muted">Formatos permitidos: PDF, DOC, DOCX, XLS, XLSX,
+                                    PPT, PPTX</small>
+                            </div>
+
+                            <div class="modal-footer px-0 pb-0">
+                                <button type="button" class="btn btn-secondary" id="volverSeleccion">
+                                    <i class="feather icon-arrow-left mr-1"></i>
+                                    Volver
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="feather icon-upload mr-1"></i>
+                                    Subir Archivo
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tareas-file-input">
+        <label for="archivo" class="tareas-file-button">
+            Elegir archivo
+        </label>
+        <span id="archivoNombre" class="tareas-file-name">
+            No se ha seleccionado ningún archivo
+        </span>
+        <input type="file" name="archivo" id="archivo" class="hidden" required
+            accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png">
+    </div>
+    </div>
+
+    <!-- Boton Cerrar y Subir -->
+    <div class="tareas-form-actions">
+        <button type="button" id="cancelModalBtn" class="tareas-btn-cancel">
+            Cancelar
+        </button>
+        <button type="submit" id="btnSubir" class="tareas-btn-submit">
+            Subir
+        </button>
+    </div>
+    </form>
+    </div>
+    </div>
     </div>
 
     <div class="tareas-tabs-section">
@@ -133,15 +386,15 @@
                         <td class="tareas-table-td">{{ $modulo['materia'] }}</td>
                         <td class="tareas-table-td">{{ $modulo['fecha_subida'] }}</td>
                         <td class="tareas-table-td">
-                            <a href="{{ route('profesores.tareas.descargar', $modulo['id']) }}" 
-                            class="tareas-link" 
-                            title="{{ $modulo['archivo'] }}">
+                            <a href="{{ route('profesores.tareas.descargar', $modulo['id']) }}" class="tareas-link"
+                                title="{{ $modulo['archivo'] }}">
                                 {{ $modulo['archivo'] }}
                             </a>
                         </td>
                         <td class="tareas-table-td">{{ $modulo['vistos'] }}</td>
                         <td class="tareas-table-td">
-                            <button class="tareas-btn-seguimiento seguimientoBtn" data-tarea-id="{{ $modulo['id'] }}">
+                            <button class="tareas-btn-seguimiento seguimientoBtn"
+                                data-tarea-id="{{ $modulo['id'] }}">
                                 Seguimiento
                             </button>
                             <button class="tareas-btn-eliminar eliminarBtn" data-tarea-id="{{ $modulo['id'] }}">
@@ -186,9 +439,8 @@
                             </span>
                         </td>
                         <td class="tareas-table-td">
-                            <a href="{{ route('profesores.tareas.descargar', $modulo['id']) }}" 
-                            class="tareas-link" 
-                            title="{{ $modulo['archivo'] }}">
+                            <a href="{{ route('profesores.tareas.descargar', $modulo['id']) }}" class="tareas-link"
+                                title="{{ $modulo['archivo'] }}">
                                 {{ $modulo['archivo'] }}
                             </a>
                         </td>
@@ -214,579 +466,96 @@
         </table>
     </div>
 
-    <!-- Modal de seguimiento -->
-    <div id="seguimientoModal" class="tareas-modal">
-        <div class="tareas-modal-content tareas-modal-large">
-
-            <button id="closeSeguimientoModal" class="tareas-modal-close">✕</button>
-
-            <h2 class="tareas-modal-title">Seguimiento de la tarea</h2>
-
-            <div id="tareaInfo" class="tareas-info-section">
-                <!-- Info de la tarea se carga dinámicamente -->
-            </div>
-
-            <div id="seguimientoContent" class="tareas-seguimiento-content">
-                <!-- Contenido del seguimiento se carga via AJAX -->
-            </div>
-
-            <div class="tareas-modal-footer">
-                <a href="#" id="btnCorregir" class="tareas-btn-corregir hidden">
-                    Ir a Corregir
-                </a>
+    {{-- Modal de seguimiento --}}
+    <div class="modal fade" id="seguimientoModal" tabindex="-1" aria-labelledby="seguimientoModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="seguimientoModalLabel">Seguimiento de Tarea</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="tareaInfo" class="mb-4">
+                        {{-- Info de la tarea se carga dinámicamente --}}
+                    </div>
+                    <div id="seguimientoContent">
+                        {{-- Contenido del seguimiento se carga via AJAX --}}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" id="btnCorregir" class="btn btn-primary d-none">
+                        <i class="feather icon-edit mr-1"></i>
+                        Ir a Corregir
+                    </a>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal de confirmación eliminar -->
-    <div id="eliminarModal" class="tareas-modal">
-        <div class="tareas-modal-content">
-            <button id="closeEliminarModal" class="tareas-modal-close">✕</button>
-            <h2 class="tareas-modal-title">Confirmar eliminación</h2>
-            <p class="tareas-modal-text">¿Estás seguro de que quieres eliminar esta tarea? Esta acción no se puede
-                deshacer.</p>
-            <div class="tareas-modal-actions">
-                <button id="cancelEliminar" class="tareas-btn-cancel">Cancelar</button>
-                <button id="confirmarEliminar" class="tareas-btn-danger">Eliminar</button>
+    {{-- Modal de confirmación eliminar --}}
+    <div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eliminarModalLabel">Confirmar Eliminación</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="feather icon-alert-triangle text-warning mb-3" style="font-size: 3rem;"></i>
+                        <p class="mb-3">¿Está seguro de que desea eliminar esta tarea?</p>
+                        <p class="text-muted mb-0">Esta acción no se puede deshacer.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" id="confirmarEliminar" class="btn btn-danger">
+                        <i class="feather icon-trash-2 mr-1"></i>
+                        Eliminar
+                    </button>
+                </div>
             </div>
         </div>
+    </div>
+    <button id="confirmarEliminar" class="tareas-btn-danger">Eliminar</button>
+    </div>
+    </div>
     </div>
 
     <style>
-        /* Base styles */
-        .tareas-main-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #111827;
+        /* Estilos mínimos para componentes específicos */
+        .custom-file-label::after {
+            content: "Seleccionar";
         }
 
-        .tareas-main-description {
-            margin-bottom: 1.5rem;
-            color: #4b5563;
+        /* Ajustes para la visualización de seguimiento */
+        #seguimientoContent table {
+            width: 100% !important;
+            margin: 0 auto !important;
         }
 
-        /* Alerts */
-        .tareas-alert {
-            margin-bottom: 1rem;
-            padding: 1rem;
-            border-radius: 6px;
-            transition: opacity 0.5s;
+        #seguimientoContent th,
+        #seguimientoContent td {
+            text-align: center !important;
+            padding: 0.5rem !important;
         }
 
-        .tareas-alert-success {
-            background-color: #dcfce7;
-            border: 1px solid #bbf7d0;
-            color: #166534;
+        #seguimientoContent th {
+            background-color: #f8f9fa !important;
+            font-weight: bold !important;
         }
 
-        .tareas-alert-error {
-            background-color: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #dc2626;
+        /* Bootstrap tab customization */
+        .nav-tabs .nav-link.active {
+            border-bottom-color: #007bff;
         }
-
-        .tareas-error-list {
-            list-style-type: disc;
-            list-style-position: inside;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Upload button */
-        .tareas-btn-upload {
-            background-color: #2563eb;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-            margin-bottom: 0.75rem;
-            cursor: pointer;
-            border: none;
-            font-weight: 500;
-        }
-
-        .tareas-btn-upload:hover {
-            background-color: #1d4ed8;
-        }
-
-        /* Modal styles */
-        .tareas-modal {
-            position: fixed;
-            inset: 0;
-            z-index: 50;
-            backdrop-filter: blur(4px);
-            background-color: rgba(0, 0, 0, 0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            overflow: auto;
-        }
-
-        .tareas-modal.flex {
-            display: flex;
-        }
-
-        .tareas-modal-content {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 28rem;
-            padding: 1.5rem;
-            position: relative;
-            transform: scale(0.95);
-            opacity: 0;
-            transition: all 0.3s;
-        }
-
-        .tareas-modal-large {
-            max-width: 56rem;
-        }
-
-        .tareas-modal-close {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            color: #6b7280;
-            cursor: pointer;
-            background: none;
-            border: none;
-            font-size: 1.25rem;
-        }
-
-        .tareas-modal-close:hover {
-            color: #374151;
-        }
-
-        .tareas-modal-selection {
-            text-align: center;
-        }
-
-        .tareas-modal-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: #111827;
-        }
-
-        .tareas-modal-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .tareas-btn-modulo {
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            background-color: #6366f1;
-            color: white;
-            cursor: pointer;
-            border: none;
-            transition: background-color 0.2s;
-        }
-
-        .tareas-btn-modulo:hover {
-            background-color: #4f46e5;
-        }
-
-        .tareas-btn-tarea {
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            background-color: #2563eb;
-            color: white;
-            cursor: pointer;
-            border: none;
-            transition: background-color 0.2s;
-        }
-
-        .tareas-btn-tarea:hover {
-            background-color: #1d4ed8;
-        }
-
-        /* Form styles */
-        .tareas-form-section {
-            /* Already hidden by default */
-        }
-
-        .tareas-form-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: #111827;
-        }
-
-        .tareas-form-group {
-            margin-bottom: 1rem;
-        }
-
-        .tareas-form-label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #374151;
-            margin-bottom: 0.25rem;
-        }
-
-        .tareas-form-input,
-        .tareas-form-textarea {
-            width: 100%;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            padding: 0.75rem;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .tareas-form-input:focus,
-        .tareas-form-textarea:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .tareas-file-input {
-            display: flex;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        .tareas-file-button {
-            padding: 0.5rem 1rem;
-            background-color: #f3f4f6;
-            cursor: pointer;
-            border-left: 1px solid #d1d5db;
-            transition: background-color 0.2s;
-        }
-
-        .tareas-file-button:hover {
-            background-color: #e5e7eb;
-        }
-
-        .tareas-file-name {
-            flex: 1;
-            padding: 0.75rem;
-            color: #4b5563;
-            font-size: 0.875rem;
-        }
-
-        .tareas-form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.5rem;
-        }
-
-        .tareas-btn-cancel {
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            background-color: #d1d5db;
-            cursor: pointer;
-            border: none;
-            transition: background-color 0.2s;
-        }
-
-        .tareas-btn-cancel:hover {
-            background-color: #9ca3af;
-        }
-
-        .tareas-btn-submit {
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            background-color: #2563eb;
-            color: white;
-            cursor: pointer;
-            border: none;
-            transition: background-color 0.2s;
-        }
-
-        .tareas-btn-submit:hover {
-            background-color: #1d4ed8;
-        }
-
-        .tareas-btn-danger {
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            background-color: #dc2626;
-            color: white;
-            cursor: pointer;
-            border: none;
-            transition: background-color 0.2s;
-        }
-
-        .tareas-btn-danger:hover {
-            background-color: #b91c1c;
-        }
-
-        /* Tabs */
-        .tareas-tabs-section {
-            margin-bottom: 1rem;
-        }
-
-        .tareas-tabs {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .tareas-tab-button {
-            padding: 0.5rem 1rem;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-            font-weight: 500;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            background-color: #e5e5e5;
-            color: #666;
-            border-bottom: 3px solid transparent;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .tareas-tab-button.active {
-            background-color: #f9f9f9;
-            color: #111;
-            border-bottom: 3px solid #4f46e5;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Tables */
-        .tareas-table-container {
-            overflow-x: auto;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-
-        .tareas-table {
-            width: 100%;
-            font-size: 0.875rem;
-            text-align: center;
-            color: #4b5563;
-            table-layout: fixed;
-        }
-
-        .tareas-table-header {
-            background-color: #f9fafb;
-            color: #374151;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-        }
-
-        .tareas-table-th {
-            padding: 0.75rem 1.5rem;
-        }
-
-        .tareas-table-row {
-            background-color: white;
-            border-bottom: 1px solid #e5e7eb;
-            transition: background-color 0.2s;
-        }
-
-        .tareas-table-row:hover {
-            background-color: #f9fafb;
-        }
-
-        .tareas-table-td {
-            padding: 1rem 1.5rem;
-        }
-
-        .tareas-table-td-title {
-            font-weight: 500;
-            color: #111827;
-        }
-
-        .tareas-table-empty {
-            padding: 1rem 1.5rem;
-            color: #6b7280;
-            font-style: italic;
-        }
-
-        .tareas-link {
-            color: #2563eb;
-            text-decoration: none;
-        }
-
-        .tareas-link:hover {
-            text-decoration: underline;
-        }
-
-        .tareas-btn-seguimiento {
-            color: #059669;
-            background: none;
-            border: none;
-            cursor: pointer;
-            margin-right: 0.5rem;
-            text-decoration: none;
-        }
-
-        .tareas-btn-seguimiento:hover {
-            text-decoration: underline;
-        }
-
-        .tareas-btn-eliminar {
-            color: #dc2626;
-            background: none;
-            border: none;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .tareas-btn-eliminar:hover {
-            text-decoration: underline;
-        }
-
-        .tareas-date-expired {
-            color: #dc2626;
-            font-weight: 600;
-        }
-
-        /* Info section */
-        .tareas-info-section {
-            margin-bottom: 1rem;
-            padding: 1rem;
-            background-color: #f9fafb;
-            border-radius: 6px;
-        }
-
-        .tareas-seguimiento-content {
-            margin-bottom: 1rem;
-        }
-
-        .tareas-modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 1rem;
-        }
-
-        .tareas-btn-corregir {
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            background-color: #059669;
-            color: white;
-            text-decoration: none;
-            transition: background-color 0.2s;
-        }
-
-        .tareas-btn-corregir:hover {
-            background-color: #047857;
-            color: white;
-            text-decoration: none;
-        }
-
-        .tareas-modal-text {
-            margin-bottom: 1.5rem;
-            color: #374151;
-        }
-
-        .tareas-modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.5rem;
-        }
-
-        /* Utility classes */
-        .hidden {
-            display: none;
-        }
-
-        .mr-2 {
-            margin-right: 0.5rem;
-        }
-
-        .flex {
-            display: flex;
-        }
-
-        .scale-95 {
-            transform: scale(0.95);
-        }
-
-        .scale-100 {
-            transform: scale(1);
-        }
-
-        .opacity-0 {
-            opacity: 0;
-        }
-
-        .opacity-100 {
-            opacity: 1;
-        }
-
-/* Centrado de tablas principales */
-.tareas-table,
-.tareas-table th,
-.tareas-table td {
-    text-align: center !important;
-}
-
-/* Quitar subrayado de botones */
-.tareas-btn-seguimiento,
-.tareas-btn-eliminar {
-    text-decoration: none !important;
-}
-
-.tareas-btn-seguimiento:hover,
-.tareas-btn-eliminar:hover {
-    text-decoration: none !important;
-}
-
-/* Forzar el modal de seguimiento a comportarse igual siempre */
-#seguimientoModal .tareas-modal-content {
-    max-width: 800px !important;
-    width: 90% !important;
-    margin: 2rem auto !important;
-}
-
-#seguimientoContent {
-    text-align: center !important;
-    width: 100% !important;
-}
-
-#seguimientoContent table {
-    width: 100% !important;
-    margin: 0 auto !important;
-    max-width: 700px !important;
-    border-collapse: collapse !important;
-}
-
-#seguimientoContent th,
-#seguimientoContent td {
-    text-align: center !important;
-    padding: 0.5rem !important;
-    border: none !important;
-}
-
-#seguimientoContent th {
-    background-color: #f3f4f6 !important;
-    font-weight: bold !important;
-}
-
-/* Controlar ancho de columnas de la tabla */
-.tareas-table {
-    table-layout: fixed !important;
-}
-
-.tareas-table-td {
-    word-wrap: break-word !important;
-    word-break: break-all !important;
-    overflow: hidden !important;
-}
-
-/* Ancho específico para la columna de archivo */
-.tareas-table th:nth-child(5),
-.tareas-table td:nth-child(5) {
-    width: 200px !important;
-    max-width: 200px !important;
-}
-
-/* Para enlaces largos en la columna archivo */
-.tareas-link {
-    display: block !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    max-width: 100% !important;
-}
     </style>
 
     <!-- Modal visual de eliminación -->
@@ -820,371 +589,203 @@
     </style>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', function() {
+            // Variables para el modal de tareas
+            let tipoSeleccionado = '';
             let tareaIdParaEliminar = null;
 
-            // --- Modal subir tareas ---
-            const openBtn = document.getElementById('openModalBtn');
-            const closeBtn = document.getElementById('closeModalBtn');
-            const cancelBtn = document.getElementById('cancelModalBtn');
-            const modal = document.getElementById('tareaModal');
-            const modalContent = document.getElementById('tareaModalContent');
-            const btnModulo = document.getElementById("btnModulo");
-            const btnTarea = document.getElementById("btnTarea");
-            const modalSeleccion = document.getElementById("modalSeleccion");
-            const modalFormulario = document.getElementById("modalFormulario");
-            const fechaEntrega = document.getElementById("fechaEntrega");
-            const archivoInput = document.getElementById('archivo');
-            const archivoNombre = document.getElementById('archivoNombre');
-            const formSubir = document.querySelector('#modalFormulario form');
-            const btnSubir = document.getElementById('btnSubir');
+            // Referencias a elementos del DOM
+            const btnModulo = document.getElementById('btnModulo');
+            const btnTarea = document.getElementById('btnTarea');
+            const modalSeleccion = document.getElementById('modalSeleccion');
+            const modalFormulario = document.getElementById('modalFormulario');
+            const fechaEntregaGroup = document.getElementById('fechaEntregaGroup');
+            const tipoArchivoInput = document.getElementById('tipoArchivo');
+            const volverBtn = document.getElementById('volverSeleccion');
+            const archivoInput = document.getElementById('archivoInput');
 
-            function openModal() {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-                setTimeout(() => {
-                    modalContent.classList.remove('scale-95', 'opacity-0');
-                    modalContent.classList.add('scale-100', 'opacity-100');
-                }, 20);
-            }
-
-            function closeModal() {
-                modalContent.classList.add('scale-95', 'opacity-0');
-                modalContent.classList.remove('scale-100', 'opacity-100');
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                    modalSeleccion.classList.remove("hidden");
-                    modalFormulario.classList.add("hidden");
-                    fechaEntrega.classList.add("hidden");
-                    limpiarFormulario();
-                }, 300);
-            }
-
-            function limpiarFormulario() {
-                document.querySelector('input[name="nombre"]').value = '';
-                document.querySelector('textarea[name="descripcion"]').value = '';
-                document.querySelector('input[name="archivo"]').value = '';
-                archivoNombre.textContent = "No se ha seleccionado ningún archivo";
-                document.querySelector('input[name="fecha_entrega"]').value = '';
-                const cupofSelect = document.querySelector('select[name="cupof"]');
-                if (cupofSelect) cupofSelect.selectedIndex = 0;
-            }
-
-            if (formSubir && btnSubir) {
-                formSubir.addEventListener('submit', () => {
-                    btnSubir.disabled = true;
-                    btnSubir.textContent = 'Subiendo...';
-                });
-            }
-
-            openBtn.addEventListener('click', openModal);
-            closeBtn.addEventListener('click', closeModal);
-            cancelBtn.addEventListener('click', closeModal);
-
-            btnModulo.addEventListener("click", () => {
-                limpiarFormulario();
-                modalSeleccion.classList.add("hidden");
-                modalFormulario.classList.remove("hidden");
-                fechaEntrega.classList.add("hidden");
-                document.getElementById("formTitulo").textContent = "Subir Módulo de Teoría";
+            // Configurar input de archivo personalizado
+            archivoInput.addEventListener('change', function() {
+                const fileName = this.files[0] ? this.files[0].name : 'Seleccionar archivo (máx. 10MB)';
+                this.nextElementSibling.innerHTML = fileName;
             });
 
-            btnTarea.addEventListener("click", () => {
-                limpiarFormulario();
-                modalSeleccion.classList.add("hidden");
-                modalFormulario.classList.remove("hidden");
-                fechaEntrega.classList.remove("hidden");
-                document.getElementById("formTitulo").textContent = "Subir Tarea con Fecha de Entrega";
+            // Manejador para abrir modal
+            document.getElementById('openModalBtn').addEventListener('click', function() {
+                $('#tareaModal').modal('show');
+                resetModal();
             });
 
-            archivoInput.addEventListener('change', () => {
-                archivoNombre.textContent = archivoInput.files.length > 0 ? archivoInput.files[0].name :
-                    "No se ha seleccionado ningún archivo";
-            });
-
-            // --- Modal seguimiento ---
-            const seguimientoBtns = document.querySelectorAll('.seguimientoBtn');
-            const seguimientoModal = document.getElementById('seguimientoModal');
-            const closeSeguimientoBtn = document.getElementById('closeSeguimientoModal');
-
-seguimientoBtns.forEach(btn => {
-    btn.addEventListener('click', async () => {
-        const tareaId = btn.getAttribute('data-tarea-id');
-        try {
-            const response = await fetch(`/profesores/tareas/${tareaId}/seguimiento`);
-            const data = await response.json();
-            
-            // Info de la tarea
-            document.getElementById('tareaInfo').innerHTML = `
-                <h3>${data.tarea.titulo}</h3>
-                <p>Curso: ${data.tarea.curso} | Materia: ${data.tarea.materia}</p>
-            `;
-            
-            // Tabla simple
-            let seguimientoHTML = `
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Alumno</th>
-                            <th>Estado</th>
-                            ${data.tarea.es_tarea ? '<th>Nota</th>' : ''}
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-            
-            data.alumnos.forEach(alumno => {
-                seguimientoHTML += `
-                    <tr>
-                        <td>${alumno.nombre_completo}</td>
-                        <td style="color: ${alumno.estado === 'No visto' ? '#dc2626' : alumno.estado === 'Visto y no respondido' ? '#d97706' : '#059669'};">${alumno.estado}</td>
-                        ${data.tarea.es_tarea ? `<td>${alumno.nota || '-'}</td>` : ''}
-                    </tr>
-                `;
-            });
-            
-            seguimientoHTML += '</tbody></table>';
-            document.getElementById('seguimientoContent').innerHTML = seguimientoHTML;
-            
-            // Botón corregir
-            const btnCorregir = document.getElementById('btnCorregir');
-            if (data.tarea.es_tarea) {
-                btnCorregir.classList.remove('hidden');
-                btnCorregir.href = `/profesores/tareas/${tareaId}/corregir`;
-            } else {
-                btnCorregir.classList.add('hidden');
+            // Función para resetear el modal
+            function resetModal() {
+                modalSeleccion.classList.remove('d-none');
+                modalFormulario.classList.add('d-none');
+                fechaEntregaGroup.style.display = 'none';
+                tipoSeleccionado = '';
+                document.querySelector('#modalFormulario form').reset();
+                archivoInput.nextElementSibling.innerHTML = 'Seleccionar archivo (máx. 10MB)';
             }
-            
-            // Mostrar modal
-            seguimientoModal.classList.remove('hidden');
-            seguimientoModal.classList.add('flex');
-            setTimeout(() => {
-                seguimientoModal.firstElementChild.classList.remove('scale-95', 'opacity-0');
-                seguimientoModal.firstElementChild.classList.add('scale-100', 'opacity-100');
-            }, 20);
-            
-        } catch (error) {
-            console.error('Error al cargar seguimiento:', error);
-            alert('Error al cargar el seguimiento de la tarea');
-        }
-    });
-});
 
-            closeSeguimientoBtn.addEventListener('click', () => {
-                seguimientoModal.firstElementChild.classList.add('scale-95', 'opacity-0');
-                seguimientoModal.firstElementChild.classList.remove('scale-100', 'opacity-100');
-                setTimeout(() => {
-                    seguimientoModal.classList.remove('flex');
-                    seguimientoModal.classList.add('hidden');
-                }, 300);
+            // Manejador para seleccionar módulo
+            btnModulo.addEventListener('click', function() {
+                tipoSeleccionado = 'modulo';
+                tipoArchivoInput.value = 'modulo';
+                modalSeleccion.classList.add('d-none');
+                modalFormulario.classList.remove('d-none');
+                fechaEntregaGroup.style.display = 'none';
+                document.getElementById('tareaModalLabel').textContent = 'Subir Módulo de Teoría';
             });
 
-            // Modal eliminar  
-            const eliminarBtns = document.querySelectorAll('.eliminarBtn');
-            const eliminarModal = document.getElementById('eliminarModal');
-            const closeEliminarModalBtn = document.getElementById('closeEliminarModal');
-            const cancelEliminarBtn = document.getElementById('cancelEliminar');
-            const confirmarEliminarBtn = document.getElementById('confirmarEliminar');
+            // Manejador para seleccionar tarea
+            btnTarea.addEventListener('click', function() {
+                tipoSeleccionado = 'tarea';
+                tipoArchivoInput.value = 'tarea';
+                modalSeleccion.classList.add('d-none');
+                modalFormulario.classList.remove('d-none');
+                fechaEntregaGroup.style.display = 'block';
+                document.getElementById('fechaEntrega').required = true;
+                document.getElementById('tareaModalLabel').textContent = 'Subir Tarea con Entrega';
+            });
 
-            eliminarBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    tareaIdParaEliminar = btn.getAttribute('data-tarea-id');
-                    eliminarModal.classList.remove('hidden');
-                    eliminarModal.classList.add('flex');
-                    setTimeout(() => {
-                        eliminarModal.firstElementChild.classList.remove('scale-95',
-                            'opacity-0');
-                        eliminarModal.firstElementChild.classList.add('scale-100',
-                            'opacity-100');
-                    }, 20);
+            // Manejador para volver a la selección
+            volverBtn.addEventListener('click', function() {
+                resetModal();
+            });
+
+            // Modal de seguimiento
+            document.querySelectorAll('.seguimientoBtn').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const tareaId = this.getAttribute('data-tarea-id');
+                    try {
+                        const response = await fetch(
+                            `/profesores/tareas/${tareaId}/seguimiento`);
+                        if (!response.ok) throw new Error('Error en la respuesta');
+
+                        const data = await response.json();
+
+                        // Actualizar el contenido del modal
+                        document.getElementById('seguimientoModalLabel').textContent =
+                            `Seguimiento: ${data.tarea.titulo}`;
+
+                        // Información de la tarea
+                        const tareaInfo = document.getElementById('tareaInfo');
+                        tareaInfo.innerHTML = `
+                            <div class="alert alert-info">
+                                <h6><strong>${data.tarea.titulo}</strong></h6>
+                                <p class="mb-1">${data.tarea.descripcion || 'Sin descripción'}</p>
+                                <small>Fecha de entrega: ${data.tarea.fecha_entrega || 'No especificada'}</small>
+                            </div>
+                        `;
+
+                        // Tabla de seguimiento
+                        const seguimientoContent = document.getElementById(
+                        'seguimientoContent');
+                        if (data.entregas && data.entregas.length > 0) {
+                            let tabla = `
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="thead-light">
+                                            <tr class="text-center">
+                                                <th>Alumno</th>
+                                                <th>Estado</th>
+                                                <th>Fecha Entrega</th>
+                                                <th>Nota</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                            `;
+
+                            data.entregas.forEach(entrega => {
+                                const estado = entrega.entrego ?
+                                    '<span class="badge badge-success">Entregado</span>' :
+                                    '<span class="badge badge-danger">No entregado</span>';
+
+                                const nota = entrega.nota ?
+                                    `<span class="badge badge-primary">${entrega.nota}</span>` :
+                                    '<span class="text-muted">-</span>';
+
+                                tabla += `
+                                    <tr class="text-center">
+                                        <td class="font-weight-medium">${entrega.alumno}</td>
+                                        <td>${estado}</td>
+                                        <td>${entrega.fecha_entrega || '-'}</td>
+                                        <td>${nota}</td>
+                                    </tr>
+                                `;
+                            });
+
+                            tabla += '</tbody></table></div>';
+                            seguimientoContent.innerHTML = tabla;
+
+                            // Mostrar botón de corrección si hay entregas
+                            const btnCorregir = document.getElementById('btnCorregir');
+                            btnCorregir.href = `/profesores/tareas/${tareaId}/corregir`;
+                            btnCorregir.classList.remove('d-none');
+                        } else {
+                            seguimientoContent.innerHTML = `
+                                <div class="text-center py-4">
+                                    <i class="feather icon-inbox text-muted mb-3" style="font-size: 3rem;"></i>
+                                    <p class="text-muted">No hay entregas para esta tarea.</p>
+                                </div>
+                            `;
+                            document.getElementById('btnCorregir').classList.add('d-none');
+                        }
+
+                        $('#seguimientoModal').modal('show');
+
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('Error al cargar el seguimiento de la tarea');
+                    }
                 });
             });
 
-            function cerrarEliminarModal() {
-                eliminarModal.firstElementChild.classList.add('scale-95', 'opacity-0');
-                eliminarModal.firstElementChild.classList.remove('scale-100', 'opacity-100');
-                setTimeout(() => {
-                    eliminarModal.classList.remove('flex');
-                    eliminarModal.classList.add('hidden');
-                    tareaIdParaEliminar = null;
-                }, 300);
-            }
+            // Modal de eliminación
+            document.querySelectorAll('.eliminarBtn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    tareaIdParaEliminar = this.getAttribute('data-tarea-id');
+                    const tareaTitle = this.getAttribute('data-tarea-titulo');
+                    document.getElementById('eliminarModalLabel').textContent =
+                        `Eliminar: ${tareaTitle}`;
+                    $('#eliminarModal').modal('show');
+                });
+            });
 
-            closeEliminarModalBtn.addEventListener('click', cerrarEliminarModal);
-            cancelEliminarBtn.addEventListener('click', cerrarEliminarModal);
-
-            // Manejo de la eliminación con fetch y CSRF
-            confirmarEliminarBtn.addEventListener('click', async () => {
+            // Confirmar eliminación
+            document.getElementById('confirmarEliminar').addEventListener('click', async function() {
                 if (!tareaIdParaEliminar) return;
 
-                // Deshabilitar botón para evitar múltiples clics
-                confirmarEliminarBtn.disabled = true;
-                confirmarEliminarBtn.textContent = 'Eliminando...';
-
                 try {
-                    // Usar el token CSRF directamente desde Laravel
-                    const csrfToken = '{{ csrf_token() }}';
-
-                    if (!csrfToken) {
-                        throw new Error(
-                            'Token CSRF no encontrado. Recarga la página e intenta nuevamente.');
-                    }
-
-                    // Hacer la petición DELETE
                     const response = await fetch(`/profesores/tareas/${tareaIdParaEliminar}`, {
                         method: 'DELETE',
                         headers: {
-                            'X-CSRF-TOKEN': csrfToken,
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                .content,
+                            'Content-Type': 'application/json'
                         }
                     });
 
-                    // Verificar si la respuesta es exitosa
-                    if (!response.ok) {
-                        let errorMessage = `Error HTTP ${response.status}`;
-                        try {
-                            const errorData = await response.json();
-                            errorMessage = errorData.message || errorMessage;
-                        } catch (e) {
-                            // Si no puede parsear JSON, usar mensaje genérico
-                            errorMessage = response.status === 404 ? 'Tarea no encontrada' :
-                                response.status === 403 ?
-                                'No tienes permisos para eliminar esta tarea' :
-                                response.status === 500 ? 'Error interno del servidor' : errorMessage;
-                        }
-                        throw new Error(errorMessage);
-                    }
-
-                    const data = await response.json();
-
-                    if (data.success) {
-                        cerrarEliminarModal();
-
-                        // Mostrar mensaje de éxito
-                        const alertDiv = document.createElement('div');
-                        alertDiv.className =
-                            'mb-4 p-4 bg-green-100 border border-green-300 text-green-700 rounded transition-opacity duration-500';
-                        alertDiv.innerHTML =
-                            `<strong>¡Éxito!</strong> ${data.message || 'Tarea eliminada correctamente'}`;
-
-                        // Insertar al inicio del contenido
-                        const mainContent = document.querySelector('h1').parentElement;
-                        mainContent.insertBefore(alertDiv, mainContent.firstChild);
-
-                        // Auto-ocultar después de 3 segundos
-                        setTimeout(() => {
-                            alertDiv.style.opacity = '0';
-                            setTimeout(() => alertDiv.remove(), 500);
-                        }, 3000);
-
-                        // Eliminar fila de la tabla con animación
-                        if (data.success) {
-                            const idAEliminar = tareaIdParaEliminar;
-                            cerrarEliminarModal();
-
-                            setTimeout(() => {
-                                const filaAEliminar = document.querySelector(
-                                    `button[data-tarea-id="${idAEliminar}"]`).closest('tr');
-                                if (filaAEliminar) {
-                                    filaAEliminar.style.transition =
-                                        'opacity 0.3s, transform 0.3s';
-                                    filaAEliminar.style.opacity = '0';
-                                    filaAEliminar.style.transform = 'translateX(-100%)';
-
-                                    setTimeout(() => {
-                                        const tbody = filaAEliminar.parentNode;
-                                        filaAEliminar.remove();
-
-                                        const filasRestantes = Array.from(tbody
-                                                .querySelectorAll('tr'))
-                                            .filter(tr => tr.style.display !== 'none');
-
-                                        if (filasRestantes.length === 0) {
-                                            const colspan = tbody.parentNode
-                                                .querySelector('thead tr').children
-                                                .length;
-                                            const esTablaModulos = tbody.closest(
-                                                '#modulosSection') !== null;
-
-                                            tbody.innerHTML = `
-                                        <tr>
-                                            <td colspan="${colspan}" class="px-6 py-4 text-gray-500 italic">
-                                                No hay ${esTablaModulos ? 'módulos' : 'tareas'} subidos aún.
-                                            </td>
-                                        </tr>
-                                    `;
-                                        }
-                                    }, 350);
-                                }
-                            }, 300);
-                        }
+                    if (response.ok) {
+                        $('#eliminarModal').modal('hide');
+                        location.reload(); // Recargar la página para mostrar los cambios
                     } else {
-                        throw new Error(data.message || 'Error desconocido al eliminar la tarea');
+                        throw new Error('Error al eliminar');
                     }
                 } catch (error) {
-                    console.error('Error al eliminar tarea:', error);
-
-                    // Mostrar mensaje de error
-                    const alertDiv = document.createElement('div');
-                    alertDiv.className =
-                        'mb-4 p-4 bg-red-100 border border-red-300 text-red-700 rounded';
-                    alertDiv.innerHTML = `<strong>Error:</strong> ${error.message}`;
-
-                    const mainContent = document.querySelector('h1').parentElement;
-                    mainContent.insertBefore(alertDiv, mainContent.firstChild);
-
-                    // Auto-ocultar mensaje de error después de 5 segundos
-                    setTimeout(() => {
-                        alertDiv.style.opacity = '0';
-                        setTimeout(() => alertDiv.remove(), 500);
-                    }, 5000);
-
-                    cerrarEliminarModal();
-                } finally {
-                    // Restaurar botón
-                    confirmarEliminarBtn.disabled = false;
-                    confirmarEliminarBtn.textContent = 'Eliminar';
+                    console.error('Error:', error);
+                    alert('Error al eliminar la tarea');
                 }
             });
 
-            // Tabs secciones
-            const tabModulos = document.getElementById('tabModulos');
-            const tabTareas = document.getElementById('tabTareas');
-            const modulosSection = document.getElementById('modulosSection');
-            const tareasSection = document.getElementById('tareasSection');
-
-            function activarTab(tabActivo, tabInactivo, sectionActivo, sectionInactivo) {
-                // Mostrar/ocultar secciones
-                sectionActivo.classList.remove('hidden');
-                sectionInactivo.classList.add('hidden');
-
-                // Activar/desactivar tabs
-                tabActivo.classList.add('active');
-                tabInactivo.classList.remove('active');
+            // Auto-hide success alerts
+            const successAlert = document.querySelector('.alert-success');
+            if (successAlert) {
+                setTimeout(() => {
+                    successAlert.style.opacity = '0';
+                    setTimeout(() => successAlert.remove(), 500);
+                }, 3000);
             }
-
-            tabModulos.addEventListener('click', () => {
-                activarTab(tabModulos, tabTareas, modulosSection, tareasSection);
-            });
-
-            tabTareas.addEventListener('click', () => {
-                activarTab(tabTareas, tabModulos, tareasSection, modulosSection);
-            });
-
-            // Inicializar con el primer tab activo
-            activarTab(tabModulos, tabTareas, modulosSection, tareasSection);
         });
-
-        // Auto-ocultar alerta de éxito si existe
-        const alertSuccess = document.getElementById('alert-success');
-        if (alertSuccess) {
-            setTimeout(() => {
-                alertSuccess.style.opacity = '0';
-                setTimeout(() => alertSuccess.remove(), 500);
-            }, 3000);
-        }
     </script>
 
 </x-layouts.profesores.dashboard>
