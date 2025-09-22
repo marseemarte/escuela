@@ -15,7 +15,7 @@ use App\Http\Controllers\CupofController;
 use App\Http\Controllers\Profesores\AsistenciaController;
 use App\Http\Middleware\EnsureUserIsProfesor;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HorariosSubidaController;
+use App\Http\Controllers\Profesores\HorariosSubidaController;
 
 use Livewire\Volt\Volt;
 
@@ -24,9 +24,12 @@ Route::get('/', function () {
 })->name('home');
 
 
-Route::get('/profesores/create', [HorariosSubidaController::class, 'create'])->name('profesores.create');
-Route::post('/horarios', [HorariosSubidaController::class, 'store'])->name('profesores.store');
 
+Route::get('/profesores/horarios/create', [HorariosSubidaController::class, 'create'])
+    ->name('horarios.create');
+
+Route::post('/profesores/horarios', [HorariosSubidaController::class, 'store'])
+    ->name('horarios.store');
 // Rutas de asistencias para usuarios generales (estudiantes/padres)
 Route::middleware(['auth'])->group(function () {
     Route::get('asistencias', [AsistenciaController::class, 'index'])->name('asistencias.index');
