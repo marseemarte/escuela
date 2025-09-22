@@ -17,7 +17,7 @@ return new class extends Migration
             // Relaciones
             $table->foreignId('id_cursosciclolectivo')->constrained('cursociclolectivo')->onDelete('cascade');
             $table->foreignId('id_tipousuario')->constrained('tipousuario')->onDelete('cascade');
-            $table->foreignId('id_grupos')->constrained('grupos')->onDelete('cascade');
+            $table->foreignId('id_grupos')->constrained('grupos')->onDelete('cascade')->nullable();
 
             $table->string('estado', 1)->default('A'); // Estado de la asignación (A=Activo, I=Inactivo, B=Baja)
 

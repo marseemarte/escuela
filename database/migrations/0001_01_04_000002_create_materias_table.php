@@ -15,6 +15,9 @@ return new class extends Migration
             $table->char('estado', 1)->default('H'); // Estado de la materia (H=Habilitada, D=Deshabilitada)
             $table->string('resumen', 50); // Descripción breve de la materia
 
+            $table->foreignId('orientacion_id')->nullable()->constrained('orientaciones')->onDelete('set null');
+            $table->integer('anio')->nullable(); // Año del curso (1-7)
+            $table->enum('tipo', ['materia', 'taller'])->default('materia'); // Tipo de contenido
             $table->timestamps();
         });
     }

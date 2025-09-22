@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
         // Usar el seeder completo de datos de prueba para asistencias
         $this->call([
             DatosPruebaAsistenciaSeeder::class,
-            Horarios::class,
+            //Horarios::class,
         ]);
     }
 }
