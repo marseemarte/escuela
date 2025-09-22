@@ -1,5 +1,5 @@
 {{-- Vista principal de tareas - Lista de materias --}}
-<x-layouts.profesores.dashboard titulo="Tareas">
+<x-layouts.profesores.dashboard tareas titulo="Tareas">
     <div class="asistencias-container">
         {{-- Header --}}
         <div class="asistencias-header">

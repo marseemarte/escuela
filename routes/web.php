@@ -70,7 +70,6 @@ Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->
         ->name('profesores.asistencias.guardar')
         ->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class);
 
-    Route::apiResource('tareas', TareaController::class);
     Route::apiResource('alumnos', AlumnoController::class);
     Route::apiResource('horarios', HorariosController::class);
 });
