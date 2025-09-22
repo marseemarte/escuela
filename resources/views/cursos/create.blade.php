@@ -43,12 +43,12 @@
                                 <select class="py-2 px-3 form-control" id="turno" name="turno" required>
                                     <option value="" disabled>
                                         Seleccione un turno</option>
-                                    <option value="Mañana">
+                                    <option value="M">
                                         Mañana</option>
-                                    <option value="Tarde">
+                                    <option value="T">
                                         Tarde
                                     </option>
-                                    <option value="Vespertino">
+                                    <option value="V">
                                         Vespertino
                                     </option>
                                 </select>
@@ -57,7 +57,7 @@
                         </div>
                     </div>
 
-                    <div class="row" id="orientacion-row" style="display: none;">
+                    {{-- <div class="row" id="orientacion-row" style="display: none;">
                         <div class="mb-3 col-md-6">
                             <label for="orientacion" class="form-label">Orientación correspondiente al curso de ciclo
                                 superior - (de 4° a 7°)</label>
@@ -71,7 +71,7 @@
                                 @endforeach
                             </select>
                         </div>
-                    </div>
+                    </div> --}}
 
                     <button type="submit" class="btn btn-primary">Subir Nuevo Curso</button>
                     <a href="{{ route('cursos.index') }}" class="btn btn-secondary">Cancelar</a>

@@ -36,11 +36,11 @@
                                     style="color: {{ old('turno', $curso->turno) ? '#212529' : '#6c757d' }};">
                                     <option value="" disabled {{ old('turno', $curso->turno) ? '' : 'selected' }}>
                                         Seleccione un turno</option>
-                                    <option value="Mañana" {{ old('turno', $curso->turno) == 'Mañana' ? 'selected' : '' }}>
+                                    <option value="M" {{ old('turno', $curso->turno) == 'Mañana' ? 'selected' : '' }}>
                                         Mañana</option>
-                                    <option value="Tarde" {{ old('turno', $curso->turno) == 'Tarde' ? 'selected' : '' }}>Tarde
+                                    <option value="T" {{ old('turno', $curso->turno) == 'Tarde' ? 'selected' : '' }}>Tarde
                                     </option>
-                                    <option value="Vespertino"
+                                    <option value="V"
                                         {{ old('turno', $curso->turno) == 'Vespertino' ? 'selected' : '' }}>Vespertino</option>
                                 </select>    
                             </div>
@@ -48,7 +48,7 @@
                         </div>
                     </div>
 
-                    <div class="row" id="orientacion-row" style="display: none;">
+                    {{-- <div class="row" id="orientacion-row" style="display: none;">
                         <div class="mb-3 col-md-6">
                             <label for="orientacion" class="form-label">Orientación correspondiente al curso de ciclo superior - (de 4° a 7°)</label>
                             <select class="py-2 px-3 form-control" id="orientacion" name="orientacion_id"
@@ -64,7 +64,7 @@
                                 @endforeach
                             </select>
                         </div>
-                    </div>
+                    </div> --}}
 
                     <button type="submit" class="btn btn-primary">Actualizar Curso</button>
                     <a href="{{ route('cursos.index') }}" class="btn btn-secondary">Cancelar</a>

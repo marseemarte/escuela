@@ -104,6 +104,9 @@ Route::get('/materias', [MateriasController::class, 'index'])->name('materias.in
 Route::get('/materias/create', [MateriasController::class, 'create'])->name('materias.create');
 Route::get('/materias/{id}', [MateriasController::class, 'edit'])->name('materias.edit');
 Route::put('/materias/{materia}/cambiar-orientacion', [MateriasController::class, 'cambiarOrientacion'])->name('materias.cambiar_orientacion');
+Route::post('/materias', [MateriasController::class, 'store'])->name('materias.store');
+Route::put('/materias/{materia}', [MateriasController::class, 'update'])->name('materias.update');
+Route::delete('/materias/{materia}', [MateriasController::class, 'destroy'])->name('materias.destroy');
 
 // Orientaciones routes
 Route::resource('orientaciones', OrientacionesController::class);
