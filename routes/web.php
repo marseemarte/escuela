@@ -16,13 +16,16 @@ use App\Http\Controllers\CupofController;
 use App\Http\Controllers\Profesores\AsistenciaController;
 use App\Http\Middleware\EnsureUserIsProfesor;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\HorariosSubidaController;
 
 use Livewire\Volt\Volt;
 
 Route::get('/', function () {
     return view('app');
 })->name('home');
+
+Route::get('/cargar-horarios', [HorariosController::class, 'create'])->name('horarios.crearhorarios');
+Route::post('/cargar-horarios', [HorariosController::class, 'store'])->name('horarios.store');
 
 // Rutas de asistencias para usuarios generales (estudiantes/padres)
 Route::middleware(['auth'])->group(function () {
