@@ -178,9 +178,8 @@
             </div>
 
             {{-- Tabs de navegación --}}
-            <div class="card">
-                <div class="card-header p-0">
-                    <ul class="nav nav-tabs card-header-tabs" id="tareasTabs" role="tablist">
+                <div class="mb-4">
+                    <ul class="nav nav-tabs" id="tareasTabs" role="tablist">
                         <li class="nav-item">
                             <a class="nav-link active" id="modulos-tab" data-toggle="tab" href="#modulos" 
                                role="tab" aria-controls="modulos" aria-selected="true">
@@ -288,7 +287,7 @@
                                                 <td>
                                                     <a href="{{ route('profesores.tareas.descargar', $tarea['id']) }}" 
                                                        class="text-primary" title="{{ $tarea['archivo'] }}">
-                                                        <i class="feather icon-download mr-1"></i>
+                                                        <i class="feather icon-download mr-1 "></i>
                                                         {{ Str::limit($tarea['archivo'], 25) }}
                                                     </a>
                                                 </td>
@@ -325,7 +324,6 @@
                         @endif
                     </div>
                 </div>
-            </div>
         </div>
     </div>
 
@@ -690,7 +688,7 @@
         
         /* Estados de badges */
         .badge-danger {
-            background-color: #dc3545;
+            background-color: #ff7b00;
         }
         
         .badge-warning {
