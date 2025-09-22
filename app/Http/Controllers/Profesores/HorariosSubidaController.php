@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Profesores;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -9,19 +10,16 @@ use Illuminate\Validation\Rule;
 
 class HorariosSubidaController extends Controller
 {
-    public function create()
+     public function create()
     {
-        // Cargar datos necesarios para el formulario
         $horas = DB::table('horas')->where('activo', 1)->orderBy('hd', 'asc')->get();
         $cursos = DB::table('cursos')->orderBy('ano')->orderBy('division')->get();
         $grupos = DB::table('grupos')->orderBy('nombre')->get();
         $materias = DB::table('materias')->orderBy('nombre')->get();
         $salones = DB::table('salones')->orderBy('numero')->get();
 
-        // turnos posibles (ajusta si en tu BD hay otra convención)
         $turnos = ['Mañana' => 'M', 'Tarde' => 'T', 'Noche' => 'N'];
 
-        // días que vas a mostrar (puedes modificar)
         $dias = [
             'L' => 'Lunes',
             'M' => 'Martes',
@@ -36,7 +34,6 @@ class HorariosSubidaController extends Controller
 
     public function store(Request $request)
     {
-        // Reglas básicas
         $rules = [
             'turno' => ['required', 'string'],
             'id_cursos' => ['required', 'integer'],
@@ -47,7 +44,7 @@ class HorariosSubidaController extends Controller
             'dias.*' => ['string'],
             'horas' => ['required', 'array', 'min:1'],
             'horas.*' => ['integer'],
-            'estado' => ['nullable', Rule::in(['A','I'])], // A = activo, I = inactivo
+            'estado' => ['nullable', Rule::in(['A','I'])],
         ];
 
         $validator = Validator::make($request->all(), $rules, [
@@ -68,7 +65,6 @@ class HorariosSubidaController extends Controller
         $horas = $request->input('horas');
         $estado = $request->input('estado', 'A');
 
-        // Buscar la entrada en cupof que corresponde a ese curso/grupo/materia/turno
         $cupof = DB::table('cupof')
             ->where('id_cursos', $idCurso)
             ->where('id_grupos', $idGrupo)
@@ -82,11 +78,9 @@ class HorariosSubidaController extends Controller
                 ->withInput();
         }
 
-        $cupofKey = $cupof->cupof; // según tu DB, se usa este campo en horarios.cupof
+        $cupofKey = $cupof->cupof ?? $cupof->id ?? null;
 
-        // Verificar conflictos: por ejemplo, el mismo día + misma hora en el mismo salón ya ocupado
         $conflictos = [];
-
         foreach ($dias as $dia) {
             foreach ($horas as $horaId) {
                 $existe = DB::table('horarios')
@@ -107,10 +101,8 @@ class HorariosSubidaController extends Controller
         }
 
         if (!empty($conflictos)) {
-            // Generar mensaje legible
             $mensajes = [];
             foreach ($conflictos as $c) {
-                // intentar recuperar nombre de hora y salon
                 $hora = DB::table('horas')->where('id', $c['hora_id'])->first();
                 $salon = DB::table('salones')->where('id', $c['salon_id'])->first();
                 $mensajes[] = "Conflicto: día {$c['dia']}, hora " . ($hora->nombre ?? $c['hora_id']) . ", salón " . ($salon->numero ?? $c['salon_id']);
@@ -118,7 +110,6 @@ class HorariosSubidaController extends Controller
             return redirect()->back()->withErrors(['conflictos' => $mensajes])->withInput();
         }
 
-        // Insertar filas (transactional)
         DB::beginTransaction();
         try {
             $insertData = [];
@@ -137,11 +128,10 @@ class HorariosSubidaController extends Controller
                 }
             }
 
-            // Inserción masiva
             DB::table('horarios')->insert($insertData);
-
             DB::commit();
-            return redirect()->route('profesores.create')->with('success', 'Horarios cargados correctamente.');
+
+            return redirect()->route('horarios.create')->with('success', 'Horarios cargados correctamente.');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->withErrors(['db' => 'Error al guardar: ' . $e->getMessage()])->withInput();
