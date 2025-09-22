@@ -32,7 +32,7 @@
                         <div class="mb-3 col-md-4">
                             <label for="turno" class="form-label">Turno</label>
                             <div>
-                                <select class="py-2 px-3 form-control" id="turno" name="turno" required
+                                <select class="py-2 px-3 form-control" id="turno" name="turno" required value="{{ old('turno', $curso->turno) }}"
                                     style="color: {{ old('turno', $curso->turno) ? '#212529' : '#6c757d' }};">
                                     <option value="" disabled {{ old('turno', $curso->turno) ? '' : 'selected' }}>
                                         Seleccione un turno</option>

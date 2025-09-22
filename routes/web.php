@@ -125,3 +125,4 @@ require __DIR__ . '/auth.php';
 
 Route::put('/materias/{materia}/cambiar-orientacion', [MateriasController::class, 'cambiarOrientacion'])->name('materias.cambiar_orientacion');
 Route::get('/materias/create', [MateriasController::class, 'create'])->name('materias.create');
+Route::post('/materias', [MateriasController::class, 'store'])->name('materias.store');
