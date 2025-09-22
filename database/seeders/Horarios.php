@@ -17,7 +17,9 @@ class Horarios extends Seeder
                 ['nombre' => '08:20-09:20', 'turno' => 'D', 'hd' => '08:20:00', 'hh' => '09:20:00', 'activo' => 1],
                 ['nombre' => '09:50-10:50', 'turno' => 'D', 'hd' => '09:50:00', 'hh' => '10:50:00', 'activo' => 1],
                 ['nombre' => '10:50-11:50', 'turno' => 'D', 'hd' => '10:50:00', 'hh' => '11:50:00', 'activo' => 1],
-                ['nombre' => '13:00-15:00', 'turno' => 'T', 'hd' => '13:00:00', 'hh' => '15:00:00', 'activo' => 1],            ];
+                ['nombre' => '13:00-15:00', 'turno' => 'T', 'hd' => '13:00:00', 'hh' => '15:00:00', 'activo' => 1],
+                ['nombre' => '20:00-21:00', 'turno' => 'N', 'hd' => '20:00:00', 'hh' => '21:00:00', 'activo' => 1],
+            ];
 
             foreach ($horas as $h) {
                 $h['created_at'] = $now;
