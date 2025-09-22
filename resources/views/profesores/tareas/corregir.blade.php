@@ -102,25 +102,25 @@
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
                         <thead class="thead-light">
-                            <tr class="text-center">
-                                <th width="20%">Alumno</th>
-                                <th width="15%">Estado</th>
-                                <th width="20%">Respuesta</th>
-                                <th width="15%">Nota</th>
-                                <th width="20%">Devolución</th>
-                                <th width="10%">Acciones</th>
+                            <tr>
+                                <th  class="text-center" width="20%">Alumno</th>
+                                <th  class="text-center" width="15%">Estado</th>
+                                <th  class="text-center" width="20%">Respuesta</th>
+                                <th  class="text-center" width="15%">Nota</th>
+                                <th  class="text-center" width="20%">Devolución</th>
+                                <th  class="text-center" width="10%">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($entregas as $entrega)
                                 <tr class="text-center {{ !$entrega['entrego'] ? 'table-danger' : '' }}">
-                                    <td class="text-left">
+                                    <td class="text-center">
                                         <strong>{{ $entrega['nombre_completo'] }}</strong>
                                         <br>
                                         <small class="text-muted">DNI: {{ $entrega['dni'] }}</small>
                                     </td>
 
-                                    <td>
+                                    <td class="estado h6">
                                         @if ($entrega['entrego'])
                                             <span class="badge badge-success">
                                                 <i class="feather icon-check-circle mr-1"></i>
@@ -142,7 +142,7 @@
 
                                     <td>
                                         @if ($entrega['entrego'])
-                                            <a href="#" class="btn btn-sm btn-link p-0"
+                                            <a href="#" class="btn btn-link p-0" style="font-size: 0.8rem; font-weight: 500;"
                                                 onclick="descargarRespuesta({{ $entrega['tarea_alumno_id'] }})">
                                                 <i class="feather icon-download mr-1"></i>
                                                 {{ $entrega['archivo'] }}
