@@ -110,7 +110,7 @@ class Horarios extends Seeder
                         'id_cursos' => $cursoId,
                         'id_grupos' => $grupoId,
                         'estado' => 'A',
-                        'funcion' => '0',
+
                         'cargo' => 'PF',
                         'created_at' => $now,
                         'updated_at' => $now,
