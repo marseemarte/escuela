@@ -1,4 +1,4 @@
-@extends('layouts.app') {{-- o el layout que uses --}}
+<x-layouts.profesores.dashboard>
 
 @section('content')
 <div class="container">
