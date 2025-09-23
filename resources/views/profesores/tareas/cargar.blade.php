@@ -223,13 +223,19 @@
                                                 <td>{{ $modulo['fecha_subida'] }}</td>
                                                 <td>
                                                     <a href="{{ route('profesores.tareas.descargar', $modulo['id']) }}" 
-                                                       class="text-primary" title="{{ $modulo['archivo'] }}">
-                                                        <i class="feather icon-download mr-1"></i>
-                                                        {{ Str::limit($modulo['archivo'], 25) }}
+                                                    class="download-link text-decoration-none" 
+                                                    title="Descargar: {{ $modulo['archivo'] }}"
+                                                    data-toggle="tooltip">
+                                                        <div class="d-flex align-items-center justify-content-center">
+                                                            <i class="feather icon-download text-primary mr-2" style="font-size: 1.1rem;"></i>
+                                                            <span class="text-primary font-weight-medium file-name">
+                                                                {{ Str::limit($modulo['archivo'], 20) }}
+                                                            </span>
+                                                        </div>
                                                     </a>
                                                 </td>
                                                 <td>
-                                                    <span class="badge badge-info">{{ $modulo['vistos'] }}</span>
+                                                    <span class="badge badge-lg badge-info">{{ $modulo['vistos'] }}</span>
                                                 </td>
                                                 <td>
                                                     <div class="btn-group" role="group">
@@ -280,19 +286,25 @@
                                                 <td>{{ $tarea['materia'] }}</td>
                                                 <td>{{ $tarea['fecha_subida'] }}</td>
                                                 <td>
-                                                    <span class="badge {{ strtotime($tarea['fecha_entrega']) < time() ? 'badge-danger' : 'badge-success' }}">
+                                                    <span class="badge badge-lg {{ strtotime($tarea['fecha_entrega']) < time() ? 'badge-danger' : 'badge-success' }}">
                                                         {{ $tarea['fecha_entrega'] }}
                                                     </span>
                                                 </td>
                                                 <td>
                                                     <a href="{{ route('profesores.tareas.descargar', $tarea['id']) }}" 
-                                                       class="text-primary" title="{{ $tarea['archivo'] }}">
-                                                        <i class="feather icon-download mr-1 "></i>
-                                                        {{ Str::limit($tarea['archivo'], 25) }}
+                                                    class="download-link text-decoration-none" 
+                                                    title="Descargar: {{ $tarea['archivo'] }}"
+                                                    data-toggle="tooltip">
+                                                        <div class="d-flex align-items-center justify-content-center">
+                                                            <i class="feather icon-download text-primary mr-2" style="font-size: 1.1rem;"></i>
+                                                            <span class="text-primary font-weight-medium file-name">
+                                                                {{ Str::limit($tarea['archivo'], 20) }}
+                                                            </span>
+                                                        </div>
                                                     </a>
                                                 </td>
                                                 <td>
-                                                    <span class="badge badge-primary">{{ $tarea['entregas'] }}</span>
+                                                    <span class="badge badge-lg badge-primary">{{ $tarea['entregas'] }}</span>
                                                 </td>
                                                 <td>
                                                     <div class="btn-group" role="group">
@@ -507,7 +519,7 @@
                                 <tr class="text-center">
                                     <td>${alumno.nombre_completo}</td>
                                     <td><span class="badge ${estadoClass}">${alumno.estado}</span></td>
-                                    ${data.tarea.es_tarea ? `<td>${alumno.nota ? `<span class="badge badge-primary">${alumno.nota}</span>` : '-'}</td>` : ''}
+                                    ${data.tarea.es_tarea ? `<td>${alumno.nota ? alumno.nota : '-'}</td>` : ''}
                                 </tr>
                             `;
                         });
@@ -743,6 +755,71 @@
         
         .modal-footer {
             border-top: 1px solid #dee2e6;
+        }
+        
+        .download-link {
+            transition: all 0.3s ease;
+            border-radius: 0.375rem;
+            padding: 0.25rem 0.5rem;
+            margin: -0.25rem -0.5rem;
+        }
+
+        .download-link:hover {
+            background-color: rgba(0, 123, 255, 0.1);
+            transform: translateY(-1px);
+            text-decoration: none !important;
+        }
+
+        .download-link:hover .feather {
+            transform: translateY(-2px);
+        }
+
+        .download-link .file-name {
+            font-size: 0.875rem;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        /* Colores específicos */
+        .text-primary {
+            color: #007bff !important;
+        }
+
+        .font-weight-medium {
+            font-weight: 500;
+        }
+
+        /* Efectos hover adicionales */
+        .download-link:hover .text-primary {
+            color: #0056b3 !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .download-link .file-name {
+                font-size: 0.8rem;
+            }
+            
+            .download-link .feather {
+                font-size: 1rem !important;
+            }
+        }
+
+        /* Tooltip personalizado */
+        .tooltip {
+            font-size: 0.875rem;
+        }
+
+        .tooltip-inner {
+            background-color: #343a40;
+            color: #fff;
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+        }
+
+        /* Estados de hover mejorados */
+        .table tbody tr:hover .download-link {
+            background-color: rgba(0, 123, 255, 0.05);
         }
     </style>
 
