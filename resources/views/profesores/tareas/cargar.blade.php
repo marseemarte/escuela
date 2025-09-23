@@ -14,7 +14,7 @@
                                 Volver
                             </a>
 
-                            <!-- Información -->>
+                            <!-- Información -->
                             <div class="text-center text-md-left">
                                 <h1 class="h4 mb-1">{{ $cursos[0]['materia'] }} - {{ $cursos[0]['nombre'] }}</h1>
                                 <p class="text-muted mb-0">
@@ -409,6 +409,22 @@
         document.addEventListener('DOMContentLoaded', () => {
             let tareaIdParaEliminar = null;
 
+            // Mantener pestaña activa al recargar
+                const tabs = document.querySelectorAll('#tareasTabs a');
+                const lastTab = localStorage.getItem('lastActiveTab');
+                if (lastTab) {
+                    const triggerEl = document.querySelector(`#tareasTabs a[href="${lastTab}"]`);
+                    if (triggerEl) {
+                        $(triggerEl).tab('show'); // jQuery + Bootstrap 4
+                    }
+                }
+
+                // Guardar la pestaña al cambiar
+                $(tabs).on('shown.bs.tab', function(e) {
+                    const href = e.target.getAttribute('href'); // href de la pestaña activa
+                    localStorage.setItem('lastActiveTab', href);
+                });    
+                
             // Sistema de mensajes
             function mostrarMensaje(mensaje, tipo) {
                 const alertasExistentes = document.querySelectorAll('.alert-temp');
@@ -878,6 +894,7 @@
         
         .badge-success {
             background-color: #28a745;
+            color: #fff
         }
         
         .badge-info {
