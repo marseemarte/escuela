@@ -1,22 +1,20 @@
-{{-- Vista para gestionar tareas de una materia específica --}}
 <x-layouts.profesores.dashboard tareas titulo="Tareas">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <div class="row">
         <div class="col-12">
-            {{-- Header con información de la materia --}}
             <div class="card mb-4">
                 <div class="card-body">
                     <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between">
                         <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-0">
-                            {{-- Botón de regreso --}}
+                            <!-- Botón volver -->
                             <a href="{{ route('profesores.index') }}"
                                 class="btn btn-outline-secondary btn-sm mb-3 mb-md-0 mr-md-3">
                                 <i class="fas fa-arrow-left mr-1"></i>
                                 Volver
                             </a>
 
-                            {{-- Información de la materia --}}
+                            <!-- Información -->>
                             <div class="text-center text-md-left">
                                 <h1 class="h4 mb-1">{{ $cursos[0]['materia'] }} - {{ $cursos[0]['nombre'] }}</h1>
                                 <p class="text-muted mb-0">
@@ -26,7 +24,7 @@
                             </div>
                         </div>
 
-                        {{-- Información adicional --}}
+                        <!-- Información adicional (Fecha) -->
                         <div class="text-center text-md-right">
                             <small class="text-muted">
                                 {{ now()->format('d/m/Y') }}
@@ -36,7 +34,7 @@
                 </div>
             </div>
 
-            {{-- Alertas --}}
+            <!-- Alertas -->
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     <i class="feather icon-check-circle mr-2"></i>
@@ -61,7 +59,7 @@
                 </div>
             @endif
 
-            {{-- Botones de acción --}}
+            <!-- Informacion y boton Subir Archivo -->
             <div class="card mb-4">
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center flex-wrap">
@@ -78,7 +76,7 @@
                 </div>
             </div>
 
-            {{-- Modal para subir tareas --}}
+            <!-- Modal para subir tareas -->
             <div id="tareaModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="tareaModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg" role="document">
                     <div class="modal-content">
@@ -88,8 +86,8 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
+                        <!-- Elegir tipo de archivo -->
                         <div class="modal-body">
-                            {{-- Pantalla de selección --}}
                             <div id="modalSeleccion">
                                 <div class="text-center mb-4">
                                     <h6>¿Qué deseas subir?</h6>
@@ -117,7 +115,7 @@
                                 </div>
                             </div>
 
-                            {{-- Formulario (oculto por defecto) --}}
+                            <!-- Formulario (oculto por defecto) -->
                             <div id="modalFormulario" class="d-none">
                                 <form method="POST" action="{{ route('profesores.tareas.store') }}" enctype="multipart/form-data">
                                     @csrf
@@ -136,7 +134,7 @@
 
                                     <input type="hidden" name="cupof" value="{{ $cursos[0]['id'] ?? $cupof }}">
 
-                                    {{-- Campo fecha de entrega (solo para tarea) --}}
+                                    <!-- Campo fecha de entrega (solo para tarea) -->
                                     <div id="fechaEntrega" class="form-group d-none">
                                         <label class="form-label">Fecha de entrega <span class="text-danger">*</span></label>
                                         <input type="date" name="fecha_entrega" class="form-control"
@@ -144,19 +142,28 @@
                                         <small class="form-text text-muted">Los estudiantes podrán entregar hasta esta fecha</small>
                                     </div>
 
-                                    {{-- Archivo --}}
+                                    <!-- Subir Archivo -->
                                     <div class="form-group">
                                         <label class="form-label">Archivo <span class="text-danger">*</span></label>
-                                        <div class="custom-file">
-                                            <input type="file" name="archivo" id="archivo" class="custom-file-input" required
-                                                   accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png">
-                                            <label class="custom-file-label" for="archivo">Elegir archivo (máx. 10MB)</label>
+                                        <div class="file-upload-container">
+                                            <input type="file" name="archivo" id="archivo" class="file-input" required
+                                                accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.rar,.zip,.7z,.tar,.gz">
+                                            <div class="file-upload-display d-flex align-items-center">
+                                                <button type="button" class="btn btn-outline-secondary file-upload-btn">
+                                                    <i class="feather icon-upload mr-2"></i>
+                                                    Agregar archivo
+                                                </button>
+                                                <span class="file-name-display ml-3 text-muted" id="fileNameDisplay">
+                                                    Ningún archivo seleccionado
+                                                </span>
+                                            </div>
                                         </div>
-                                        <small class="form-text text-muted">
-                                            Formatos permitidos: PDF, Word, PowerPoint, Excel, Imágenes
+                                        <small class="form-text text-muted mt-2">
+                                            Formatos permitidos: PDF, Word, PowerPoint, Excel, Imágenes, Comprimidos (máx. 20MB)
                                         </small>
                                     </div>
 
+                                    <!-- Botones -->
                                     <div class="d-flex justify-content-between">
                                         <button type="button" id="backToSelection" class="btn btn-secondary">
                                             <i class="feather icon-arrow-left mr-1"></i> Atrás
@@ -177,7 +184,7 @@
                 </div>
             </div>
 
-            {{-- Tabs de navegación --}}
+            <!-- Tabs de navegación -->
                 <div class="mb-4">
                     <ul class="nav nav-tabs" id="tareasTabs" role="tablist">
                         <li class="nav-item">
@@ -199,8 +206,8 @@
                     </ul>
                 </div>
                 
+                <!-- Sección Módulos de teoría -->
                 <div class="tab-content" id="tareasTabContent">
-                    {{-- Sección Módulos de teoría --}}
                     <div class="tab-pane fade show active" id="modulos" role="tabpanel" aria-labelledby="modulos-tab">
                         @if(count($modulos) > 0)
                             <div class="table-responsive">
@@ -263,7 +270,7 @@
                         @endif
                     </div>
 
-                    {{-- Sección Tareas con fecha de entrega --}}
+                    <!-- Sección Tareas con fecha de entrega -->
                     <div class="tab-pane fade" id="tareas" role="tabpanel" aria-labelledby="tareas-tab">
                         @if(count($tareas) > 0)
                             <div class="table-responsive">
@@ -339,7 +346,7 @@
         </div>
     </div>
 
-    {{-- Modal de seguimiento --}}
+    <!-- Modal de seguimiento -->
     <div class="modal fade" id="seguimientoModal" tabindex="-1" role="dialog" aria-labelledby="seguimientoModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
@@ -351,13 +358,14 @@
                 </div>
                 <div class="modal-body">
                     <div id="tareaInfo" class="alert alert-info">
-                        {{-- Info de la tarea se carga dinámicamente --}}
+                        <!-- Info de la tarea se carga dinámicamente, revisar script -->>
                     </div>
 
                     <div id="seguimientoContent">
-                        {{-- Contenido del seguimiento se carga via AJAX --}}
+                        <!-- Contenido del seguimiento se carga via AJAX, revisar script -->
                     </div>
                 </div>
+                <!-- Botones -->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                     <a href="#" id="btnCorregir" class="btn btn-success d-none">
@@ -369,7 +377,7 @@
         </div>
     </div>
 
-    {{-- Modal de confirmación eliminar --}}
+    <!-- Modal de confirmación eliminar -->
     <div class="modal fade" id="eliminarModal" tabindex="-1" role="dialog" aria-labelledby="eliminarModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -397,7 +405,7 @@
         </div>
     </div>
 
-    <script>
+   <script>
         document.addEventListener('DOMContentLoaded', () => {
             let tareaIdParaEliminar = null;
 
@@ -429,16 +437,81 @@
             }
 
             // Modal subir tareas
+            const openModalBtn = document.getElementById('openModalBtn');
             const modalSeleccion = document.getElementById('modalSeleccion');
             const modalFormulario = document.getElementById('modalFormulario');
             const fechaEntrega = document.getElementById('fechaEntrega');
             const archivoInput = document.getElementById('archivo');
+
+            // abrir modal
+            openModalBtn?.addEventListener('click', () => {
+                $('#tareaModal').modal('show');
+            });
             
-            // Manejar selección de archivo
+            // Funcionalidad mejorada del selector de archivo
+            const fileUploadDisplay = document.querySelector('.file-upload-display');
+            const fileNameDisplay = document.getElementById('fileNameDisplay');
+            const fileUploadBtn = document.querySelector('.file-upload-btn');
+            
+            // Clic en el área completa abre el selector
+            fileUploadDisplay?.addEventListener('click', () => {
+                archivoInput?.click();
+            });
+            
+            // Manejar selección de archivo mejorada
             if (archivoInput) {
                 archivoInput.addEventListener('change', function() {
-                    const fileName = this.files.length > 0 ? this.files[0].name : 'Elegir archivo (máx. 10MB)';
-                    this.nextElementSibling.textContent = fileName;
+                    const file = this.files[0];
+                    if (file) {
+                        // Validar tamaño del archivo (20MB máximo)
+                        const maxSize = 20 * 1024 * 1024; // 20MB en bytes
+                        if (file.size > maxSize) {
+                            if (fileNameDisplay) {
+                                fileNameDisplay.textContent = 'Error: El archivo es demasiado grande (máx. 20MB)';
+                                fileNameDisplay.style.color = '#dc3545';
+                            }
+                            if (fileUploadDisplay) {
+                                fileUploadDisplay.classList.remove('file-selected');
+                                fileUploadDisplay.style.borderColor = '#dc3545';
+                            }
+                            if (fileUploadBtn) {
+                                fileUploadBtn.innerHTML = '<i class="feather icon-alert-triangle mr-2"></i>Archivo muy grande';
+                            }
+                            this.value = ''; // Limpiar selección
+                        } else {
+                            // Mostrar nombre del archivo
+                            if (fileNameDisplay) {
+                                fileNameDisplay.textContent = file.name;
+                                fileNameDisplay.classList.add('has-file');
+                                fileNameDisplay.style.color = '';
+                            }
+                            
+                            // Cambiar apariencia del contenedor
+                            if (fileUploadDisplay) {
+                                fileUploadDisplay.classList.add('file-selected');
+                                fileUploadDisplay.style.borderColor = '';
+                            }
+                            
+                            // Cambiar texto del botón
+                            if (fileUploadBtn) {
+                                fileUploadBtn.innerHTML = '<i class="feather icon-check mr-2"></i>Archivo seleccionado';
+                            }
+                        }
+                    } else {
+                        // Restablecer estado
+                        if (fileNameDisplay) {
+                            fileNameDisplay.textContent = 'Ningún archivo seleccionado';
+                            fileNameDisplay.classList.remove('has-file');
+                            fileNameDisplay.style.color = '';
+                        }
+                        if (fileUploadDisplay) {
+                            fileUploadDisplay.classList.remove('file-selected');
+                            fileUploadDisplay.style.borderColor = '';
+                        }
+                        if (fileUploadBtn) {
+                            fileUploadBtn.innerHTML = '<i class="feather icon-upload mr-2"></i>Agregar archivo';
+                        }
+                    }
                 });
             }
 
@@ -473,12 +546,24 @@
                 modalFormulario.classList.add('d-none');
                 document.getElementById('tareaModalLabel').textContent = 'Subir Archivo';
                 
-                // Limpiar formulario
+                // Limpiar formulario y selector personalizado
                 const form = modalFormulario.querySelector('form');
                 if (form) {
                     form.reset();
-                    const fileLabel = document.querySelector('.custom-file-label');
-                    if (fileLabel) fileLabel.textContent = 'Elegir archivo (máx. 10MB)';
+                    
+                    // Restablecer selector de archivo personalizado
+                    if (fileNameDisplay) {
+                        fileNameDisplay.textContent = 'Ningún archivo seleccionado';
+                        fileNameDisplay.classList.remove('has-file');
+                        fileNameDisplay.style.color = '';
+                    }
+                    if (fileUploadDisplay) {
+                        fileUploadDisplay.classList.remove('file-selected');
+                        fileUploadDisplay.style.borderColor = '';
+                    }
+                    if (fileUploadBtn) {
+                        fileUploadBtn.innerHTML = '<i class="feather icon-upload mr-2"></i>Agregar archivo';
+                    }
                 }
             });
 
@@ -635,6 +720,89 @@
         /* Mejoras visuales */
         .custom-file-label::after {
             content: "Buscar";
+        }
+
+        .file-upload-container {
+            position: relative;
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 0.1px;
+            height: 0.1px;
+            overflow: hidden;
+        }
+
+        .file-upload-display {
+            border: 2px dashed #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-upload-display:hover {
+            border-color: #007bff;
+            background-color: rgba(0, 123, 255, 0.05);
+        }
+
+        .file-upload-display.file-selected {
+            border-color: #28a745;
+            background-color: rgba(40, 167, 69, 0.05);
+        }
+
+        .file-upload-btn {
+            border: 1px solid #6c757d;
+            background-color: #fff;
+            color: #6c757d;
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .file-upload-btn:hover {
+            background-color: #6c757d;
+            color: #fff;
+            border-color: #6c757d;
+        }
+
+        .file-upload-display.file-selected .file-upload-btn {
+            border-color: #28a745;
+            color: #28a745;
+        }
+
+        .file-upload-display.file-selected .file-upload-btn:hover {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+        .file-name-display {
+            font-size: 0.875rem;
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .file-name-display.has-file {
+            color: #495057 !important;
+            font-weight: 500;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .file-upload-display {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            
+            .file-name-display {
+                margin-left: 0 !important;
+                margin-top: 0.5rem;
+            }
         }
         
         .btn-group .btn {
