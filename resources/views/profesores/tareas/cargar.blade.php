@@ -1,4 +1,4 @@
-<x-layouts.profesores.dashboard tareas titulo="Tareas">
+<x-layouts.profesores.dashboard tareas titulo="Tareas" title="Mi Técnica | Panel de Profesores - Tareas">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <div class="row">
@@ -18,8 +18,10 @@
                             <div class="text-center text-md-left">
                                 <h1 class="h4 mb-1">{{ $cursos[0]['materia'] }} - {{ $cursos[0]['nombre'] }}</h1>
                                 <p class="text-muted mb-0">
-                                    Gestiona las tareas de la materia {{ $cursos[0]['materia'] }} del curso {{ $cursos[0]['nombre'] }}.
-                                    Aquí puedes subir módulos de teoría, tareas con fecha de entrega y hacer el seguimiento de respuestas.
+                                    Gestiona las tareas de la materia {{ $cursos[0]['materia'] }} del curso
+                                    {{ $cursos[0]['nombre'] }}.
+                                    Aquí puedes subir módulos de teoría, tareas con fecha de entrega y hacer el
+                                    seguimiento de respuestas.
                                 </p>
                             </div>
                         </div>
@@ -77,7 +79,8 @@
             </div>
 
             <!-- Modal para subir tareas -->
-            <div id="tareaModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="tareaModalLabel" aria-hidden="true">
+            <div id="tareaModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="tareaModalLabel"
+                aria-hidden="true">
                 <div class="modal-dialog modal-lg" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -99,7 +102,8 @@
                                             <i class="feather icon-book mr-2"></i>
                                             <div>
                                                 <strong>Módulo de teoría</strong>
-                                                <br><small class="text-muted">Material de estudio sin fecha de entrega</small>
+                                                <br><small class="text-muted">Material de estudio sin fecha de
+                                                    entrega</small>
                                             </div>
                                         </button>
                                     </div>
@@ -108,7 +112,8 @@
                                             <i class="feather icon-edit mr-2"></i>
                                             <div>
                                                 <strong>Tarea con fecha de entrega</strong>
-                                                <br><small class="text-muted">Actividad evaluable con fecha límite</small>
+                                                <br><small class="text-muted">Actividad evaluable con fecha
+                                                    límite</small>
                                             </div>
                                         </button>
                                     </div>
@@ -117,39 +122,43 @@
 
                             <!-- Formulario (oculto por defecto) -->
                             <div id="modalFormulario" class="d-none">
-                                <form method="POST" action="{{ route('profesores.tareas.store') }}" enctype="multipart/form-data">
+                                <form method="POST" action="{{ route('profesores.tareas.store') }}"
+                                    enctype="multipart/form-data">
                                     @csrf
-                                    
+
                                     <div class="form-group">
                                         <label class="form-label">Nombre <span class="text-danger">*</span></label>
-                                        <input type="text" name="nombre" class="form-control" required 
-                                               placeholder="Ingresa el nombre del archivo">
+                                        <input type="text" name="nombre" class="form-control" required
+                                            placeholder="Ingresa el nombre del archivo">
                                     </div>
 
                                     <div class="form-group">
                                         <label class="form-label">Descripción</label>
-                                        <textarea name="descripcion" class="form-control" rows="3" 
-                                                  placeholder="Descripción opcional del contenido"></textarea>
+                                        <textarea name="descripcion" class="form-control" rows="3" placeholder="Descripción opcional del contenido"></textarea>
                                     </div>
 
                                     <input type="hidden" name="cupof" value="{{ $cursos[0]['id'] ?? $cupof }}">
 
                                     <!-- Campo fecha de entrega (solo para tarea) -->
                                     <div id="fechaEntrega" class="form-group d-none">
-                                        <label class="form-label">Fecha de entrega <span class="text-danger">*</span></label>
+                                        <label class="form-label">Fecha de entrega <span
+                                                class="text-danger">*</span></label>
                                         <input type="date" name="fecha_entrega" class="form-control"
-                                               min="{{ date('Y-m-d', strtotime('+1 day')) }}">
-                                        <small class="form-text text-muted">Los estudiantes podrán entregar hasta esta fecha</small>
+                                            min="{{ date('Y-m-d', strtotime('+1 day')) }}">
+                                        <small class="form-text text-muted">Los estudiantes podrán entregar hasta esta
+                                            fecha</small>
                                     </div>
 
                                     <!-- Subir Archivo -->
                                     <div class="form-group">
                                         <label class="form-label">Archivo <span class="text-danger">*</span></label>
                                         <div class="file-upload-container">
-                                            <input type="file" name="archivo" id="archivo" class="file-input" required
+                                            <input type="file" name="archivo" id="archivo" class="file-input"
+                                                required
                                                 accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.rar,.zip,.7z,.tar,.gz">
                                             <div class="file-upload-display d-flex align-items-center">
-                                                <button type="button" class="btn btn-outline-secondary file-upload-btn">
+                                                <button type="button"
+                                                    class="btn btn-outline-secondary file-upload-btn">
                                                     <i class="feather icon-upload mr-2"></i>
                                                     Agregar archivo
                                                 </button>
@@ -159,7 +168,8 @@
                                             </div>
                                         </div>
                                         <small class="form-text text-muted mt-2">
-                                            Formatos permitidos: PDF, Word, PowerPoint, Excel, Imágenes, Comprimidos (máx. 20MB)
+                                            Formatos permitidos: PDF, Word, PowerPoint, Excel, Imágenes, Comprimidos
+                                            (máx. 20MB)
                                         </small>
                                     </div>
 
@@ -169,7 +179,8 @@
                                             <i class="feather icon-arrow-left mr-1"></i> Atrás
                                         </button>
                                         <div>
-                                            <button type="button" class="btn btn-outline-secondary mr-2" data-dismiss="modal">
+                                            <button type="button" class="btn btn-outline-secondary mr-2"
+                                                data-dismiss="modal">
                                                 Cancelar
                                             </button>
                                             <button type="submit" id="btnSubir" class="btn btn-primary">
@@ -185,169 +196,174 @@
             </div>
 
             <!-- Tabs de navegación -->
-                <div class="mb-4">
-                    <ul class="nav nav-tabs" id="tareasTabs" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" id="modulos-tab" data-toggle="tab" href="#modulos" 
-                               role="tab" aria-controls="modulos" aria-selected="true">
-                                <i class="feather icon-book mr-1"></i>
-                                Módulos de teoría
-                                <span class="badge badge-secondary ml-1">{{ count($modulos) }}</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="tareas-tab" data-toggle="tab" href="#tareas" 
-                               role="tab" aria-controls="tareas" aria-selected="false">
-                                <i class="feather icon-edit mr-1"></i>
-                                Tareas con fecha de entrega
-                                <span class="badge badge-secondary ml-1">{{ count($tareas) }}</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                
-                <!-- Sección Módulos de teoría -->
-                <div class="tab-content" id="tareasTabContent">
-                    <div class="tab-pane fade show active" id="modulos" role="tabpanel" aria-labelledby="modulos-tab">
-                        @if(count($modulos) > 0)
-                            <div class="table-responsive">
-                                <table class="table table-hover mb-0">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th scope="col" class="text-center">Nombre</th>
-                                            <th scope="col" class="text-center">Materia</th>
-                                            <th scope="col" class="text-center">Fecha de subida</th>
-                                            <th scope="col" class="text-center">Archivo</th>
-                                            <th scope="col" class="text-center">Vistos</th>
-                                            <th scope="col" class="text-center">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($modulos as $modulo)
-                                            <tr class="text-center">
-                                                <td class="font-weight-bold">{{ $modulo['titulo'] }}</td>
-                                                <td>{{ $modulo['materia'] }}</td>
-                                                <td>{{ $modulo['fecha_subida'] }}</td>
-                                                <td>
-                                                    <a href="{{ route('profesores.tareas.descargar', $modulo['id']) }}" 
-                                                    class="download-link text-decoration-none" 
+            <div class="mb-4">
+                <ul class="nav nav-tabs" id="tareasTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="modulos-tab" data-toggle="tab" href="#modulos"
+                            role="tab" aria-controls="modulos" aria-selected="true">
+                            <i class="feather icon-book mr-1"></i>
+                            Módulos de teoría
+                            <span class="badge badge-secondary ml-1">{{ count($modulos) }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="tareas-tab" data-toggle="tab" href="#tareas" role="tab"
+                            aria-controls="tareas" aria-selected="false">
+                            <i class="feather icon-edit mr-1"></i>
+                            Tareas con fecha de entrega
+                            <span class="badge badge-secondary ml-1">{{ count($tareas) }}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Sección Módulos de teoría -->
+            <div class="tab-content" id="tareasTabContent">
+                <div class="tab-pane fade show active" id="modulos" role="tabpanel" aria-labelledby="modulos-tab">
+                    @if (count($modulos) > 0)
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col" class="text-center">Nombre</th>
+                                        <th scope="col" class="text-center">Materia</th>
+                                        <th scope="col" class="text-center">Fecha de subida</th>
+                                        <th scope="col" class="text-center">Archivo</th>
+                                        <th scope="col" class="text-center">Vistos</th>
+                                        <th scope="col" class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($modulos as $modulo)
+                                        <tr class="text-center">
+                                            <td class="font-weight-bold">{{ $modulo['titulo'] }}</td>
+                                            <td>{{ $modulo['materia'] }}</td>
+                                            <td>{{ $modulo['fecha_subida'] }}</td>
+                                            <td>
+                                                <a href="{{ route('profesores.tareas.descargar', $modulo['id']) }}"
+                                                    class="download-link text-decoration-none"
                                                     title="Descargar: {{ $modulo['archivo'] }}"
                                                     data-toggle="tooltip">
-                                                        <div class="d-flex align-items-center justify-content-center">
-                                                            <i class="feather icon-download text-primary mr-2" style="font-size: 1.1rem;"></i>
-                                                            <span class="text-primary font-weight-medium file-name">
-                                                                {{ Str::limit($modulo['archivo'], 20) }}
-                                                            </span>
-                                                        </div>
-                                                    </a>
-                                                </td>
-                                                <td>
-                                                    <span class="badge badge-lg badge-info">{{ $modulo['vistos'] }}</span>
-                                                </td>
-                                                <td>
-                                                    <div class="btn-group" role="group">
-                                                        <button class="btn btn-sm btn-outline-primary seguimientoBtn" 
-                                                                data-tarea-id="{{ $modulo['id'] }}" title="Ver seguimiento">
-                                                            <i class="feather icon-eye"></i>
-                                                        </button>
-                                                        <button class="btn btn-sm btn-outline-danger eliminarBtn" 
-                                                                data-tarea-id="{{ $modulo['id'] }}" title="Eliminar">
-                                                            <i class="feather icon-trash-2"></i>
-                                                        </button>
+                                                    <div class="d-flex align-items-center justify-content-center">
+                                                        <i class="feather icon-download text-primary mr-2"
+                                                            style="font-size: 1.1rem;"></i>
+                                                        <span class="text-primary font-weight-medium file-name">
+                                                            {{ Str::limit($modulo['archivo'], 20) }}
+                                                        </span>
                                                     </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @else
-                            <div class="text-center py-5">
-                                <i class="feather icon-book text-muted mb-3" style="font-size: 3rem;"></i>
-                                <h5 class="text-muted">No hay módulos subidos aún</h5>
-                                <p class="text-muted">Los módulos de teoría aparecerán aquí una vez que los subas</p>
-                            </div>
-                        @endif
-                    </div>
-
-                    <!-- Sección Tareas con fecha de entrega -->
-                    <div class="tab-pane fade" id="tareas" role="tabpanel" aria-labelledby="tareas-tab">
-                        @if(count($tareas) > 0)
-                            <div class="table-responsive">
-                                <table class="table table-hover mb-0">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th scope="col" class="text-center">Nombre</th>
-                                            <th scope="col" class="text-center">Materia</th>
-                                            <th scope="col" class="text-center">Fecha de Subida</th>
-                                            <th scope="col" class="text-center">Fecha de entrega</th>
-                                            <th scope="col" class="text-center">Archivo</th>
-                                            <th scope="col" class="text-center">Entregas</th>
-                                            <th scope="col" class="text-center">Acciones</th>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-lg badge-info">{{ $modulo['vistos'] }}</span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <button class="btn btn-sm btn-outline-primary seguimientoBtn"
+                                                        data-tarea-id="{{ $modulo['id'] }}" title="Ver seguimiento">
+                                                        <i class="feather icon-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger eliminarBtn"
+                                                        data-tarea-id="{{ $modulo['id'] }}" title="Eliminar">
+                                                        <i class="feather icon-trash-2"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($tareas as $tarea)
-                                            <tr class="text-center">
-                                                <td class="font-weight-bold">{{ $tarea['titulo'] }}</td>
-                                                <td>{{ $tarea['materia'] }}</td>
-                                                <td>{{ $tarea['fecha_subida'] }}</td>
-                                                <td>
-                                                    <span class="badge badge-lg {{ strtotime($tarea['fecha_entrega']) < time() ? 'badge-danger' : 'badge-success' }}">
-                                                        {{ $tarea['fecha_entrega'] }}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <a href="{{ route('profesores.tareas.descargar', $tarea['id']) }}" 
-                                                    class="download-link text-decoration-none" 
-                                                    title="Descargar: {{ $tarea['archivo'] }}"
-                                                    data-toggle="tooltip">
-                                                        <div class="d-flex align-items-center justify-content-center">
-                                                            <i class="feather icon-download text-primary mr-2" style="font-size: 1.1rem;"></i>
-                                                            <span class="text-primary font-weight-medium file-name">
-                                                                {{ Str::limit($tarea['archivo'], 20) }}
-                                                            </span>
-                                                        </div>
-                                                    </a>
-                                                </td>
-                                                <td>
-                                                    <span class="badge badge-lg badge-primary">{{ $tarea['entregas'] }}</span>
-                                                </td>
-                                                <td>
-                                                    <div class="btn-group" role="group">
-                                                        <button class="btn btn-sm btn-outline-primary seguimientoBtn"
-                                                                data-tarea-id="{{ $tarea['id'] }}" title="Ver seguimiento">
-                                                            <i class="feather icon-eye"></i>
-                                                        </button>
-                                                        <a href="{{ route('profesores.tareas.corregir', $tarea['id']) }}" 
-                                                           class="btn btn-sm btn-outline-success" title="Corregir">
-                                                            <i class="feather icon-check-circle"></i>
-                                                        </a>
-                                                        <button class="btn btn-sm btn-outline-danger eliminarBtn" 
-                                                                data-tarea-id="{{ $tarea['id'] }}" title="Eliminar">
-                                                            <i class="feather icon-trash-2"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @else
-                            <div class="text-center py-5">
-                                <i class="feather icon-edit text-muted mb-3" style="font-size: 3rem;"></i>
-                                <h5 class="text-muted">No hay tareas subidas aún</h5>
-                                <p class="text-muted">Las tareas con fecha de entrega aparecerán aquí una vez que las subas</p>
-                            </div>
-                        @endif
-                    </div>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="text-center py-5">
+                            <i class="feather icon-book text-muted mb-3" style="font-size: 3rem;"></i>
+                            <h5 class="text-muted">No hay módulos subidos aún</h5>
+                            <p class="text-muted">Los módulos de teoría aparecerán aquí una vez que los subas</p>
+                        </div>
+                    @endif
                 </div>
+
+                <!-- Sección Tareas con fecha de entrega -->
+                <div class="tab-pane fade" id="tareas" role="tabpanel" aria-labelledby="tareas-tab">
+                    @if (count($tareas) > 0)
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col" class="text-center">Nombre</th>
+                                        <th scope="col" class="text-center">Materia</th>
+                                        <th scope="col" class="text-center">Fecha de Subida</th>
+                                        <th scope="col" class="text-center">Fecha de entrega</th>
+                                        <th scope="col" class="text-center">Archivo</th>
+                                        <th scope="col" class="text-center">Entregas</th>
+                                        <th scope="col" class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($tareas as $tarea)
+                                        <tr class="text-center">
+                                            <td class="font-weight-bold">{{ $tarea['titulo'] }}</td>
+                                            <td>{{ $tarea['materia'] }}</td>
+                                            <td>{{ $tarea['fecha_subida'] }}</td>
+                                            <td>
+                                                <span
+                                                    class="badge badge-lg {{ strtotime($tarea['fecha_entrega']) < time() ? 'badge-danger' : 'badge-success' }}">
+                                                    {{ $tarea['fecha_entrega'] }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <a href="{{ route('profesores.tareas.descargar', $tarea['id']) }}"
+                                                    class="download-link text-decoration-none"
+                                                    title="Descargar: {{ $tarea['archivo'] }}" data-toggle="tooltip">
+                                                    <div class="d-flex align-items-center justify-content-center">
+                                                        <i class="feather icon-download text-primary mr-2"
+                                                            style="font-size: 1.1rem;"></i>
+                                                        <span class="text-primary font-weight-medium file-name">
+                                                            {{ Str::limit($tarea['archivo'], 20) }}
+                                                        </span>
+                                                    </div>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <span
+                                                    class="badge badge-lg badge-primary">{{ $tarea['entregas'] }}</span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <button class="btn btn-sm btn-outline-primary seguimientoBtn"
+                                                        data-tarea-id="{{ $tarea['id'] }}" title="Ver seguimiento">
+                                                        <i class="feather icon-eye"></i>
+                                                    </button>
+                                                    <a href="{{ route('profesores.tareas.corregir', $tarea['id']) }}"
+                                                        class="btn btn-sm btn-outline-success" title="Corregir">
+                                                        <i class="feather icon-check-circle"></i>
+                                                    </a>
+                                                    <button class="btn btn-sm btn-outline-danger eliminarBtn"
+                                                        data-tarea-id="{{ $tarea['id'] }}" title="Eliminar">
+                                                        <i class="feather icon-trash-2"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="text-center py-5">
+                            <i class="feather icon-edit text-muted mb-3" style="font-size: 3rem;"></i>
+                            <h5 class="text-muted">No hay tareas subidas aún</h5>
+                            <p class="text-muted">Las tareas con fecha de entrega aparecerán aquí una vez que las subas
+                            </p>
+                        </div>
+                    @endif
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Modal de seguimiento -->
-    <div class="modal fade" id="seguimientoModal" tabindex="-1" role="dialog" aria-labelledby="seguimientoModalLabel" aria-hidden="true">
+    <div class="modal fade" id="seguimientoModal" tabindex="-1" role="dialog"
+        aria-labelledby="seguimientoModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -378,7 +394,8 @@
     </div>
 
     <!-- Modal de confirmación eliminar -->
-    <div class="modal fade" id="eliminarModal" tabindex="-1" role="dialog" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+    <div class="modal fade" id="eliminarModal" tabindex="-1" role="dialog" aria-labelledby="eliminarModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -405,26 +422,26 @@
         </div>
     </div>
 
-   <script>
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
             let tareaIdParaEliminar = null;
 
             // Mantener pestaña activa al recargar
-                const tabs = document.querySelectorAll('#tareasTabs a');
-                const lastTab = localStorage.getItem('lastActiveTab');
-                if (lastTab) {
-                    const triggerEl = document.querySelector(`#tareasTabs a[href="${lastTab}"]`);
-                    if (triggerEl) {
-                        $(triggerEl).tab('show'); // jQuery + Bootstrap 4
-                    }
+            const tabs = document.querySelectorAll('#tareasTabs a');
+            const lastTab = localStorage.getItem('lastActiveTab');
+            if (lastTab) {
+                const triggerEl = document.querySelector(`#tareasTabs a[href="${lastTab}"]`);
+                if (triggerEl) {
+                    $(triggerEl).tab('show'); // jQuery + Bootstrap 4
                 }
+            }
 
-                // Guardar la pestaña al cambiar
-                $(tabs).on('shown.bs.tab', function(e) {
-                    const href = e.target.getAttribute('href'); // href de la pestaña activa
-                    localStorage.setItem('lastActiveTab', href);
-                });    
-                
+            // Guardar la pestaña al cambiar
+            $(tabs).on('shown.bs.tab', function(e) {
+                const href = e.target.getAttribute('href'); // href de la pestaña activa
+                localStorage.setItem('lastActiveTab', href);
+            });
+
             // Sistema de mensajes
             function mostrarMensaje(mensaje, tipo) {
                 const alertasExistentes = document.querySelectorAll('.alert-temp');
@@ -463,17 +480,17 @@
             openModalBtn?.addEventListener('click', () => {
                 $('#tareaModal').modal('show');
             });
-            
+
             // Funcionalidad mejorada del selector de archivo
             const fileUploadDisplay = document.querySelector('.file-upload-display');
             const fileNameDisplay = document.getElementById('fileNameDisplay');
             const fileUploadBtn = document.querySelector('.file-upload-btn');
-            
+
             // Clic en el área completa abre el selector
             fileUploadDisplay?.addEventListener('click', () => {
                 archivoInput?.click();
             });
-            
+
             // Manejar selección de archivo mejorada
             if (archivoInput) {
                 archivoInput.addEventListener('change', function() {
@@ -483,7 +500,8 @@
                         const maxSize = 20 * 1024 * 1024; // 20MB en bytes
                         if (file.size > maxSize) {
                             if (fileNameDisplay) {
-                                fileNameDisplay.textContent = 'Error: El archivo es demasiado grande (máx. 20MB)';
+                                fileNameDisplay.textContent =
+                                    'Error: El archivo es demasiado grande (máx. 20MB)';
                                 fileNameDisplay.style.color = '#dc3545';
                             }
                             if (fileUploadDisplay) {
@@ -491,7 +509,8 @@
                                 fileUploadDisplay.style.borderColor = '#dc3545';
                             }
                             if (fileUploadBtn) {
-                                fileUploadBtn.innerHTML = '<i class="feather icon-alert-triangle mr-2"></i>Archivo muy grande';
+                                fileUploadBtn.innerHTML =
+                                    '<i class="feather icon-alert-triangle mr-2"></i>Archivo muy grande';
                             }
                             this.value = ''; // Limpiar selección
                         } else {
@@ -501,16 +520,17 @@
                                 fileNameDisplay.classList.add('has-file');
                                 fileNameDisplay.style.color = '';
                             }
-                            
+
                             // Cambiar apariencia del contenedor
                             if (fileUploadDisplay) {
                                 fileUploadDisplay.classList.add('file-selected');
                                 fileUploadDisplay.style.borderColor = '';
                             }
-                            
+
                             // Cambiar texto del botón
                             if (fileUploadBtn) {
-                                fileUploadBtn.innerHTML = '<i class="feather icon-check mr-2"></i>Archivo seleccionado';
+                                fileUploadBtn.innerHTML =
+                                    '<i class="feather icon-check mr-2"></i>Archivo seleccionado';
                             }
                         }
                     } else {
@@ -525,7 +545,8 @@
                             fileUploadDisplay.style.borderColor = '';
                         }
                         if (fileUploadBtn) {
-                            fileUploadBtn.innerHTML = '<i class="feather icon-upload mr-2"></i>Agregar archivo';
+                            fileUploadBtn.innerHTML =
+                                '<i class="feather icon-upload mr-2"></i>Agregar archivo';
                         }
                     }
                 });
@@ -561,12 +582,12 @@
                 modalSeleccion.classList.remove('d-none');
                 modalFormulario.classList.add('d-none');
                 document.getElementById('tareaModalLabel').textContent = 'Subir Archivo';
-                
+
                 // Limpiar formulario y selector personalizado
                 const form = modalFormulario.querySelector('form');
                 if (form) {
                     form.reset();
-                    
+
                     // Restablecer selector de archivo personalizado
                     if (fileNameDisplay) {
                         fileNameDisplay.textContent = 'Ningún archivo seleccionado';
@@ -588,15 +609,16 @@
                 btn.addEventListener('click', async () => {
                     const tareaId = btn.getAttribute('data-tarea-id');
                     try {
-                        const response = await fetch(`/profesores/tareas/${tareaId}/seguimiento`);
+                        const response = await fetch(
+                            `/profesores/tareas/${tareaId}/seguimiento`);
                         const data = await response.json();
-                        
+
                         // Info de la tarea
                         document.getElementById('tareaInfo').innerHTML = `
                             <strong>${data.tarea.titulo}</strong><br>
                             <small>Curso: ${data.tarea.curso} | Materia: ${data.tarea.materia}</small>
                         `;
-                        
+
                         // Tabla de seguimiento
                         let seguimientoHTML = `
                             <div class="table-responsive">
@@ -610,12 +632,14 @@
                                     </thead>
                                     <tbody>
                         `;
-                        
+
                         data.alumnos.forEach(alumno => {
                             let estadoClass = 'badge-danger';
-                            if (alumno.estado === 'Visto y no respondido') estadoClass = 'badge-warning';
-                            if (alumno.estado.includes('Entregado') || alumno.estado === 'Visto') estadoClass = 'badge-success';
-                            
+                            if (alumno.estado === 'Visto y no respondido') estadoClass =
+                                'badge-warning';
+                            if (alumno.estado.includes('Entregado') || alumno.estado ===
+                                'Visto') estadoClass = 'badge-success';
+
                             seguimientoHTML += `
                                 <tr class="text-center">
                                     <td>${alumno.nombre_completo}</td>
@@ -624,10 +648,11 @@
                                 </tr>
                             `;
                         });
-                        
+
                         seguimientoHTML += '</tbody></table></div>';
-                        document.getElementById('seguimientoContent').innerHTML = seguimientoHTML;
-                        
+                        document.getElementById('seguimientoContent').innerHTML =
+                            seguimientoHTML;
+
                         // Botón corregir
                         const btnCorregir = document.getElementById('btnCorregir');
                         if (data.tarea.es_tarea) {
@@ -636,9 +661,9 @@
                         } else {
                             btnCorregir.classList.add('d-none');
                         }
-                        
+
                         $('#seguimientoModal').modal('show');
-                        
+
                     } catch (error) {
                         console.error('Error al cargar seguimiento:', error);
                         mostrarMensaje('Error al cargar el seguimiento de la tarea', 'error');
@@ -660,7 +685,7 @@
 
                 const btnConfirmar = document.getElementById('confirmarEliminar');
                 const originalText = btnConfirmar.innerHTML;
-                
+
                 btnConfirmar.disabled = true;
                 btnConfirmar.innerHTML = '<i class="feather icon-loader mr-1"></i> Eliminando...';
 
@@ -668,7 +693,8 @@
                     const response = await fetch(`/profesores/tareas/${tareaIdParaEliminar}`, {
                         method: 'DELETE',
                         headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                .content,
                             'Content-Type': 'application/json',
                             'Accept': 'application/json'
                         }
@@ -683,15 +709,16 @@
                     if (data.success) {
                         $('#eliminarModal').modal('hide');
                         mostrarMensaje(data.message || 'Tarea eliminada correctamente', 'success');
-                        
+
                         // Eliminar fila de la tabla
-                        const fila = document.querySelector(`button[data-tarea-id="${tareaIdParaEliminar}"]`)?.closest('tr');
+                        const fila = document.querySelector(
+                            `button[data-tarea-id="${tareaIdParaEliminar}"]`)?.closest('tr');
                         if (fila) {
                             fila.style.transition = 'opacity 0.3s';
                             fila.style.opacity = '0';
                             setTimeout(() => fila.remove(), 300);
                         }
-                        
+
                         setTimeout(() => location.reload(), 1500);
                     } else {
                         throw new Error(data.message || 'Error desconocido al eliminar la tarea');
@@ -711,7 +738,7 @@
             // Manejar envío del formulario
             const formSubir = document.querySelector('#modalFormulario form');
             const btnSubir = document.getElementById('btnSubir');
-            
+
             if (formSubir && btnSubir) {
                 formSubir.addEventListener('submit', () => {
                     btnSubir.disabled = true;
@@ -723,7 +750,8 @@
             setTimeout(() => {
                 const alertas = document.querySelectorAll('.alert:not(.alert-temp)');
                 alertas.forEach(alerta => {
-                    if (alerta.classList.contains('alert-success') || alerta.classList.contains('alert-danger')) {
+                    if (alerta.classList.contains('alert-success') || alerta.classList.contains(
+                            'alert-danger')) {
                         $(alerta).alert('close');
                     }
                 });
@@ -814,134 +842,134 @@
                 align-items: stretch;
                 text-align: center;
             }
-            
+
             .file-name-display {
                 margin-left: 0 !important;
                 margin-top: 0.5rem;
             }
         }
-        
+
         .btn-group .btn {
             border-radius: 0.25rem !important;
             margin-right: 2px;
         }
-        
+
         .btn-group .btn:last-child {
             margin-right: 0;
         }
-        
+
         .table td {
             vertical-align: middle;
         }
-        
+
         .nav-tabs .nav-link.active {
             background-color: #fff;
             border-color: #dee2e6 #dee2e6 #fff;
             border-bottom-color: transparent;
         }
-        
+
         .tab-content {
             border-top: none;
         }
-        
+
         .modal-xl {
             max-width: 1140px;
         }
-        
+
         .alert-temp {
             position: relative;
             z-index: 1050;
         }
-        
+
         /* Animaciones suaves */
         .table tbody tr {
             transition: all 0.3s ease;
         }
-        
+
         .btn {
             transition: all 0.2s ease;
         }
-        
+
         .modal {
             backdrop-filter: blur(3px);
         }
-        
+
         /* Responsive mejoras */
         @media (max-width: 768px) {
             .btn-group {
                 flex-direction: column;
             }
-            
+
             .btn-group .btn {
                 margin-bottom: 2px;
                 margin-right: 0;
             }
-            
+
             .table-responsive {
                 font-size: 0.875rem;
             }
         }
-        
+
         /* Estados de badges */
         .badge-danger {
             background-color: #ff7b00;
         }
-        
+
         .badge-warning {
             background-color: #ffc107;
             color: #212529;
         }
-        
+
         .badge-success {
             background-color: #28a745;
             color: #fff
         }
-        
+
         .badge-info {
             background-color: #17a2b8;
         }
-        
+
         .badge-primary {
             background-color: #007bff;
         }
-        
+
         /* Efectos hover mejorados */
         .btn-outline-primary:hover,
         .btn-outline-success:hover,
         .btn-outline-danger:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        
+
         /* Loading states */
         .btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
         }
-        
+
         /* Mejoras en la tabla */
         .table-hover tbody tr:hover {
-            background-color: rgba(0,0,0,.05);
+            background-color: rgba(0, 0, 0, .05);
         }
-        
+
         /* Iconos más grandes en estados vacíos */
         .text-center i[style*="font-size: 3rem"] {
             opacity: 0.3;
         }
-        
+
         /* Espaciado consistente */
         .card .card-header {
-            border-bottom: 1px solid rgba(0,0,0,.125);
+            border-bottom: 1px solid rgba(0, 0, 0, .125);
         }
-        
+
         .modal-header {
             border-bottom: 1px solid #dee2e6;
         }
-        
+
         .modal-footer {
             border-top: 1px solid #dee2e6;
         }
-        
+
         .download-link {
             transition: all 0.3s ease;
             border-radius: 0.375rem;
@@ -984,7 +1012,7 @@
             .download-link .file-name {
                 font-size: 0.8rem;
             }
-            
+
             .download-link .feather {
                 font-size: 1rem !important;
             }

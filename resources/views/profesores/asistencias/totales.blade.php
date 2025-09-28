@@ -1,4 +1,5 @@
-<x-layouts.profesores.dashboard asistencias titulo="Asistencias Totales">
+<x-layouts.profesores.dashboard asistencias titulo="Asistencias Totales"
+    title="Mi Técnica | Panel de Profesores - Asistencias">
     <div class="row">
         <div class="col-12">
             {{-- Header --}}

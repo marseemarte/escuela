@@ -1,5 +1,5 @@
 {{-- Vista para corregir tareas de una materia específica --}}
-<x-layouts.profesores.dashboard tareas titulo="Corregir Tarea">
+<x-layouts.profesores.dashboard tareas titulo="Corregir Tarea" title="Mi Técnica | Panel de Profesores - Tareas">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <div class="row">
@@ -103,12 +103,12 @@
                     <table class="table table-hover mb-0">
                         <thead class="thead-light">
                             <tr>
-                                <th  class="text-center" width="20%">Alumno</th>
-                                <th  class="text-center" width="15%">Estado</th>
-                                <th  class="text-center" width="20%">Respuesta</th>
-                                <th  class="text-center" width="15%">Nota</th>
-                                <th  class="text-center" width="20%">Devolución</th>
-                                <th  class="text-center" width="10%">Acciones</th>
+                                <th class="text-center" width="20%">Alumno</th>
+                                <th class="text-center" width="15%">Estado</th>
+                                <th class="text-center" width="20%">Respuesta</th>
+                                <th class="text-center" width="15%">Nota</th>
+                                <th class="text-center" width="20%">Devolución</th>
+                                <th class="text-center" width="10%">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -142,7 +142,8 @@
 
                                     <td>
                                         @if ($entrega['entrego'])
-                                            <a href="#" class="btn btn-link p-0" style="font-size: 0.8rem; font-weight: 500;"
+                                            <a href="#" class="btn btn-link p-0"
+                                                style="font-size: 0.8rem; font-weight: 500;"
                                                 onclick="descargarRespuesta({{ $entrega['tarea_alumno_id'] }})">
                                                 <i class="feather icon-download mr-1"></i>
                                                 {{ $entrega['archivo'] }}

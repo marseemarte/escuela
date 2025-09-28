@@ -2,15 +2,14 @@
 <html lang="es">
 
 <head>
-    @include('partials.profesores.head')
+    @include('partials.profesores.head', ['title' => isset($title) ? $title : 'Indefinido'])
 </head>
 
 @php
     $inicio = isset($inicio) ? $inicio : 'false';
     $asistencias = isset($asistencias) ? $asistencias : 'false';
     $tareas = isset($tareas) ? $tareas : 'false';
-    $alumnos = isset($alumnos) ? $alumnos : 'false';
-    $notas = isset($notas) ? $notas : 'false';
+    $informes = isset($informes) ? $informes : 'false';
     $horarios = isset($horarios) ? $horarios : 'false';
     $titulo = isset($titulo) ? $titulo : 'Indefinido';
 @endphp
@@ -65,7 +64,7 @@
                 <div class="pcoded-wrapper">
                     <!-- Sidebar -->
                     <x-layouts.profesores.sidebar :inicio="$inicio" :asistencias="$asistencias" :tareas="$tareas"
-                        :alumnos="$alumnos" :notas="$notas" :horarios="$horarios" />
+                        :informes="$informes" :horarios="$horarios" />
 
                     <div class="pcoded-content">
                         <div class="pcoded-inner-content">

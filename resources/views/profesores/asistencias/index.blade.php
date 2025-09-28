@@ -1,5 +1,5 @@
 {{-- Vista principal de asistencias - Lista de materias --}}
-<x-layouts.profesores.dashboard asistencias titulo="Asistencias">
+<x-layouts.profesores.dashboard asistencias titulo="Asistencias" title="Mi Técnica | Panel de Profesores - Asistencias">
     <div class="asistencias-container">
         {{-- Header --}}
         <div class="asistencias-header">

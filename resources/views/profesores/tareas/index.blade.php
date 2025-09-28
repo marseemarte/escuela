@@ -1,5 +1,5 @@
 {{-- Vista principal de tareas - Lista de materias --}}
-<x-layouts.profesores.dashboard tareas titulo="Tareas">
+<x-layouts.profesores.dashboard tareas titulo="Tareas" title="Mi Técnica | Panel de Profesores - Tareas">
     <div class="asistencias-container">
         {{-- Header --}}
         <div class="asistencias-header">

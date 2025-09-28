@@ -1,7 +1,6 @@
 {{-- Vista para tomar asistencias de una materia específica --}}
 {{-- Vista para tomar asistencias de una materia específica --}}
 <x-layouts.profesores.dashboard asistencias titulo="Tomar Asistencias">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <div class="row">
         <div class="col-12">
@@ -251,32 +250,26 @@
 
             // Función para marcar todos los alumnos con un estado
             function marcarTodos(estado) {
-                console.log('Ejecutando marcarTodos con estado:', estado);
 
                 // Marcar radios en vista desktop
                 const radiosDesktop = document.querySelectorAll(
                     `input[type="radio"][value="${estado}"][name*="asistencia_"]:not([name*="mobile"])`);
-                console.log('Radios desktop encontrados:', radiosDesktop.length);
 
                 radiosDesktop.forEach((radio, index) => {
                     radio.checked = true;
-                    console.log(`Marcado radio desktop ${index + 1}:`, radio.name);
                 });
 
                 // Marcar radios en vista mobile
                 const radiosMobile = document.querySelectorAll(
                     `input[type="radio"][value="${estado}"][name*="asistencia_mobile_"]`);
-                console.log('Radios mobile encontrados:', radiosMobile.length);
 
                 radiosMobile.forEach((radio, index) => {
                     radio.checked = true;
-                    console.log(`Marcado radio mobile ${index + 1}:`, radio.name);
 
                     // Actualizar visual del card mobile
                     updateMobileCardVisual(radio);
                 });
 
-                console.log('marcarTodos completado');
             }
 
             // Función para actualizar el visual de los cards móviles
@@ -304,19 +297,16 @@
 
             // Función para guardar asistencias
             async function guardarAsistencias() {
-                console.log('🚀 Iniciando proceso de guardado de asistencias...');
 
                 // Verificar que la función mostrarMensaje esté disponible
                 if (typeof mostrarMensaje !== 'function') {
-                    console.error('❌ Función mostrarMensaje no está disponible');
                     alert('Error: Sistema de mensajes no disponible');
                     return;
                 }
 
                 const asistencias = [];
 
-                // SOLUCION: Procesar solo los elementos únicos por asignacion_id
-                // En lugar de procesar todos los [data-asignacion], vamos a obtener IDs únicos
+                // Procesar solo los elementos únicos por asignacion_id
                 const todosLosElementos = document.querySelectorAll('[data-asignacion]');
                 const asignacionesUnicas = new Set();
 
@@ -324,11 +314,6 @@
                 todosLosElementos.forEach(elemento => {
                     asignacionesUnicas.add(elemento.dataset.asignacion);
                 });
-
-                console.log('🔍 DEBUG CHECKBOXES - Iniciando recolección de datos');
-                console.log('Total de elementos encontrados:', todosLosElementos.length);
-                console.log('Asignaciones únicas:', asignacionesUnicas.size);
-                console.log('IDs únicos:', Array.from(asignacionesUnicas));
 
                 // Procesar cada asignación única
                 Array.from(asignacionesUnicas).forEach((asignacionId, index) => {
@@ -347,17 +332,6 @@
                         justificadoCheckbox = document.querySelector(`#justificado_mobile_${asignacionId}`);
                     }
 
-                    console.log('Estado radio encontrado:', estadoRadio ? estadoRadio.value : 'NO ENCONTRADO');
-                    console.log('Checkbox justificado encontrado:', justificadoCheckbox ? 'SÍ' : 'NO');
-
-                    if (justificadoCheckbox) {
-                        console.log('Checkbox justificado checked:', justificadoCheckbox.checked);
-                        console.log('Checkbox justificado type:', justificadoCheckbox.type);
-                        console.log('Checkbox justificado id:', justificadoCheckbox.id);
-                    } else {
-                        console.log('❌ NO SE ENCONTRÓ EL CHECKBOX DE JUSTIFICADO');
-                    }
-
                     if (estadoRadio) {
                         // IMPORTANTE: El justificado solo es válido para Ausente (A) o Tarde (T)
                         let justificadoValue = false;
@@ -372,18 +346,8 @@
                             justificado: justificadoValue
                         };
 
-                        console.log('Datos finales para enviar:', asistenciaData);
-                        console.log(
-                            `  Estado: ${estadoRadio.value}, Justificado permitido: ${estadoRadio.value === 'A' || estadoRadio.value === 'T'}, Checkbox marcado: ${justificadoCheckbox ? justificadoCheckbox.checked : false}, Resultado final: ${justificadoValue}`
-                        );
                         asistencias.push(asistenciaData);
                     }
-                });
-
-                console.log('\n🚀 DATOS FINALES PARA ENVIAR:');
-                console.log('Total asistencias recolectadas:', asistencias.length);
-                asistencias.forEach((asistencia, idx) => {
-                    console.log(`Asistencia ${idx + 1}:`, asistencia);
                 });
 
                 if (asistencias.length === 0) {
@@ -397,34 +361,20 @@
                 botonGuardar.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Guardando...';
 
                 try {
-                    console.log('Enviando request sin CSRF (temporalmente)');
-                    console.log('URL de destino:', '/profesores/asistencias/guardar');
-                    console.log('Datos a enviar:', {
-                        cupof: cupofActual,
-                        asistencias: asistencias
-                    });
 
                     // Temporalmente sin CSRF para Laravel 12
                     const formData = new FormData();
                     formData.append('cupof', cupofActual);
                     formData.append('asistencias', JSON.stringify(asistencias));
 
-                    console.log('📡 Enviando petición HTTP...');
                     const response = await fetch('/profesores/asistencias/guardar', {
                         method: 'POST',
                         headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
                             'X-Requested-With': 'XMLHttpRequest',
                             'Accept': 'application/json'
                         },
                         body: formData
-                    });
-
-                    console.log('📡 Respuesta HTTP recibida, status:', response.status);
-
-                    console.log('Respuesta recibida:', {
-                        status: response.status,
-                        statusText: response.statusText,
-                        headers: Object.fromEntries(response.headers.entries())
                     });
 
                     // Verificar si la respuesta es válida
@@ -439,15 +389,12 @@
                         }
 
                         const errorText = await response.text();
-                        console.error('Error response:', errorText);
                         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                     }
 
                     const result = await response.json();
-                    console.log('🎯 Respuesta del servidor:', result);
 
                     if (result.success) {
-                        console.log('✅ Guardado exitoso, mostrando mensaje...');
                         // Mostrar mensaje de éxito simplificado
                         mostrarMensaje('Asistencias guardadas correctamente', 'success');
 
@@ -456,25 +403,18 @@
                             window.location.reload();
                         }, 2000);
                     } else {
-                        console.log('❌ Error en el guardado, mostrando error...');
                         mostrarMensaje('Error al guardar: ' + (result.error || result.message || 'Error desconocido'),
                             'error');
                     }
 
                 } catch (error) {
-                    console.error('💥 Error completo al guardar asistencias:', error);
-                    console.error('💥 Stack trace:', error.stack);
-                    console.log('🔍 Intentando mostrar mensaje de error...');
-
                     try {
                         mostrarMensaje('Error al guardar las asistencias: ' + error.message, 'error');
                     } catch (mensajeError) {
-                        console.error('💥 Error al mostrar mensaje:', mensajeError);
                         // Fallback a alert si todo falla
                         alert('Error al guardar las asistencias: ' + error.message);
                     }
                 } finally {
-                    console.log('🔄 Finalizando proceso de guardado...');
                     // Restaurar botón
                     botonGuardar.disabled = false;
                     botonGuardar.innerHTML = '<i class="fas fa-save mr-2"></i>Guardar Asistencias';
@@ -568,8 +508,6 @@
 
                 document.body.appendChild(alertDiv);
 
-                console.log('📢 Mensaje mostrado:', mensaje, 'Tipo:', tipo);
-
                 // Remover después de 4 segundos con animación
                 setTimeout(() => {
                     alertDiv.style.animation = 'slideOutRight 0.3s ease-in';
@@ -583,26 +521,17 @@
 
             // Event listeners para la vista móvil y desktop
             document.addEventListener('DOMContentLoaded', function() {
-                // Debug: Verificar token CSRF
-                const csrfToken = document.querySelector('meta[name="csrf-token"]');
-                console.log('Token CSRF encontrado:', csrfToken ? 'Sí' : 'No');
-                if (csrfToken) {
-                    console.log('Valor del token:', csrfToken.getAttribute('content'));
-                }
 
-                // Debug: Event listener global para detectar TODOS los cambios
+                // Event listener global para detectar TODOS los cambios
                 document.addEventListener('change', function(event) {
                     if (event.target.type === 'radio' && event.target.name.includes('asistencia')) {
-                        console.log('🔄 CAMBIO GLOBAL DETECTADO:', event.target.name, '=', event.target.value);
-                        console.log('🔍 Tipo de radio:', event.target.name.includes('mobile') ? 'MOBILE' :
-                            'DESKTOP');
 
                         // Si es un radio mobile, actualizar visual
                         if (event.target.name.includes('mobile')) {
                             updateMobileCardVisual(event.target);
                         }
 
-                        // NUEVO: Manejar estado del checkbox justificado
+                        // Manejar estado del checkbox justificado
                         handleJustificadoCheckbox(event.target);
                     }
                 });
@@ -611,7 +540,6 @@
                 function handleJustificadoCheckbox(radioElement) {
                     // Verificar que el elemento exista
                     if (!radioElement || !radioElement.name) {
-                        console.warn('⚠️ handleJustificadoCheckbox: elemento radio inválido');
                         return;
                     }
 
@@ -619,53 +547,31 @@
                     let asignacionId;
                     const radioName = radioElement.name;
 
-                    console.log('🔍 Analizando radio name:', radioName);
-
                     if (radioName.includes('mobile')) {
                         // Formato: asistencia_mobile_13
                         asignacionId = radioName.replace('asistencia_mobile_', '');
-                        console.log('📱 Radio mobile detectado, ID extraído:', asignacionId);
                     } else if (radioName.includes('asistencia_')) {
                         // Formato: asistencia_13 (desktop)
                         asignacionId = radioName.replace('asistencia_', '');
-                        console.log('🖥️ Radio desktop detectado, ID extraído:', asignacionId);
                     } else if (radioName.includes('asistencia[')) {
                         // Formato: asistencia[13] (formulario array)
                         asignacionId = radioName.replace('asistencia[', '').replace(']', '');
-                        console.log('📋 Radio array detectado, ID extraído:', asignacionId);
+
                     } else {
-                        console.warn('⚠️ Formato de nombre de radio no reconocido:', radioName);
                         return;
                     }
 
                     const estadoSeleccionado = radioElement.value;
 
-                    // Verificar que tenemos un ID válido
-                    if (!asignacionId || asignacionId === '') {
-                        console.warn('⚠️ No se pudo extraer ID de asignación de:', radioName);
-                        return;
-                    }
-
                     // Encontrar ambos checkboxes (desktop y mobile)
                     const checkboxDesktop = document.querySelector(`#justificado_desktop_${asignacionId}`);
                     const checkboxMobile = document.querySelector(`#justificado_mobile_${asignacionId}`);
 
-                    console.log(
-                        `📋 Manejando checkbox justificado para asignación ${asignacionId}, estado: ${estadoSeleccionado}`
-                    );
-                    console.log('🔍 Checkboxes encontrados:', {
-                        desktop: checkboxDesktop ? 'SÍ' : 'NO',
-                        mobile: checkboxMobile ? 'SÍ' : 'NO'
-                    });
-
                     // Función helper para manejar estilos del checkbox
                     function updateCheckboxStyle(checkbox, disabled, elementType) {
                         if (!checkbox) {
-                            console.log(`⚠️ No se encontró checkbox ${elementType} para ID ${asignacionId}`);
                             return;
                         }
-
-                        console.log(`🔧 Actualizando checkbox ${elementType}: disabled=${disabled}`);
 
                         checkbox.disabled = disabled;
 
@@ -692,26 +598,17 @@
                         // Si está presente, deshabilitar y desmarcar justificado
                         updateCheckboxStyle(checkboxDesktop, true, 'desktop');
                         updateCheckboxStyle(checkboxMobile, true, 'mobile');
-                        console.log(`  ✅ Checkboxes deshabilitados (Presente)`);
+
                     } else if (estadoSeleccionado === 'ausente' || estadoSeleccionado === 'tarde' ||
                         estadoSeleccionado === 'A' || estadoSeleccionado === 'T') {
                         // Si está ausente o tarde, habilitar justificado
                         updateCheckboxStyle(checkboxDesktop, false, 'desktop');
                         updateCheckboxStyle(checkboxMobile, false, 'mobile');
-                        console.log(
-                            `  ✅ Checkboxes habilitados (${estadoSeleccionado === 'A' || estadoSeleccionado === 'ausente' ? 'Ausente' : 'Tarde'})`
-                        );
                     }
                 }
-
-                // Verificar si hay asistencias ya cargadas para hoy
-                verificarAsistenciasExistentes();
-
                 // Función para verificar asistencias existentes
                 function verificarAsistenciasExistentes() {
-                    console.log('🔍 Verificando asistencias existentes...');
                     const radiosChecked = document.querySelectorAll('input[type="radio"]:checked');
-                    console.log(`Radios marcados encontrados: ${radiosChecked.length}`);
 
                     radiosChecked.forEach((radio, index) => {
                         if (radio.name.includes('mobile')) {
@@ -721,9 +618,11 @@
                     });
                 }
 
-                // NUEVO: Inicializar estado de checkboxes justificado según estado actual
+                // Verificar si hay asistencias ya cargadas para hoy
+                verificarAsistenciasExistentes();
+
+                // Inicializar estado de checkboxes justificado según estado actual
                 function inicializarCheckboxesJustificado() {
-                    console.log('🔄 Inicializando estado de checkboxes justificado...');
 
                     const todosLosRadios = document.querySelectorAll('input[type="radio"]:checked');
                     todosLosRadios.forEach(radio => {
@@ -731,27 +630,13 @@
                             handleJustificadoCheckbox(radio);
                         }
                     });
-
-                    console.log('✅ Inicialización de checkboxes completada');
                 }
 
                 // Ejecutar inicialización
                 inicializarCheckboxesJustificado();
 
-                // Debug: Contar radios en cada vista
-                const allRadios = document.querySelectorAll('input[type="radio"]');
                 const mobileRadios = document.querySelectorAll('.asistencia-mobile-container input[type="radio"]');
                 const desktopRadios = document.querySelectorAll('.d-none.d-md-block input[type="radio"]');
-
-                console.log('Total de radios encontrados:', allRadios.length);
-                console.log('Radios mobile encontrados:', mobileRadios.length);
-                console.log('Radios desktop encontrados:', desktopRadios.length);
-
-                // Verificar estructura de HTML
-                console.log('Contenedores desktop encontrados:', document.querySelectorAll('.d-none.d-md-block')
-                    .length);
-                console.log('Contenedores mobile encontrados:', document.querySelectorAll(
-                    '.asistencia-mobile-container').length);
 
                 // Agregar event listeners para los radio buttons de la vista móvil (con nuevos nombres)
                 mobileRadios.forEach(radio => {
@@ -763,8 +648,6 @@
                             `input[name="asistencia_${asignacionId}"][value="${this.value}"]`);
                         if (desktopRadio) {
                             desktopRadio.checked = true;
-                            console.log('Sincronizado radio mobile -> desktop:', asignacionId, this
-                                .value);
                         }
                     });
 
@@ -777,7 +660,6 @@
                 // Agregar event listeners para los radio buttons de la vista de escritorio
                 desktopRadios.forEach(radio => {
                     radio.addEventListener('change', function() {
-                        console.log('Radio button desktop cambiado:', this.name, this.value);
                         // Sincronizar con el radio button móvil correspondiente si existe
                         const asignacionId = this.name.replace('asistencia_', '');
                         const mobileRadio = document.querySelector(
@@ -790,272 +672,10 @@
                     });
                 });
 
-                // Función de debug para verificar estado actual
-                window.verificarEstado = function() {
-                    console.log('=== VERIFICACIÓN DE ESTADO ===');
-                    const formData = new FormData();
-                    const asistencias = [];
-
-                    document.querySelectorAll('[data-asignacion]').forEach(elemento => {
-                        const asignacionId = elemento.dataset.asignacion;
-
-                        // Buscar radio marcado (desktop o mobile)
-                        let radioMarcado = elemento.querySelector(
-                            `input[name="asistencia_${asignacionId}"]:checked`);
-                        if (!radioMarcado) {
-                            radioMarcado = document.querySelector(
-                                `input[name="asistencia_mobile_${asignacionId}"]:checked`);
-                        }
-
-                        // Buscar checkbox justificado (desktop o mobile)
-                        let justificado = document.querySelector(`#justificado_desktop_${asignacionId}`);
-                        if (!justificado) {
-                            justificado = document.querySelector(`#justificado_mobile_${asignacionId}`);
-                        }
-
-                        if (radioMarcado) {
-                            console.log(
-                                `Alumno ${asignacionId}: ${radioMarcado.value}, Justificado: ${justificado ? justificado.checked : false}`
-                            );
-                            asistencias.push({
-                                asignacion_id: asignacionId,
-                                estado: radioMarcado.value,
-                                justificado: justificado ? justificado.checked : false
-                            });
-                        }
-                    });
-
-                    console.log('Total asistencias a enviar:', asistencias.length);
-                    return asistencias;
-                };
-
-                // Test rápido de la función marcarTodos
-                window.testMarcarTodos = function() {
-                    console.log('Test de marcarTodos iniciado');
-                    marcarTodos('P');
-                };
-
-                // Función para verificar el estado de todos los radios
-                window.verificarRadios = function() {
-                    console.log('=== VERIFICACIÓN DE RADIOS ===');
-                    const estudiantes = document.querySelectorAll('[data-asignacion]');
-                    estudiantes.forEach((elemento, index) => {
-                        const asignacionId = elemento.dataset.asignacion;
-
-                        // Radios desktop
-                        const radiosDesktopP = document.querySelectorAll(
-                            `input[name="asistencia_${asignacionId}"][value="P"]`);
-                        const radiosDesktopA = document.querySelectorAll(
-                            `input[name="asistencia_${asignacionId}"][value="A"]`);
-                        const radiosDesktopT = document.querySelectorAll(
-                            `input[name="asistencia_${asignacionId}"][value="T"]`);
-
-                        // Radios mobile
-                        const radiosMobileP = document.querySelectorAll(
-                            `input[name="asistencia_mobile_${asignacionId}"][value="P"]`);
-                        const radiosMobileA = document.querySelectorAll(
-                            `input[name="asistencia_mobile_${asignacionId}"][value="A"]`);
-                        const radiosMobileT = document.querySelectorAll(
-                            `input[name="asistencia_mobile_${asignacionId}"][value="T"]`);
-
-                        console.log(`Estudiante ${index + 1} (${asignacionId}):`);
-                        console.log(
-                            `  Desktop - P: ${radiosDesktopP.length}, Checked: ${Array.from(radiosDesktopP).filter(r => r.checked).length}`
-                        );
-                        console.log(
-                            `  Desktop - A: ${radiosDesktopA.length}, Checked: ${Array.from(radiosDesktopA).filter(r => r.checked).length}`
-                        );
-                        console.log(
-                            `  Desktop - T: ${radiosDesktopT.length}, Checked: ${Array.from(radiosDesktopT).filter(r => r.checked).length}`
-                        );
-                        console.log(
-                            `  Mobile - P: ${radiosMobileP.length}, Checked: ${Array.from(radiosMobileP).filter(r => r.checked).length}`
-                        );
-                        console.log(
-                            `  Mobile - A: ${radiosMobileA.length}, Checked: ${Array.from(radiosMobileA).filter(r => r.checked).length}`
-                        );
-                        console.log(
-                            `  Mobile - T: ${radiosMobileT.length}, Checked: ${Array.from(radiosMobileT).filter(r => r.checked).length}`
-                        );
-                    });
-                    console.log('=== FIN VERIFICACIÓN ===');
-                };
-
-                // Test de CSRF independiente
-                window.testCSRF = async function() {
-                    console.log('Test de CSRF iniciado');
-                    try {
-                        const csrfToken = document.querySelector('meta[name="csrf-token"]');
-                        console.log('Token CSRF del meta:', csrfToken.getAttribute('content'));
-
-                        const formData = new FormData();
-                        formData.append('_token', csrfToken.getAttribute('content'));
-                        formData.append('test', 'data');
-
-                        const response = await fetch('/test-csrf', {
-                            method: 'POST',
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'Accept': 'application/json'
-                            },
-                            body: formData
-                        });
-
-                        console.log('Respuesta del servidor:', response.status, response.statusText);
-                        const result = await response.json();
-                        console.log('Test CSRF resultado:', result);
-                        return result;
-                    } catch (error) {
-                        console.error('Test CSRF error:', error);
-                        return error;
-                    }
-                };
-
-                // NUEVA FUNCIÓN: Verificar estado específico de justificados
-                window.verificarEstadoJustificado = function() {
-                    console.log('=== VERIFICACIÓN ESTADO JUSTIFICADO ===');
-
-                    const todosLosElementos = document.querySelectorAll('[data-asignacion]');
-                    const asignacionesUnicas = new Set();
-
-                    todosLosElementos.forEach(elemento => {
-                        asignacionesUnicas.add(elemento.dataset.asignacion);
-                    });
-
-                    Array.from(asignacionesUnicas).forEach((asignacionId, index) => {
-                        // Buscar estado actual
-                        let estadoRadio = document.querySelector(
-                            `input[name="asistencia_${asignacionId}"]:checked`);
-                        if (!estadoRadio) {
-                            estadoRadio = document.querySelector(
-                                `input[name="asistencia_mobile_${asignacionId}"]:checked`);
-                        }
-
-                        // Buscar checkboxes
-                        const checkboxDesktop = document.querySelector(
-                            `#justificado_desktop_${asignacionId}`);
-                        const checkboxMobile = document.querySelector(
-                            `#justificado_mobile_${asignacionId}`);
-
-                        console.log(`Estudiante ${index + 1} (ID: ${asignacionId}):`);
-                        console.log(`  Estado: ${estadoRadio ? estadoRadio.value : 'SIN ESTADO'}`);
-                        console.log(
-                            `  Justificado permitido: ${estadoRadio && (estadoRadio.value === 'A' || estadoRadio.value === 'T')}`
-                        );
-
-                        if (checkboxDesktop) {
-                            console.log(
-                                `  Desktop - Disabled: ${checkboxDesktop.disabled}, Checked: ${checkboxDesktop.checked}`
-                            );
-                        }
-                        if (checkboxMobile) {
-                            console.log(
-                                `  Mobile - Disabled: ${checkboxMobile.disabled}, Checked: ${checkboxMobile.checked}`
-                            );
-                        }
-                    });
-
-                    console.log('=== FIN VERIFICACIÓN ===');
-                };
-
-                // NUEVA FUNCIÓN: Verificar que no hay duplicados
-                window.verificarDuplicados = function() {
-                    console.log('=== VERIFICACIÓN DE DUPLICADOS ===');
-                    const todosLosElementos = document.querySelectorAll('[data-asignacion]');
-                    const asignacionesUnicas = new Set();
-                    const contadorPorAsignacion = {};
-
-                    todosLosElementos.forEach(elemento => {
-                        const id = elemento.dataset.asignacion;
-                        asignacionesUnicas.add(id);
-                        contadorPorAsignacion[id] = (contadorPorAsignacion[id] || 0) + 1;
-                    });
-
-                    console.log('Total elementos encontrados:', todosLosElementos.length);
-                    console.log('Asignaciones únicas:', asignacionesUnicas.size);
-                    console.log('Conteo por asignación:', contadorPorAsignacion);
-
-                    // Detectar duplicados
-                    const duplicados = Object.entries(contadorPorAsignacion).filter(([id, count]) => count > 1);
-                    if (duplicados.length > 0) {
-                        console.log('⚠️ DUPLICADOS DETECTADOS:', duplicados);
-                    } else {
-                        console.log('✅ No hay duplicados');
-                    }
-
-                    return {
-                        total: todosLosElementos.length,
-                        unicos: asignacionesUnicas.size,
-                        duplicados: duplicados
-                    };
-                };
-
-                // Función para verificar el estado de todos los checkboxes
-                window.verificarCheckboxes = function() {
-                    console.log('=== VERIFICACIÓN DE CHECKBOXES ===');
-                    const estudiantes = document.querySelectorAll('[data-asignacion]');
-                    estudiantes.forEach((elemento, index) => {
-                        const asignacionId = elemento.dataset.asignacion;
-
-                        const checkboxDesktop = document.querySelector(
-                            `#justificado_desktop_${asignacionId}`);
-                        const checkboxMobile = document.querySelector(
-                            `#justificado_mobile_${asignacionId}`);
-
-                        console.log(`Estudiante ${index + 1} (ID: ${asignacionId}):`);
-                        console.log(`  Checkbox desktop: ${checkboxDesktop ? 'SÍ' : 'NO'}`);
-                        console.log(`  Checkbox mobile: ${checkboxMobile ? 'SÍ' : 'NO'}`);
-
-                        if (checkboxDesktop) {
-                            console.log(`  Desktop checked: ${checkboxDesktop.checked}`);
-                        }
-                        if (checkboxMobile) {
-                            console.log(`  Mobile checked: ${checkboxMobile.checked}`);
-                        }
-                    });
-                    console.log('=== FIN VERIFICACIÓN ===');
-                };
-
-                // Función para probar marcar algunos checkboxes
-                window.testCheckboxes = function() {
-                    console.log('=== TEST DE CHECKBOXES ===');
-                    const checkboxesDesktop = document.querySelectorAll(
-                        'input[type="checkbox"][id*="justificado_desktop_"]');
-                    const checkboxesMobile = document.querySelectorAll(
-                        'input[type="checkbox"][id*="justificado_mobile_"]');
-
-                    console.log('Checkboxes desktop encontrados:', checkboxesDesktop.length);
-                    console.log('Checkboxes mobile encontrados:', checkboxesMobile.length);
-
-                    // Marcar los primeros 2 checkboxes desktop
-                    checkboxesDesktop.forEach((checkbox, index) => {
-                        if (index < 2) {
-                            checkbox.checked = true;
-                            console.log(`Marcado checkbox desktop ${index + 1}: ${checkbox.id}`);
-
-                            // Sincronizar con el mobile correspondiente
-                            const asignacionId = checkbox.id.replace('justificado_desktop_', '');
-                            const checkboxMobile = document.querySelector(
-                                `#justificado_mobile_${asignacionId}`);
-                            if (checkboxMobile) {
-                                checkboxMobile.checked = true;
-                                console.log(
-                                    `Sincronizado checkbox mobile: justificado_mobile_${asignacionId}`);
-                            }
-                        }
-                    });
-
-                    console.log('Test completado. Verificar estado:');
-                    verificarCheckboxes();
-                };
-
                 // Agregar event listeners para los checkboxes de justificado
                 const checkboxesDesktop = document.querySelectorAll(
                     'input[type="checkbox"][id*="justificado_desktop_"]');
                 const checkboxesMobile = document.querySelectorAll('input[type="checkbox"][id*="justificado_mobile_"]');
-
-                console.log('Checkboxes desktop encontrados para sync:', checkboxesDesktop.length);
-                console.log('Checkboxes mobile encontrados para sync:', checkboxesMobile.length);
 
                 // Sincronizar desktop -> mobile
                 checkboxesDesktop.forEach(checkbox => {
@@ -1065,8 +685,6 @@
                             `#justificado_mobile_${asignacionId}`);
                         if (checkboxMobile) {
                             checkboxMobile.checked = this.checked;
-                            console.log(`Sincronizado desktop -> mobile (${asignacionId}):`, this
-                                .checked);
                         }
                     });
                 });
@@ -1079,235 +697,10 @@
                             `#justificado_desktop_${asignacionId}`);
                         if (checkboxDesktop) {
                             checkboxDesktop.checked = this.checked;
-                            console.log(`Sincronizado mobile -> desktop (${asignacionId}):`, this
-                                .checked);
                         }
                     });
                 });
 
-                console.log('Sincronización de checkboxes configurada');
-
-                // Función de test inicial
-                window.testBasico = function() {
-                    console.log('=== TEST BÁSICO ===');
-                    console.log('1. Verificando contenedores:');
-                    console.log('   - Desktop container:', document.querySelectorAll('.d-none.d-md-block').length);
-                    console.log('   - Mobile container:', document.querySelectorAll('.asistencia-mobile-container')
-                        .length);
-
-                    console.log('2. Verificando radios:');
-                    console.log('   - Total radios:', document.querySelectorAll('input[type="radio"]').length);
-                    console.log('   - Radios mobile:', document.querySelectorAll(
-                        '.asistencia-mobile-container input[type="radio"]').length);
-                    console.log('   - Radios desktop:', document.querySelectorAll(
-                        '.d-none.d-md-block input[type="radio"]').length);
-
-                    console.log('3. Verificando checkboxes:');
-                    console.log('   - Checkboxes desktop:', document.querySelectorAll(
-                        'input[id*="justificado_desktop_"]').length);
-                    console.log('   - Checkboxes mobile:', document.querySelectorAll(
-                        'input[id*="justificado_mobile_"]').length);
-
-                    console.log('4. Verificando data-asignacion:');
-                    console.log('   - Elementos con data-asignacion:', document.querySelectorAll(
-                        '[data-asignacion]').length);
-
-                    console.log('5. Verificando estructura de tabla:');
-                    const tablaRadios = document.querySelectorAll('.asistencia-radio-group input[type="radio"]');
-                    console.log('   - Radios en tabla con nueva clase:', tablaRadios.length);
-
-                    const checkboxJustificados = document.querySelectorAll(
-                        '.justificado-center input[type="checkbox"]');
-                    console.log('   - Checkboxes justificado con nueva clase:', checkboxJustificados.length);
-
-                    console.log('6. Test de funcionalidad:');
-                    const primerRadio = document.querySelector('input[type="radio"]');
-                    if (primerRadio) {
-                        console.log('   - Primer radio encontrado:', primerRadio.name, primerRadio.value);
-                        console.log('   - Está checked:', primerRadio.checked);
-                    } else {
-                        console.warn('   ⚠️ NO SE ENCONTRARON RADIOS');
-                    }
-
-                    console.log('=== FIN TEST BÁSICO ===');
-
-                    // Verificar problemas comunes
-                    if (tablaRadios.length === 0) {
-                        console.error('❌ PROBLEMA: No se encontraron radios en la tabla');
-                    }
-                    if (checkboxJustificados.length === 0) {
-                        console.error('❌ PROBLEMA: No se encontraron checkboxes de justificado');
-                    }
-                };
-
-                window.testEventos = function() {
-                    console.log('=== TEST DE EVENTOS ===');
-
-                    // Test de radio buttons
-                    const primeraAsignacion = document.querySelector('[data-asignacion]');
-                    if (primeraAsignacion) {
-                        const asignacionId = primeraAsignacion.getAttribute('data-asignacion');
-                        console.log('1. Testeando radio buttons para asignación:', asignacionId);
-
-                        // Test radio desktop (formato: asistencia_ID)
-                        const radioDesktopPresente = document.querySelector(
-                            `input[name="asistencia_${asignacionId}"][value="P"]`);
-                        const radioDesktopAusente = document.querySelector(
-                            `input[name="asistencia_${asignacionId}"][value="A"]`);
-
-                        console.log('   🖥️ Radios desktop encontrados:');
-                        console.log('      - Presente:', radioDesktopPresente ? 'SÍ' : 'NO');
-                        console.log('      - Ausente:', radioDesktopAusente ? 'SÍ' : 'NO');
-
-                        // Test radio mobile (formato: asistencia_mobile_ID)
-                        const radioMobilePresente = document.querySelector(
-                            `input[name="asistencia_mobile_${asignacionId}"][value="P"]`);
-                        const radioMobileAusente = document.querySelector(
-                            `input[name="asistencia_mobile_${asignacionId}"][value="A"]`);
-
-                        console.log('   📱 Radios mobile encontrados:');
-                        console.log('      - Presente:', radioMobilePresente ? 'SÍ' : 'NO');
-                        console.log('      - Ausente:', radioMobileAusente ? 'SÍ' : 'NO');
-
-                        // Test checkboxes justificado
-                        const checkboxDesktop = document.querySelector(`#justificado_desktop_${asignacionId}`);
-                        const checkboxMobile = document.querySelector(`#justificado_mobile_${asignacionId}`);
-
-                        console.log('   ☑️ Checkboxes justificado encontrados:');
-                        console.log('      - Desktop:', checkboxDesktop ? 'SÍ' : 'NO', checkboxDesktop?.disabled ?
-                            '(DISABLED)' : '(ENABLED)');
-                        console.log('      - Mobile:', checkboxMobile ? 'SÍ' : 'NO', checkboxMobile?.disabled ?
-                            '(DISABLED)' : '(ENABLED)');
-
-                        // Simular click en ausente desktop
-                        if (radioDesktopAusente) {
-                            console.log('   🧪 Simulando click en ausente desktop...');
-                            radioDesktopAusente.click();
-                            setTimeout(() => {
-                                console.log('      ✅ Resultado desktop ausente:');
-                                console.log('         - Radio checked:', radioDesktopAusente.checked);
-                                console.log('         - Checkbox desktop disabled:', checkboxDesktop
-                                    ?.disabled);
-                                console.log('         - Checkbox mobile disabled:', checkboxMobile
-                                    ?.disabled);
-                            }, 500);
-                        }
-
-                        // Test de checkbox justificado
-                        setTimeout(() => {
-                            if (checkboxDesktop && !checkboxDesktop.disabled) {
-                                console.log('   🧪 Simulando click en checkbox desktop...');
-                                checkboxDesktop.click();
-                                console.log('      ✅ Checkbox desktop checked:', checkboxDesktop.checked);
-                            } else {
-                                console.log('   ⚠️ Checkbox desktop no disponible para test');
-                            }
-                        }, 1000);
-                    } else {
-                        console.error('❌ No se encontró ninguna asignación para testear');
-                    }
-
-                    console.log('=== FIN TEST DE EVENTOS ===');
-                };
-
-                // Función para resetear estado de test
-                window.resetearTest = function() {
-                    // Desmarcar todos los radios y checkboxes
-                    document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(input => {
-                        input.checked = false;
-                    });
-
-                    // Limpiar clases visuales
-                    document.querySelectorAll('.selected-present, .selected-absent, .selected-late').forEach(el => {
-                        el.classList.remove('selected-present', 'selected-absent', 'selected-late');
-                    });
-
-                    console.log('✅ Estado de test reseteado');
-                };
-
-                // Función para test del mensaje
-                window.testMensaje = function() {
-                    console.log('=== TEST DE MENSAJE ===');
-                    console.log('Probando mensaje de éxito...');
-                    mostrarMensaje('✅ Asistencias guardadas correctamente', 'success');
-
-                    setTimeout(() => {
-                        console.log('Probando mensaje de error...');
-                        mostrarMensaje('❌ Error al guardar las asistencias', 'error');
-                    }, 2000);
-
-                    setTimeout(() => {
-                        console.log('Probando mensaje de info...');
-                        mostrarMensaje('ℹ️ Información importante para el profesor', 'info');
-                    }, 4000);
-
-                    console.log('=== FIN TEST DE MENSAJE ===');
-                };
-
-                // Función específica para test de mensaje de guardado
-                window.testMensajeGuardado = function() {
-                    console.log('🧪 Testing mensaje de guardado específico...');
-
-                    // Simular el mensaje exacto que se muestra al guardar
-                    mostrarMensaje('Asistencias guardadas correctamente', 'success');
-
-                    console.log('✅ Si ves el mensaje verde arriba a la derecha, el sistema funciona');
-                }; // Función para test de guardado completo
-                window.testGuardado = function() {
-                    console.log('=== TEST DE GUARDADO ===');
-
-                    // Verificar que hay asistencias para procesar
-                    const asignaciones = document.querySelectorAll('[data-asignacion]');
-                    if (asignaciones.length === 0) {
-                        console.error('❌ No hay asignaciones para testear');
-                        return;
-                    }
-
-                    console.log('✅ Asignaciones encontradas:', asignaciones.length);
-
-                    // Simular marcar algunos estudiantes
-                    const primeraAsignacion = asignaciones[0].dataset.asignacion;
-                    const radioPresente = document.querySelector(
-                        `input[name="asistencia_${primeraAsignacion}"][value="P"]`);
-
-                    if (radioPresente) {
-                        console.log('🧪 Marcando primer estudiante como presente...');
-                        radioPresente.checked = true;
-
-                        // Simular guardado (sin enviar realmente)
-                        console.log('🧪 Simulando mensaje de guardado exitoso...');
-                        mostrarMensaje('Asistencias guardadas correctamente (TEST)', 'success');
-                    } else {
-                        console.error('❌ No se encontró radio para testear');
-                    }
-
-                    console.log('=== FIN TEST DE GUARDADO ===');
-                }; // Ejecutar test básico al cargar
-                testBasico();
-
-                // Funciones de debugging para el usuario
-                console.log('=== FUNCIONES DE DEBUG DISPONIBLES ===');
-                console.log('- testBasico(): Test inicial de elementos');
-                console.log('- testEventos(): Test de funcionalidad de clicks');
-                console.log('- resetearTest(): Resetea el estado de prueba');
-                console.log('- testMensaje(): Prueba el sistema de mensajes (3 tipos)');
-                console.log('- testMensajeGuardado(): Prueba específica del mensaje de guardado');
-                console.log('- testGuardado(): Simula proceso de guardado completo');
-                console.log('- mostrarMensaje(msg, tipo): Muestra mensaje personalizado');
-                console.log('- verificarEstado(): Muestra el estado actual de todas las asistencias');
-                console.log('- testMarcarTodos(): Marca todos los estudiantes como presentes');
-                console.log('- verificarRadios(): Muestra información de los radios');
-                console.log('- verificarCheckboxes(): Muestra información de los checkboxes de justificado');
-                console.log('- verificarDuplicados(): Verifica si hay elementos duplicados');
-                console.log('- testCSRF(): Prueba la funcionalidad CSRF');
-                console.log('=== USO RECOMENDADO ===');
-                console.log('1. Ejecutar testBasico() para verificar estructura');
-                console.log('2. Ejecutar testEventos() para probar funcionalidad');
-                console.log('3. Usar testMensaje() para probar mensajes');
-                console.log('4. Usar resetearTest() para limpiar antes de nuevas pruebas');
-                console.log('==========================================');
-
-                console.log('✅ Inicialización JavaScript completada correctamente');
             });
         </script>
 </x-layouts.profesores.dashboard>

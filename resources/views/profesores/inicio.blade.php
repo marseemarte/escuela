@@ -1,4 +1,4 @@
-<x-layouts.profesores.dashboard inicio titulo="Inicio">
+<x-layouts.profesores.dashboard inicio titulo="Inicio" title="Mi Técnica | Panel de Profesores - Inicio">
     <div class="asistencias-container">
         <!-- Header de bienvenida -->
         <div class="asistencias-header">
@@ -19,12 +19,12 @@
         <div class="quick-actions-section">
             <h2 class="section-title">Accesos Rápidos</h2>
             <div class="quick-actions-grid">
-                <a href="/profesores/notas" class="quick-action-card">
+                <a href="/profesores/informes" class="quick-action-card">
                     <div class="action-icon action-primary">
                         <i class="fas fa-edit"></i>
                     </div>
-                    <h3 class="action-title">Cargar Notas</h3>
-                    <p class="action-description">Registra las calificaciones de tus estudiantes</p>
+                    <h3 class="action-title">Cargar Informes</h3>
+                    <p class="action-description">Registra los informes de tus estudiantes</p>
                 </a>
 
                 <a href="/profesores/asistencias" class="quick-action-card">
@@ -43,12 +43,12 @@
                     <p class="action-description">Sube nuevas tareas y revisa entregas</p>
                 </a>
 
-                <a href="/profesores/alumnos" class="quick-action-card">
+                <a href="/profesores/horarios" class="quick-action-card">
                     <div class="action-icon action-info">
                         <i class="fas fa-users"></i>
                     </div>
-                    <h3 class="action-title">Ver Alumnos</h3>
-                    <p class="action-description">Consulta información de tus estudiantes</p>
+                    <h3 class="action-title">Ver Horarios</h3>
+                    <p class="action-description">Consulta información de tus horarios</p>
                 </a>
             </div>
         </div>

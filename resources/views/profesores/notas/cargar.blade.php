@@ -1,5 +1,5 @@
-{{-- Vista para cargar notas de una materia específica --}}
-<x-layouts.profesores.dashboard notas titulo="Cargar Notas">
+{{-- Vista para cargar informes de una materia específica --}}
+<x-layouts.profesores.dashboard informes titulo="Cargar Informes" title="Mi Técnica | Panel de Profesores - Informes">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <div class="row">
@@ -10,7 +10,7 @@
                     <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between">
                         <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-0">
                             {{-- Botón de regreso --}}
-                            <a href="{{ route('profesores.notas.index') }}"
+                            <a href="{{ route('profesores.informes.index') }}"
                                 class="btn btn-outline-secondary btn-sm mb-3 mb-md-0 mr-md-3">
                                 <i class="fas fa-arrow-left mr-1"></i>
                                 Volver
@@ -43,7 +43,7 @@
                     <div class="d-flex justify-content-between align-items-center flex-wrap">
                         <div>
                             <h2 class="h5 mb-1">Lista de Estudiantes</h2>
-                            <p class="text-muted mb-0">Ingrese las notas para cada estudiante</p>
+                            <p class="text-muted mb-0">Ingrese las informes para cada estudiante</p>
                         </div>
                         <div class="d-flex gap-2 mt-2 mt-md-0">
                             <button type="button" onclick="limpiarFormulario()" class="btn btn-secondary btn-sm">
@@ -52,11 +52,11 @@
                             {{-- Botón para Desktop --}}
                             <button type="submit" form="notasFormDesktop"
                                 class="btn btn-primary btn-sm d-none d-md-inline-block">
-                                <i class="feather icon-save mr-1"></i> Guardar Notas
+                                <i class="feather icon-save mr-1"></i> Guardar Informes
                             </button>
                             {{-- Botón para Mobile --}}
                             <button type="submit" form="notasFormMobile" class="btn btn-primary btn-sm d-md-none">
-                                <i class="feather icon-save mr-1"></i> Guardar Notas
+                                <i class="feather icon-save mr-1"></i> Guardar Informes
                             </button>
                         </div>
                     </div>
@@ -64,7 +64,7 @@
                 <div class="card-body">
                     @if (isset($alumnosConNotas) && count($alumnosConNotas) > 0)
                         {{-- Vista Desktop --}}
-                        <form id="notasFormDesktop" action="{{ route('profesores.notas.guardar') }}" method="POST"
+                        <form id="notasFormDesktop" action="{{ route('profesores.informes.guardar') }}" method="POST"
                             class="d-none d-md-block">
                             @csrf
                             <input type="hidden" name="cupof" value="{{ $cupof }}">
@@ -153,8 +153,8 @@
                         </form>
 
                         {{-- Vista Mobile --}}
-                        <form id="notasFormMobile" action="{{ route('profesores.notas.guardar') }}" method="POST"
-                            class="d-md-none">
+                        <form id="notasFormMobile" action="{{ route('profesores.informes.guardar') }}"
+                            method="POST" class="d-md-none">
                             @csrf
                             <input type="hidden" name="cupof" value="{{ $cupof }}">
 
@@ -265,7 +265,8 @@
 
             const notaFinal = parseFloat(notaFinalInput ? notaFinalInput.value : 0);
             const notaPrimerCuatrimestre = parseFloat(notaPrimerCuatrimestreInput ? notaPrimerCuatrimestreInput.value : 0);
-            const notaSegundoCuatrimestre = parseFloat(notaSegundoCuatrimestreInput ? notaSegundoCuatrimestreInput.value : 0);
+            const notaSegundoCuatrimestre = parseFloat(notaSegundoCuatrimestreInput ? notaSegundoCuatrimestreInput.value :
+                0);
 
             let estado = 'Ausente';
             let claseEstado = 'badge badge-light';
@@ -277,7 +278,7 @@
                 // Si hay nota final, usar esa
                 notaParaEvaluar = notaFinal;
             } else if (!isNaN(notaPrimerCuatrimestre) && notaPrimerCuatrimestre >= 1 && notaPrimerCuatrimestre <= 10 &&
-                       !isNaN(notaSegundoCuatrimestre) && notaSegundoCuatrimestre >= 1 && notaSegundoCuatrimestre <= 10) {
+                !isNaN(notaSegundoCuatrimestre) && notaSegundoCuatrimestre >= 1 && notaSegundoCuatrimestre <= 10) {
                 // Si hay ambas notas de cuatrimestres, calcular promedio
                 notaParaEvaluar = (notaPrimerCuatrimestre + notaSegundoCuatrimestre) / 2;
             } else if (!isNaN(notaPrimerCuatrimestre) && notaPrimerCuatrimestre >= 1 && notaPrimerCuatrimestre <= 10) {
@@ -330,9 +331,9 @@
             const pathParts = window.location.pathname.split('/');
             const cupof = pathParts[pathParts.length - 1];
 
-            if (!cupof || cupof === 'notas') return;
+            if (!cupof || cupof === 'informes') return;
 
-            fetch(`/profesores/notas/${cupof}`, {
+            fetch(`/profesores/informes/${cupof}`, {
                     method: 'GET',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
@@ -395,7 +396,7 @@
                 const texto = span.textContent;
                 if (texto !== 'Ausente') {
                     totalConNotas++;
-                    
+
                     // Buscar la nota final correspondiente
                     const asignacionId = span.id.replace('estado-', '');
                     const notaFinalInput = document.querySelector(`input[name="notas[${asignacionId}][5]"]`);
@@ -403,13 +404,13 @@
                         const notaFinal = parseFloat(notaFinalInput.value);
                         if (!isNaN(notaFinal)) {
                             sumaNotasFinales += notaFinal;
-                            
+
                             if (notaFinal >= 7) {
-                        aprobados++;
+                                aprobados++;
                             } else if (notaFinal >= 4) {
-                        enRiesgo++;
-                    } else {
-                        desaprobados++;
+                                enRiesgo++;
+                            } else {
+                                desaprobados++;
                             }
                         }
                     }
@@ -466,7 +467,7 @@
 
         // Función para limpiar el formulario
         function limpiarFormulario() {
-            if (confirm('¿Está seguro que desea limpiar todas las notas?')) {
+            if (confirm('¿Está seguro que desea limpiar todos los informes?')) {
                 document.querySelectorAll('input[type="number"]').forEach(input => {
                     input.value = '';
                 });
@@ -627,7 +628,7 @@
                 console.log(key + ': ' + value);
             }
 
-            mostrarMensaje('Guardando notas...', 'info', 10000);
+            mostrarMensaje('Guardando informes...', 'info', 10000);
 
             fetch(formElement.action, {
                     method: 'POST',
@@ -646,7 +647,7 @@
                 .then(data => {
                     console.log('Response data:', data);
                     if (data.success) {
-                        let mensaje = '✅ Notas guardadas correctamente';
+                        let mensaje = 'Informes guardados correctamente';
                         if (data.notas_nuevas > 0 && data.notas_actualizadas_eliminadas > 0) {
                             mensaje +=
                                 ` (${data.notas_nuevas} nuevas, ${data.notas_actualizadas_eliminadas} actualizadas/eliminadas)`;
@@ -663,7 +664,7 @@
                             window.location.reload();
                         }, 2000);
                     } else {
-                        mostrarMensaje(data.message || data.error || 'Error al guardar las notas', 'error');
+                        mostrarMensaje(data.message || data.error || 'Error al guardar los informes', 'error');
                     }
                 })
                 .catch(error => {
