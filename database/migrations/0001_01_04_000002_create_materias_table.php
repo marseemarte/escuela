@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('orientacion_id')->nullable()->constrained('orientaciones')->onDelete('set null');
             $table->integer('anio')->nullable(); // Año del curso (1-7)
             $table->enum('tipo', ['materia', 'taller'])->default('materia'); // Tipo de contenido
+            $table->softDeletes();
             $table->timestamps();
         });
     }
