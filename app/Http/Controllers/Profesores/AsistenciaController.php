@@ -89,9 +89,8 @@ class AsistenciaController extends Controller
                 ->orderBy('persona.nombre')
                 ->get();
 
-            // Obtener asistencias de hoy (sin zona horaria para evitar problemas de fecha)
+            // Obtener asistencias de hoy
             $hoy = now()->format('Y-m-d');
-            Log::info('Fecha utilizada para consulta:', ['fecha' => $hoy, 'now' => now()]);
 
             $asistenciasHoy = DB::table('inasistenciasalumnos')
                 ->whereIn('id_asignacionesalumnos', $alumnos->pluck('asignacion_id'))
@@ -113,13 +112,6 @@ class AsistenciaController extends Controller
 
                 return $alumno;
             });
-
-            Log::info('Asistencias cargadas para tomar:', [
-                'cupof' => $cupof,
-                'total_alumnos' => $alumnos->count(),
-                'asistencias_existentes' => $asistenciasEncontradas,
-                'fecha' => $hoy
-            ]);
 
             // Pasar información adicional a la vista
             $datosAsistencia = [
@@ -143,19 +135,12 @@ class AsistenciaController extends Controller
 
     public function obtenerAlumnos(Request $request, $cupof)
     {
-        $debug = [];
-        $debug[] = "METODO EJECUTADO - CUPOF: " . $cupof;
 
         try {
-            $debug[] = "Paso 1: Verificando autenticación";
-
             // Verificar autenticación
             if (!Auth::check()) {
-                $debug[] = "Usuario no autenticado";
-                return response()->json(['error' => 'No autenticado', 'debug' => $debug], 401);
+                return response()->json(['error' => 'No autenticado'], 401);
             }
-
-            $debug[] = "Paso 2: Usuario autenticado, verificando CUPOF";
 
             // Obtener información del CUPOF
             $cupofInfo = DB::table('cupof')
@@ -176,14 +161,8 @@ class AsistenciaController extends Controller
                 ->first();
 
             if (!$cupofInfo) {
-                $debug[] = "CUPOF no encontrado: " . $cupof;
-                return response()->json(['error' => 'CUPOF no encontrado', 'debug' => $debug], 404);
+                return response()->json(['error' => 'CUPOF no encontrado'], 404);
             }
-
-            $debug[] = "Paso 3: CUPOF encontrado - Grupo: " . $cupofInfo->id_grupos . ", Curso: " . $cupofInfo->id_cursos;
-
-            // Consulta de alumnos simplificada
-            $debug[] = "Paso 4: Ejecutando consulta de alumnos...";
 
             $alumnos = DB::table('asignacionesalumnos')
                 ->join('tipousuario', 'asignacionesalumnos.id_tipousuario', '=', 'tipousuario.id')
@@ -203,19 +182,14 @@ class AsistenciaController extends Controller
                 ->orderBy('persona.nombre')
                 ->get();
 
-            $debug[] = "Paso 5: Consulta ejecutada, total alumnos: " . $alumnos->count();
-
             if ($alumnos->isEmpty()) {
-                $debug[] = "No se encontraron alumnos para el CUPOF: " . $cupof;
                 return response()->json([
                     'cupof_info' => $cupofInfo,
-                    'alumnos' => [],
-                    'debug' => $debug
+                    'alumnos' => []
                 ]);
             }
 
             // Obtener asistencias de hoy
-            $debug[] = "Paso 6: Obteniendo asistencias de hoy...";
             $hoy = now()->format('Y-m-d');
             $asistenciasHoy = DB::table('inasistenciasalumnos')
                 ->whereIn('id_asignacionesalumnos', $alumnos->pluck('asignacion_id'))
@@ -232,21 +206,15 @@ class AsistenciaController extends Controller
                 return $alumno;
             });
 
-            $debug[] = "Paso 7: Alumnos procesados con asistencias - Total final: " . $alumnos->count();
-
             return response()->json([
                 'cupof_info' => $cupofInfo,
                 'alumnos' => $alumnos,
-                'debug' => $debug
             ]);
         } catch (\Exception $e) {
-            $debug[] = "ERROR en obtenerAlumnos: " . $e->getMessage();
-            $debug[] = "TRACE: " . $e->getTraceAsString();
 
             return response()->json([
                 'success' => false,
                 'error' => 'Error interno del servidor: ' . $e->getMessage(),
-                'debug' => $debug
             ], 500);
         }
     }
@@ -530,50 +498,69 @@ class AsistenciaController extends Controller
                 ->orderBy('persona.nombre')
                 ->get();
 
-            // Calcular estadísticas de asistencia por alumno
+            // Calcular estadísticas de asistencia por alumno con lógica de justificaciones
+            // REGLAS DEL SISTEMA:
+            // 1. Ausencias justificadas: Se muestran pero NO afectan el porcentaje
+            // 2. Tardanzas justificadas: Se muestran pero NO afectan el porcentaje
+            // 3. Tardanzas NO justificadas: cada 2 tardanzas = 1 ausencia
+            // 4. Porcentajes se calculan sobre total de días registrados
             $estadisticas = [];
             foreach ($alumnos as $alumno) {
-                // Contar total de días con registro de asistencias para esta materia
-                $totalDias = DB::table('inasistenciasalumnos')
+                // Obtener todos los registros de asistencia para este alumno
+                $registrosAsistencia = DB::table('inasistenciasalumnos')
                     ->where('id_asignacionesalumnos', $alumno->asignacion_id)
                     ->where('cupof', $cupof)
-                    ->count();
+                    ->select('estado', 'justificado')
+                    ->get();
 
-                // Contar presentes
-                $presentes = DB::table('inasistenciasalumnos')
-                    ->where('id_asignacionesalumnos', $alumno->asignacion_id)
-                    ->where('cupof', $cupof)
-                    ->where('estado', 'P')
-                    ->count();
+                $totalDias = $registrosAsistencia->count();
 
-                // Contar ausencias
-                $ausencias = DB::table('inasistenciasalumnos')
-                    ->where('id_asignacionesalumnos', $alumno->asignacion_id)
-                    ->where('cupof', $cupof)
+                // Contar por categorías
+                $presentes = $registrosAsistencia->where('estado', 'P')->count();
+
+                // Ausencias: solo las NO justificadas cuentan como ausencias
+                $ausenciasNoJustificadas = $registrosAsistencia
                     ->where('estado', 'A')
+                    ->where('justificado', '0')
                     ->count();
 
-                // Contar tardanzas
-                $tardanzas = DB::table('inasistenciasalumnos')
-                    ->where('id_asignacionesalumnos', $alumno->asignacion_id)
-                    ->where('cupof', $cupof)
+                $ausenciasJustificadas = $registrosAsistencia
+                    ->where('estado', 'A')
+                    ->where('justificado', '1')
+                    ->count();
+
+                // Tardanzas: solo las NO justificadas cuentan (cada 2 = 1 ausencia)
+                $tardanzasNoJustificadas = $registrosAsistencia
                     ->where('estado', 'T')
+                    ->where('justificado', '0')
                     ->count();
 
-                // Calcular porcentajes
+                $tardanzasJustificadas = $registrosAsistencia
+                    ->where('estado', 'T')
+                    ->where('justificado', '1')
+                    ->count();
+
+                // Calcular ausencias efectivas: ausencias reales + (tardanzas no justificadas / 2)
+                $ausenciasEfectivas = $ausenciasNoJustificadas + floor($tardanzasNoJustificadas / 2);
+
+                // Calcular porcentajes sobre días totales
                 $porcentajePresente = $totalDias > 0 ? round(($presentes / $totalDias) * 100, 1) : 0;
-                $porcentajeAusencia = $totalDias > 0 ? round(($ausencias / $totalDias) * 100, 1) : 0;
-                $porcentajeTardanza = $totalDias > 0 ? round(($tardanzas / $totalDias) * 100, 1) : 0;
+                $porcentajeAusencia = $totalDias > 0 ? round(($ausenciasEfectivas / $totalDias) * 100, 1) : 0;
 
                 $estadisticas[] = [
                     'alumno' => $alumno,
                     'total_dias' => $totalDias,
                     'presentes' => $presentes,
-                    'ausencias' => $ausencias,
-                    'tardanzas' => $tardanzas,
+                    'ausencias_no_justificadas' => $ausenciasNoJustificadas,
+                    'ausencias_justificadas' => $ausenciasJustificadas,
+                    'tardanzas_no_justificadas' => $tardanzasNoJustificadas,
+                    'tardanzas_justificadas' => $tardanzasJustificadas,
+                    'ausencias_efectivas' => $ausenciasEfectivas,
                     'porcentaje_presente' => $porcentajePresente,
                     'porcentaje_ausencia' => $porcentajeAusencia,
-                    'porcentaje_tardanza' => $porcentajeTardanza
+                    // Para compatibilidad con la vista
+                    'ausencias' => $ausenciasNoJustificadas,
+                    'tardanzas' => $tardanzasNoJustificadas
                 ];
             }
 

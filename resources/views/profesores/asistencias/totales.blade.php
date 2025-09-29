@@ -6,7 +6,11 @@
             <div class="mb-4">
                 <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between">
                     <div class="mb-3 mb-md-0">
-                        <h1 class="h4 mb-1">Porcentajes de Asistencia</h1>
+                        <h1 class="h4 mb-1">
+                            Porcentajes de Asistencia
+                            <i class="fas fa-info-circle text-muted ml-2" data-toggle="tooltip" data-placement="right"
+                                title="Sistema de cálculo: Ausencias/tardanzas justificadas se muestran pero no afectan el porcentaje. Cada 2 tardanzas no justificadas = 1 ausencia."></i>
+                        </h1>
                         <p class="text-muted">
                             {{ $cupofInfo->materia_nombre }} - {{ $cupofInfo->ano }}° {{ $cupofInfo->division }}
                             "{{ $cupofInfo->grupo_nombre }}" ({{ $cupofInfo->turno }})
@@ -96,8 +100,9 @@
                                         <th scope="col" class="text-left">Apellido y Nombre</th>
                                         <th scope="col" class="text-center">Total Días</th>
                                         <th scope="col" class="text-center">Presentes</th>
-                                        <th scope="col" class="text-center">Ausencias</th>
+                                        <th scope="col" class="text-center">Ausencias Efectivas</th>
                                         <th scope="col" class="text-center">Tardanzas</th>
+                                        <th scope="col" class="text-center">Justificadas</th>
                                         <th scope="col" class="text-center">% Asistencia</th>
                                     </tr>
                                 </thead>
@@ -119,13 +124,47 @@
                                             </td>
                                             <td class="text-center">
                                                 <span class="badge badge-danger">
-                                                    {{ $stat['ausencias'] }}
+                                                    {{ $stat['ausencias_efectivas'] }}
                                                 </span>
+                                                @if ($stat['tardanzas_no_justificadas'] > 0)
+                                                    <br><small class="text-muted">
+                                                        ({{ $stat['ausencias_no_justificadas'] }} aus. +
+                                                        {{ floor($stat['tardanzas_no_justificadas'] / 2) }} por tard.)
+                                                    </small>
+                                                @endif
                                             </td>
                                             <td class="text-center">
                                                 <span class="badge badge-warning">
-                                                    {{ $stat['tardanzas'] }}
+                                                    {{ $stat['tardanzas_no_justificadas'] }}
                                                 </span>
+                                                @if ($stat['tardanzas_justificadas'] > 0)
+                                                    <br><small
+                                                        class="text-success">(+{{ $stat['tardanzas_justificadas'] }}
+                                                        just.)</small>
+                                                @endif
+                                            </td>
+                                            <td class="text-center">
+                                                @php
+                                                    $totalJustificadas =
+                                                        $stat['ausencias_justificadas'] +
+                                                        $stat['tardanzas_justificadas'];
+                                                @endphp
+                                                @if ($totalJustificadas > 0)
+                                                    <span class="badge badge-info">{{ $totalJustificadas }}</span>
+                                                    <br><small class="text-muted">
+                                                        @if ($stat['ausencias_justificadas'] > 0)
+                                                            {{ $stat['ausencias_justificadas'] }} aus.
+                                                        @endif
+                                                        @if ($stat['ausencias_justificadas'] > 0 && $stat['tardanzas_justificadas'] > 0)
+                                                            ,
+                                                        @endif
+                                                        @if ($stat['tardanzas_justificadas'] > 0)
+                                                            {{ $stat['tardanzas_justificadas'] }} tard.
+                                                        @endif
+                                                    </small>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
                                             </td>
                                             <td class="text-center">
                                                 <div class="d-flex align-items-center justify-content-center">
@@ -207,13 +246,22 @@
                                         <div class="stat-detail-value present">{{ $stat['presentes'] }}</div>
                                     </div>
                                     <div class="stat-detail">
-                                        <div class="stat-detail-label">Ausencias</div>
-                                        <div class="stat-detail-value absent">{{ $stat['ausencias'] }}</div>
+                                        <div class="stat-detail-label">Aus. Efectivas</div>
+                                        <div class="stat-detail-value absent">{{ $stat['ausencias_efectivas'] }}</div>
                                     </div>
                                     <div class="stat-detail">
                                         <div class="stat-detail-label">Tardanzas</div>
-                                        <div class="stat-detail-value late">{{ $stat['tardanzas'] }}</div>
+                                        <div class="stat-detail-value late">{{ $stat['tardanzas_no_justificadas'] }}
+                                        </div>
                                     </div>
+                                    @if ($stat['ausencias_justificadas'] + $stat['tardanzas_justificadas'] > 0)
+                                        <div class="stat-detail">
+                                            <div class="stat-detail-label">Justificadas</div>
+                                            <div class="stat-detail-value" style="color: #17a2b8;">
+                                                {{ $stat['ausencias_justificadas'] + $stat['tardanzas_justificadas'] }}
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         @endforeach
@@ -240,4 +288,68 @@
             </div>
         </div>
     </div>
+
+    <style>
+        /* Estilos personalizados para la tabla de asistencias */
+        .table th {
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .badge {
+            font-size: 0.875rem;
+            padding: 0.375rem 0.5rem;
+        }
+
+        .text-success {
+            color: #28a745 !important;
+        }
+
+        .text-primary {
+            color: #007bff !important;
+        }
+
+        /* Estilos para estadísticas móviles */
+        .stat-detail-value {
+            font-weight: 600;
+        }
+
+        .stat-detail-value.present {
+            color: #28a745;
+        }
+
+        .stat-detail-value.absent {
+            color: #dc3545;
+        }
+
+        .stat-detail-value.late {
+            color: #ffc107;
+        }
+
+        /* Responsive improvements */
+        @media (max-width: 768px) {
+            .totales-mobile-container {
+                display: block;
+                padding: 1rem;
+            }
+
+            .d-none.d-md-block {
+                display: none !important;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .totales-mobile-container {
+                display: none;
+            }
+        }
+    </style>
+
+    <script>
+        // Activar tooltips de Bootstrap
+        $(document).ready(function() {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
 </x-layouts.profesores.dashboard>
