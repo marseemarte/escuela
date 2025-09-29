@@ -20,7 +20,7 @@ class Cupof extends Model
         'hsmodcar',
         'id_materias',
         'id_cursos',
-        'id_grupos', 
+        'id_grupos',
         'estado',
         'funcion',
         'cargo'
@@ -48,6 +48,11 @@ class Cupof extends Model
     public function grupo(): BelongsTo
     {
         return $this->belongsTo(Grupo::class, 'id_grupos');
+    }
+
+    public function revistas(): HasMany
+    {
+        return $this->hasMany(Revista::class, 'cupof', 'cupof');
     }
 
     public function asistencias(): HasMany

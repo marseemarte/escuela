@@ -1,6 +1,7 @@
 {{-- Vista para tomar asistencias de una materia específica --}}
 {{-- Vista para tomar asistencias de una materia específica --}}
-<x-layouts.profesores.dashboard asistencias titulo="Tomar Asistencias">
+<x-layouts.profesores.dashboard asistencias titulo="Tomar Asistencias"
+    title="Mi Técnica | Panel de Profesores - Asistencias">
 
     <div class="row">
         <div class="col-12">

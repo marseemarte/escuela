@@ -10,7 +10,7 @@
                     <div class="card-body text-center">
                         <h5 class="card-title">Asistencias</h5>
                         <p class="card-text">Gestionar asistencias de alumnos</p>
-                        <a href="{{ route('asistencias.index') }}" class="btn btn-primary">
+                        <a href="{{ route('profesores.asistencias.index') }}" class="btn btn-primary">
                             Ir a Asistencias
                         </a>
                     </div>
@@ -20,8 +20,8 @@
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-body text-center">
-                        <h5 class="card-title">Notas</h5>
-                        <p class="card-text">Gestionar notas de alumnos</p>
+                        <h5 class="card-title">Informes</h5>
+                        <p class="card-text">Gestionar informes de alumnos</p>
                         <a href="#" class="btn btn-secondary">
                             Próximamente
                         </a>

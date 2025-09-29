@@ -27,10 +27,6 @@ Route::get('/profesores/horarios/create', [HorariosController::class, 'create'])
 
 Route::post('/profesores/horarios', [HorariosController::class, 'store'])
     ->name('horarios.store');
-// Rutas de asistencias para usuarios generales (estudiantes/padres)
-Route::middleware(['auth'])->group(function () {
-    Route::get('asistencias', [AsistenciaController::class, 'index'])->name('asistencias.index');
-});
 
 Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->group(function () {
 
@@ -41,11 +37,11 @@ Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->
     Route::prefix('tareas')->name('profesores.tareas.')->group(function () {
         Route::get('/', [TareaController::class, 'index'])->name('index');
         Route::post('/', [TareaController::class, 'store'])->name('store');
-        Route::get('/corregir', [TareaController::class, 'corregir'])->name('corregir');
-        Route::get('/{id}/descargar', [TareaController::class, 'descargar'])->name('descargar');
-        Route::get('/{id}/seguimiento', [TareaController::class, 'seguimiento'])->name('seguimiento');
-        Route::delete('/{id}', [TareaController::class, 'destroy'])->name('destroy');
-        Route::get('/{cupof}', [TareaController::class, 'cargar'])->name('cargar');
+        Route::get('corregir', [TareaController::class, 'corregir'])->name('corregir');
+        Route::get('{id}/descargar', [TareaController::class, 'descargar'])->name('descargar');
+        Route::get('{id}/seguimiento', [TareaController::class, 'seguimiento'])->name('seguimiento');
+        Route::delete('{id}', [TareaController::class, 'destroy'])->name('destroy');
+        Route::get('{cupof}', [TareaController::class, 'cargar'])->name('cargar');
         Route::get('{id}/corregir', [CorregirTareaController::class, 'index'])->name('corregir');
         Route::post('guardar-correccion', [CorregirTareaController::class, 'guardar'])->name('guardar-correccion');
         Route::post('eliminar-correccion', [CorregirTareaController::class, 'eliminar'])->name('eliminar-correccion');
