@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class TareaController extends Controller
-{   
+{
     // Mostrar lista de materias asignadas al profesor
     public function index()
     {
@@ -110,6 +110,7 @@ class TareaController extends Controller
                 return [
                     'id' => $tarea->id,
                     'titulo' => $tarea->titulo,
+                    'descripcion' => $tarea->descripcion,
                     'curso' => $curso,
                     'materia' => $materia,
                     'fecha_subida' => $tarea->fecha_subida ? $tarea->fecha_subida->format('d/m/Y') : date('d/m/Y'),
@@ -138,17 +139,19 @@ class TareaController extends Controller
 
                 // Contar entregas realizadas
                 $entregas = $this->contarEntregasRealizadas($tarea->id);
-                
+
                 // Contar alumnos que vieron la tarea
                 $vistos = $this->contarAlumnosVisto($tarea->id);
 
                 return [
                     'id' => $tarea->id,
                     'titulo' => $tarea->titulo,
+                    'descripcion' => $tarea->descripcion,
                     'curso' => $curso,
                     'materia' => $materia,
                     'fecha_subida' => $tarea->fecha_subida ? $tarea->fecha_subida->format('d/m/Y') : date('d/m/Y'),
                     'fecha_entrega' => $tarea->fecha_entrega ? $tarea->fecha_entrega->format('d/m/Y') : '-',
+                    'fecha_entrega_carbon' => $tarea->fecha_entrega, // Fecha original para comparaciones
                     'archivo' => $tarea->nombre_archivo,
                     'entregas' => $entregas . '/' . $totalAlumnos,
                     'vistos' => $vistos . '/' . $totalAlumnos
@@ -249,7 +252,7 @@ class TareaController extends Controller
         try {
             // Obtener la tarea
             $tarea = Tarea::findOrFail($id);
-            
+
             // Verificar permisos
             $this->verificarPermisos($tarea);
 
@@ -258,7 +261,7 @@ class TareaController extends Controller
             $cupofModel = null;
             $curso = 'Sin asignar';
             $materia = 'Sin materia';
-            
+
             if ($revista) {
                 $cupofModel = Cupof::with(['materia', 'curso'])->find($revista->cupof);
                 if ($cupofModel) {
@@ -273,7 +276,7 @@ class TareaController extends Controller
 
             // Obtener alumnos del curso
             $alumnos = collect();
-            
+
             if ($cupofModel && $cupofModel->curso) {
                 $alumnos = DB::table('asignacionesalumnos as aa')
                     ->join('cursociclolectivo as ccl', 'aa.id_cursosciclolectivo', '=', 'ccl.id')
@@ -289,7 +292,7 @@ class TareaController extends Controller
                         'p.dni'
                     ])
                     ->get()
-                    ->map(function($alumno) use ($tarea) {
+                    ->map(function ($alumno) use ($tarea) {
                         // Verificar si vio la tarea
                         $visto = DB::table('archivos_visto')
                             ->where('id_tarea', $tarea->id)
@@ -335,7 +338,6 @@ class TareaController extends Controller
                 ],
                 'alumnos' => $alumnos,
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'error' => $e->getMessage()
@@ -346,19 +348,23 @@ class TareaController extends Controller
     // Eliminar tarea
     public function destroy($id)
     {
-        $tarea = Tarea::findOrFail($id);
+        try {
+            $tarea = Tarea::findOrFail($id);
 
-        // Verificar permisos
-        $this->verificarPermisos($tarea);
+            // Verificar permisos
+            $this->verificarPermisos($tarea);
 
-        // Eliminar archivo físico
-        if ($tarea->ruta_archivo && Storage::disk('local')->exists($tarea->ruta_archivo)) {
-            Storage::disk('local')->delete($tarea->ruta_archivo);
+            // Eliminar archivo físico
+            if ($tarea->ruta_archivo && Storage::disk('local')->exists($tarea->ruta_archivo)) {
+                Storage::disk('local')->delete($tarea->ruta_archivo);
+            }
+
+            $tarea->delete();
+
+            return response()->json(['success' => true, 'message' => 'Tarea eliminada correctamente.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error al eliminar la tarea: ' . $e->getMessage()], 500);
         }
-
-        $tarea->delete();
-
-        return response()->json(['success' => true, 'message' => 'Tarea eliminada correctamente.']);
     }
 
     // Descargar archivo de tarea
@@ -374,7 +380,7 @@ class TareaController extends Controller
 
         // Usar Storage para obtener la ruta completa
         $rutaCompleta = Storage::disk('local')->path($tarea->ruta_archivo);
-        
+
         return response()->download($rutaCompleta, $tarea->nombre_archivo);
     }
 

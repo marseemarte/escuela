@@ -8,10 +8,10 @@
                     <span class="pcoded-mtext">Inicio</span>
                 </a>
             </li>
-            <li class="{{ $notas == 'true' ? 'active' : '' }}">
-                <a href="{{ route('profesores.notas.index') }}">
+            <li class="{{ $informes == 'true' ? 'active' : '' }}">
+                <a href="{{ route('profesores.informes.index') }}">
                     <span class="pcoded-micon"><i class="feather icon-clipboard"></i></span>
-                    <span class="pcoded-mtext">Notas</span>
+                    <span class="pcoded-mtext">Informes</span>
                 </a>
             </li>
             <li class="{{ $asistencias == 'true' ? 'active' : '' }}">
@@ -24,12 +24,6 @@
                 <a href="{{ route('profesores.tareas.index') }}">
                     <span class="pcoded-micon"><i class="feather icon-book"></i></span>
                     <span class="pcoded-mtext">Tareas</span>
-                </a>
-            </li>
-            <li class="{{ $alumnos == 'true' ? 'active' : '' }}">
-                <a href="{{ route('alumnos.index') }}">
-                    <span class="pcoded-micon"><i class="feather icon-users"></i></span>
-                    <span class="pcoded-mtext">Alumnos</span>
                 </a>
             </li>
             <li class="{{ $horarios == 'true' ? 'active' : '' }}">

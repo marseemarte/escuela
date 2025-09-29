@@ -23,8 +23,6 @@
 <link rel="stylesheet" href="{{ asset('libraries/assets/css/style.css') }}">
 <link rel="stylesheet" href="{{ asset('libraries/assets/css/jquery.mCustomScrollbar.css') }}">
 
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <script src="https://kit.fontawesome.com/aae8b7156c.js" crossorigin="anonymous"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">

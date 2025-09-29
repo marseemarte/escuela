@@ -1,4 +1,4 @@
-<x-layouts.profesores.dashboard horarios="true" titulo="Horarios">
+<x-layouts.profesores.dashboard horarios="true" titulo="Horarios" title="Mi Técnica | Panel de Profesores - Horarios">
     <div class="container py-4">
         <h1 class="mb-1">Horarios</h1>
 
@@ -15,7 +15,7 @@
                         <div class="card-body d-flex flex-column p-3">
                             <!-- Título de la materia/curso -->
                             <h5 class="card-title mb-1 fw-bold text-dark">
-                                @if(!empty($curso['grupo_nombre']))
+                                @if (!empty($curso['grupo_nombre']))
                                     {{ $curso['grupo_nombre'] }}
                                 @else
                                     Curso {{ $curso['cupof'] }}
@@ -23,7 +23,8 @@
                             </h5>
 
                             <p class="card-subtitle mb-3 text-muted small fw-normal">
-                                {{ $curso['anio'] ? $curso['anio'].'° ' : '' }}{{ $curso['division'] ?? 'A' }} - {{ $curso['cupof'] ?? '' }}
+                                {{ $curso['anio'] ? $curso['anio'] . '° ' : '' }}{{ $curso['division'] ?? 'A' }} -
+                                {{ $curso['cupof'] ?? '' }}
                             </p>
 
                             <!-- Información del turno -->
@@ -31,14 +32,16 @@
                                 <div class="d-flex align-items-center mb-2">
                                     <i class="fas fa-clock text-dark me-2" style="font-size: 0.875rem;"></i>
                                     <span class="small text-dark">
-                                        Turno: {{ isset($curso['turno']) ? ( $curso['turno'] === 'M' ? 'Mañana' : ($curso['turno'] === 'T' ? 'Tarde' : 'Noche') ) : 'Mañana' }}
+                                        Turno:
+                                        {{ isset($curso['turno']) ? ($curso['turno'] === 'M' ? 'Mañana' : ($curso['turno'] === 'T' ? 'Tarde' : 'Noche')) : 'Mañana' }}
                                     </span>
                                 </div>
 
                                 <div class="d-flex align-items-center">
                                     <i class="fas fa-users text-dark me-2" style="font-size: 0.875rem;"></i>
                                     <span class="small text-dark">
-                                        Curso: {{ $curso['anio'] ? $curso['anio'].'°' : '4°' }} Año División {{ $curso['division'] ?? 'A' }}
+                                        Curso: {{ $curso['anio'] ? $curso['anio'] . '°' : '4°' }} Año División
+                                        {{ $curso['division'] ?? 'A' }}
                                     </span>
                                 </div>
                             </div>
@@ -46,9 +49,8 @@
                             <!-- Botón para ver horario (sin onclick inline) -->
                             <div class="mt-auto">
                                 <button type="button" class="btn btn-primary w-100 gestionar-btn"
-                                        data-cupof="{{ $cupRaw }}"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#horarioCursoModal{{ $cup }}">
+                                    data-cupof="{{ $cupRaw }}" data-bs-toggle="modal"
+                                    data-bs-target="#horarioCursoModal{{ $cup }}">
                                     <i class="fas fa-tasks me-2"></i>ver horario
                                 </button>
                             </div>
@@ -67,8 +69,8 @@
     </div>
 
     {{-- Modales fuera del loop principal --}}
-    @if(isset($cursosList) && count($cursosList) > 0)
-        @foreach($cursosList as $curso)
+    @if (isset($cursosList) && count($cursosList) > 0)
+        @foreach ($cursosList as $curso)
             @php
                 $cupRaw = (string) ($curso['cupof'] ?? '');
                 $cup = preg_replace('/[^A-Za-z0-9_-]/', '_', $cupRaw);
@@ -76,29 +78,34 @@
             @endphp
 
             <div class="modal fade" id="horarioCursoModal{{ $cup }}" tabindex="-1"
-                 aria-labelledby="horarioCursoLabel{{ $cup }}" aria-hidden="true">
+                aria-labelledby="horarioCursoLabel{{ $cup }}" aria-hidden="true">
                 <div class="modal-dialog modal-xl modal-dialog-scrollable">
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white">
                             <div>
                                 <h5 class="modal-title mb-1" id="horarioCursoLabel{{ $cup }}">
                                     <i class="fas fa-clock me-2"></i>
-                                    @if($curso['anio'] || $curso['division'])
-                                        {{ $curso['anio'] ? $curso['anio'].'°' : '' }} {{ $curso['division'] ?? '' }}
-                                        @if(!empty($curso['grupo_nombre'])) - {{ $curso['grupo_nombre'] }} @endif
+                                    @if ($curso['anio'] || $curso['division'])
+                                        {{ $curso['anio'] ? $curso['anio'] . '°' : '' }}
+                                        {{ $curso['division'] ?? '' }}
+                                        @if (!empty($curso['grupo_nombre']))
+                                            - {{ $curso['grupo_nombre'] }}
+                                        @endif
                                     @else
                                         Curso {{ $curso['cupof'] }}
                                     @endif
                                 </h5>
                                 <small class="text-white-50">
-                                    Turno {{ isset($curso['turno']) ? ( $curso['turno'] === 'M' ? 'Mañana' : ($curso['turno'] === 'T' ? 'Tarde' : 'Noche') ) : '—' }}
+                                    Turno
+                                    {{ isset($curso['turno']) ? ($curso['turno'] === 'M' ? 'Mañana' : ($curso['turno'] === 'T' ? 'Tarde' : 'Noche')) : '—' }}
                                 </small>
                             </div>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Cerrar"></button>
                         </div>
 
                         <div class="modal-body p-0">
-                            @if($horario && count($horario) > 0)
+                            @if ($horario && count($horario) > 0)
                                 <div class="table-responsive">
                                     <table class="table align-middle mb-0 horario-table">
                                         <thead class="bg-light">
@@ -106,7 +113,7 @@
                                                 <th class="text-center fw-bold" style="width:120px;">
                                                     <i class="fas fa-clock me-1"></i>Hora
                                                 </th>
-                                                @foreach($dias as $clave => $etiqueta)
+                                                @foreach ($dias as $clave => $etiqueta)
                                                     <th class="text-center fw-bold">
                                                         <div class="d-none d-md-block">{{ $etiqueta }}</div>
                                                         <div class="d-md-none">{{ substr($etiqueta, 0, 3) }}</div>
@@ -115,28 +122,29 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach($horario as $franja => $celdas)
+                                            @foreach ($horario as $franja => $celdas)
                                                 <tr>
                                                     <td class="text-center fw-semibold text-primary bg-light">
                                                         <small>{{ $franja }}</small>
                                                     </td>
 
-                                                    @foreach($dias as $clave => $etiqueta)
-                                                        @if(isset($celdas[$clave]) && $celdas[$clave] && !empty($celdas[$clave]['titulo']))
+                                                    @foreach ($dias as $clave => $etiqueta)
+                                                        @if (isset($celdas[$clave]) && $celdas[$clave] && !empty($celdas[$clave]['titulo']))
                                                             <td class="p-2 align-top">
-                                                                <div class="horario-card p-2 rounded border-start border-3 border-primary">
+                                                                <div
+                                                                    class="horario-card p-2 rounded border-start border-3 border-primary">
                                                                     <div class="fw-bold small text-dark lh-sm mb-1">
                                                                         {{ $celdas[$clave]['titulo'] }}
                                                                     </div>
 
-                                                                    @if(!empty($celdas[$clave]['profesor']))
+                                                                    @if (!empty($celdas[$clave]['profesor']))
                                                                         <div class="small text-secondary mb-1">
                                                                             <i class="fas fa-user me-1"></i>
                                                                             {{ $celdas[$clave]['profesor'] }}
                                                                         </div>
                                                                     @endif
 
-                                                                    @if(!empty($celdas[$clave]['salon']))
+                                                                    @if (!empty($celdas[$clave]['salon']))
                                                                         <div class="small text-primary">
                                                                             <i class="fas fa-map-marker-alt me-1"></i>
                                                                             Aula {{ $celdas[$clave]['salon'] }}
@@ -313,7 +321,9 @@
 
         /* Modal responsivo */
         @media (max-width: 768px) {
-            .horario-table th, .horario-table td {
+
+            .horario-table th,
+            .horario-table td {
                 font-size: 0.75rem;
                 padding: 0.5rem 0.25rem;
             }
@@ -387,7 +397,9 @@
 
                 // Conectar botones .gestionar-btn
                 document.querySelectorAll('.gestionar-btn').forEach(function(btn) {
-                    try { btn.removeAttribute('onclick'); } catch(e){}
+                    try {
+                        btn.removeAttribute('onclick');
+                    } catch (e) {}
 
                     btn.addEventListener('click', function(e) {
                         const cupRaw = btn.dataset.cupof || btn.getAttribute('data-cupof');
@@ -402,7 +414,8 @@
 
                         if (!modalEl) {
                             console.error('Modal no encontrado:', modalId);
-                            alert('Error: modal no encontrado (ID: ' + modalId + '). Revisa la consola.');
+                            alert('Error: modal no encontrado (ID: ' + modalId +
+                                '). Revisa la consola.');
                             return;
                         }
 
@@ -410,7 +423,8 @@
                         if (typeof bootstrap.Modal.getOrCreateInstance === 'function') {
                             modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
                         } else {
-                            modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                            modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap
+                                .Modal(modalEl);
                         }
                         modalInstance.show();
                     });
@@ -440,7 +454,8 @@
                     initAfterBootstrap();
                 };
                 s.onerror = function() {
-                    console.error('No se pudo cargar Bootstrap desde CDN. Asegúrate de incluirlo en el layout.');
+                    console.error(
+                        'No se pudo cargar Bootstrap desde CDN. Asegúrate de incluirlo en el layout.');
                     // No hacemos alert intrusivo en producción, pero en desarrollo es útil:
                     // alert('Error: Bootstrap JS no está disponible. Revisa la consola y que el bundle esté cargado.');
                 };

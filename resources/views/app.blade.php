@@ -330,7 +330,7 @@
                                 </li>
                                 @auth
                                     <li class="">
-                                        <a href="{{ route('asistencias.index') }}">
+                                        <a href="{{ route('profesores.asistencias.index') }}">
                                             <span class="pcoded-micon"><i class="feather icon-check-square"></i></span>
                                             <span class="pcoded-mtext">Asistencias</span>
                                         </a>

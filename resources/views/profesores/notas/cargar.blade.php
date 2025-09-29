@@ -1,5 +1,5 @@
-{{-- Vista para cargar notas de una materia específica --}}
-<x-layouts.profesores.dashboard notas titulo="Cargar Notas">
+{{-- Vista para cargar informes de una materia específica --}}
+<x-layouts.profesores.dashboard informes titulo="Cargar Informes" title="Mi Técnica | Panel de Profesores - Informes">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <div class="row">
@@ -10,7 +10,7 @@
                     <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between">
                         <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-0">
                             {{-- Botón de regreso --}}
-                            <a href="{{ route('profesores.notas.index') }}"
+                            <a href="{{ route('profesores.informes.index') }}"
                                 class="btn btn-outline-secondary btn-sm mb-3 mb-md-0 mr-md-3">
                                 <i class="fas fa-arrow-left mr-1"></i>
                                 Volver
@@ -43,7 +43,7 @@
                     <div class="d-flex justify-content-between align-items-center flex-wrap">
                         <div>
                             <h2 class="h5 mb-1">Lista de Estudiantes</h2>
-                            <p class="text-muted mb-0">Ingrese las notas para cada estudiante</p>
+                            <p class="text-muted mb-0">Ingrese las informes para cada estudiante</p>
                         </div>
                         <div class="d-flex gap-2 mt-2 mt-md-0">
                             <button type="button" onclick="limpiarFormulario()" class="btn btn-secondary btn-sm">
@@ -52,11 +52,11 @@
                             {{-- Botón para Desktop --}}
                             <button type="submit" form="notasFormDesktop"
                                 class="btn btn-primary btn-sm d-none d-md-inline-block">
-                                <i class="feather icon-save mr-1"></i> Guardar Notas
+                                <i class="feather icon-save mr-1"></i> Guardar Informes
                             </button>
                             {{-- Botón para Mobile --}}
                             <button type="submit" form="notasFormMobile" class="btn btn-primary btn-sm d-md-none">
-                                <i class="feather icon-save mr-1"></i> Guardar Notas
+                                <i class="feather icon-save mr-1"></i> Guardar Informes
                             </button>
                         </div>
                     </div>
@@ -64,7 +64,7 @@
                 <div class="card-body">
                     @if (isset($alumnosConNotas) && count($alumnosConNotas) > 0)
                         {{-- Vista Desktop --}}
-                        <form id="notasFormDesktop" action="{{ route('profesores.notas.guardar') }}" method="POST"
+                        <form id="notasFormDesktop" action="{{ route('profesores.informes.guardar') }}" method="POST"
                             class="d-none d-md-block">
                             @csrf
                             <input type="hidden" name="cupof" value="{{ $cupof }}">
@@ -78,7 +78,7 @@
                                             <th scope="col" class="text-center">1° Cuatrimestre</th>
                                             <th scope="col" class="text-center">2° Informe</th>
                                             <th scope="col" class="text-center">2° Cuatrimestre</th>
-                                            <th scope="col" class="text-center">Promedio</th>
+                                            <th scope="col" class="text-center">Nota Final</th>
                                             <th scope="col" class="text-center">Estado</th>
                                             <th scope="col" class="text-center">Acciones</th>
                                         </tr>
@@ -125,13 +125,17 @@
                                                         max="10" step="0.1">
                                                 </td>
                                                 <td class="text-center">
-                                                    <span id="promedio-{{ $alumno['asignacion_id'] }}"
-                                                        class="badge badge-secondary">-</span>
+                                                    <input type="number"
+                                                        name="notas[{{ $alumno['asignacion_id'] }}][5]"
+                                                        value="{{ $alumno['nota_periodo_5'] ?? '' }}"
+                                                        class="form-control form-control-sm text-center"
+                                                        style="width: 70px; margin: 0 auto;" min="1"
+                                                        max="10" step="0.1">
                                                 </td>
                                                 <td class="text-center">
                                                     <span id="estado-{{ $alumno['asignacion_id'] }}"
                                                         class="badge badge-light">
-                                                        <i class="feather icon-minus mr-1"></i>Sin datos
+                                                        <i class="feather icon-minus mr-1"></i>Ausente
                                                     </span>
                                                 </td>
                                                 <td class="text-center">
@@ -149,8 +153,8 @@
                         </form>
 
                         {{-- Vista Mobile --}}
-                        <form id="notasFormMobile" action="{{ route('profesores.notas.guardar') }}" method="POST"
-                            class="d-md-none">
+                        <form id="notasFormMobile" action="{{ route('profesores.informes.guardar') }}"
+                            method="POST" class="d-md-none">
                             @csrf
                             <input type="hidden" name="cupof" value="{{ $cupof }}">
 
@@ -210,18 +214,24 @@
                                                 </div>
                                             </div>
 
+                                            <div class="row mb-3">
+                                                <div class="col-12">
+                                                    <label class="form-label small">Nota Final</label>
+                                                    <input type="number"
+                                                        name="notas[{{ $alumno['asignacion_id'] }}][5]"
+                                                        value="{{ $alumno['nota_periodo_5'] ?? '' }}"
+                                                        class="form-control form-control-sm text-center"
+                                                        min="1" max="10" step="0.1">
+                                                </div>
+                                            </div>
+
                                             <div
                                                 class="d-flex justify-content-between align-items-center pt-3 border-top">
-                                                <div class="text-center">
-                                                    <small class="text-muted">Promedio</small>
-                                                    <div id="promedio-mobile-{{ $alumno['asignacion_id'] }}"
-                                                        class="badge badge-secondary mt-1">-</div>
-                                                </div>
                                                 <div class="text-center">
                                                     <small class="text-muted">Estado</small>
                                                     <div id="estado-mobile-{{ $alumno['asignacion_id'] }}"
                                                         class="badge badge-light mt-1">
-                                                        <i class="feather icon-minus mr-1"></i>Sin datos
+                                                        <i class="feather icon-minus mr-1"></i>Ausente
                                                     </div>
                                                 </div>
                                             </div>
@@ -245,53 +255,55 @@
         // Variables globales para el sistema de mensajes
         let mensajeTimeout;
 
-        // Función para calcular el promedio de un alumno específico
-        function calcularPromedio(asignacionId) {
-            console.log('Calculando promedio para asignación:', asignacionId);
+        // Función para calcular el estado basado en la nota final o promedio de cuatrimestres
+        function calcularEstado(asignacionId) {
+            console.log('Calculando estado para asignación:', asignacionId);
 
-            const inputs = document.querySelectorAll(`input[name^="notas[${asignacionId}]"]`);
-            const notas = [];
+            const notaFinalInput = document.querySelector(`input[name="notas[${asignacionId}][5]"]`);
+            const notaPrimerCuatrimestreInput = document.querySelector(`input[name="notas[${asignacionId}][2]"]`);
+            const notaSegundoCuatrimestreInput = document.querySelector(`input[name="notas[${asignacionId}][4]"]`);
 
-            inputs.forEach(input => {
-                const valor = parseFloat(input.value);
-                if (!isNaN(valor) && valor >= 1 && valor <= 10) {
-                    notas.push(valor);
-                }
-            });
+            const notaFinal = parseFloat(notaFinalInput ? notaFinalInput.value : 0);
+            const notaPrimerCuatrimestre = parseFloat(notaPrimerCuatrimestreInput ? notaPrimerCuatrimestreInput.value : 0);
+            const notaSegundoCuatrimestre = parseFloat(notaSegundoCuatrimestreInput ? notaSegundoCuatrimestreInput.value :
+                0);
 
-            let promedio = '-';
-            let clasePromedio = 'badge badge-secondary';
-            let estado = 'Sin datos';
+            let estado = 'Ausente';
             let claseEstado = 'badge badge-light';
             let iconoEstado = 'feather icon-minus';
+            let notaParaEvaluar = 0;
 
-            if (notas.length > 0) {
-                const promedioNum = notas.reduce((a, b) => a + b, 0) / notas.length;
-                promedio = promedioNum.toFixed(1);
+            // Prioridad: Nota Final > Promedio de Cuatrimestres
+            if (!isNaN(notaFinal) && notaFinal >= 1 && notaFinal <= 10) {
+                // Si hay nota final, usar esa
+                notaParaEvaluar = notaFinal;
+            } else if (!isNaN(notaPrimerCuatrimestre) && notaPrimerCuatrimestre >= 1 && notaPrimerCuatrimestre <= 10 &&
+                !isNaN(notaSegundoCuatrimestre) && notaSegundoCuatrimestre >= 1 && notaSegundoCuatrimestre <= 10) {
+                // Si hay ambas notas de cuatrimestres, calcular promedio
+                notaParaEvaluar = (notaPrimerCuatrimestre + notaSegundoCuatrimestre) / 2;
+            } else if (!isNaN(notaPrimerCuatrimestre) && notaPrimerCuatrimestre >= 1 && notaPrimerCuatrimestre <= 10) {
+                // Solo primer cuatrimestre
+                notaParaEvaluar = notaPrimerCuatrimestre;
+            } else if (!isNaN(notaSegundoCuatrimestre) && notaSegundoCuatrimestre >= 1 && notaSegundoCuatrimestre <= 10) {
+                // Solo segundo cuatrimestre
+                notaParaEvaluar = notaSegundoCuatrimestre;
+            }
 
-                if (promedioNum >= 7) {
-                    clasePromedio = 'badge badge-success';
-                    estado = 'Aprobado';
+            // Determinar el estado basado en la nota
+            if (notaParaEvaluar > 0) {
+                if (notaParaEvaluar >= 7) {
+                    estado = 'TEA(Aprobado)';
                     claseEstado = 'badge badge-success';
                     iconoEstado = 'feather icon-check-circle';
-                } else if (promedioNum >= 4) {
-                    clasePromedio = 'badge badge-warning';
-                    estado = 'En riesgo';
+                } else if (notaParaEvaluar >= 4) {
+                    estado = 'TEP(En Proceso)';
                     claseEstado = 'badge badge-warning';
                     iconoEstado = 'feather icon-alert-triangle';
                 } else {
-                    clasePromedio = 'badge badge-danger';
-                    estado = 'Desaprobado';
+                    estado = 'TED(Desaprobado)';
                     claseEstado = 'badge badge-danger';
                     iconoEstado = 'feather icon-x-circle';
                 }
-            }
-
-            // Actualizar promedio en vista desktop
-            const spanPromedio = document.getElementById(`promedio-${asignacionId}`);
-            if (spanPromedio) {
-                spanPromedio.textContent = promedio;
-                spanPromedio.className = clasePromedio;
             }
 
             // Actualizar estado en vista desktop
@@ -301,20 +313,15 @@
                 spanEstado.className = claseEstado;
             }
 
-            // Actualizar promedio en vista móvil
-            const promedioMobile = document.getElementById(`promedio-mobile-${asignacionId}`);
-            if (promedioMobile) {
-                promedioMobile.textContent = promedio;
-                promedioMobile.className = clasePromedio;
-            }
-
             // Actualizar estado en vista móvil
             const estadoMobile = document.getElementById(`estado-mobile-${asignacionId}`);
             if (estadoMobile) {
                 estadoMobile.innerHTML = `<i class="${iconoEstado} mr-1"></i>${estado}`;
                 estadoMobile.className = claseEstado;
             }
-        } // Función para actualizar el dashboard de estadísticas
+        }
+
+        // Función para actualizar el dashboard de estadísticas
         function actualizarDashboard() {
             cargarEstadisticas();
         }
@@ -324,9 +331,9 @@
             const pathParts = window.location.pathname.split('/');
             const cupof = pathParts[pathParts.length - 1];
 
-            if (!cupof || cupof === 'notas') return;
+            if (!cupof || cupof === 'informes') return;
 
-            fetch(`/profesores/notas/${cupof}`, {
+            fetch(`/profesores/informes/${cupof}`, {
                     method: 'GET',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
@@ -375,29 +382,37 @@
         function actualizarDashboardLocal() {
             console.log('Calculando estadísticas localmente');
 
-            const totalEstudiantes = document.querySelectorAll('[id^="promedio-"]:not([id*="mobile"])').length;
+            const totalEstudiantes = document.querySelectorAll('[id^="estado-"]:not([id*="mobile"])').length;
             let totalConNotas = 0;
-            let sumaPromedios = 0;
+            let sumaNotasFinales = 0;
             let aprobados = 0;
             let desaprobados = 0;
             let enRiesgo = 0;
             let totalInputsLlenos = 0;
             let totalInputs = 0;
 
-            // Recorrer todos los promedios (solo desktop para evitar duplicados)
-            document.querySelectorAll('[id^="promedio-"]:not([id*="mobile"])').forEach(span => {
+            // Recorrer todos los estados (solo desktop para evitar duplicados)
+            document.querySelectorAll('[id^="estado-"]:not([id*="mobile"])').forEach(span => {
                 const texto = span.textContent;
-                if (texto !== '-') {
-                    const promedio = parseFloat(texto);
+                if (texto !== 'Ausente') {
                     totalConNotas++;
-                    sumaPromedios += promedio;
 
-                    if (promedio >= 7) {
-                        aprobados++;
-                    } else if (promedio >= 4) {
-                        enRiesgo++;
-                    } else {
-                        desaprobados++;
+                    // Buscar la nota final correspondiente
+                    const asignacionId = span.id.replace('estado-', '');
+                    const notaFinalInput = document.querySelector(`input[name="notas[${asignacionId}][5]"]`);
+                    if (notaFinalInput && notaFinalInput.value) {
+                        const notaFinal = parseFloat(notaFinalInput.value);
+                        if (!isNaN(notaFinal)) {
+                            sumaNotasFinales += notaFinal;
+
+                            if (notaFinal >= 7) {
+                                aprobados++;
+                            } else if (notaFinal >= 4) {
+                                enRiesgo++;
+                            } else {
+                                desaprobados++;
+                            }
+                        }
                     }
                 }
             });
@@ -411,7 +426,7 @@
             });
 
             // Calcular métricas
-            const promedioGeneral = totalConNotas > 0 ? (sumaPromedios / totalConNotas).toFixed(1) : '0.0';
+            const promedioGeneral = totalConNotas > 0 ? (sumaNotasFinales / totalConNotas).toFixed(1) : '0.0';
             const porcentajeAprobacion = totalConNotas > 0 ? Math.round((aprobados / totalConNotas) * 100) : 0;
             const progresoPorcentaje = totalInputs > 0 ? Math.round((totalInputsLlenos / totalInputs) * 100) : 0;
 
@@ -452,18 +467,13 @@
 
         // Función para limpiar el formulario
         function limpiarFormulario() {
-            if (confirm('¿Está seguro que desea limpiar todas las notas?')) {
+            if (confirm('¿Está seguro que desea limpiar todos los informes?')) {
                 document.querySelectorAll('input[type="number"]').forEach(input => {
                     input.value = '';
                 });
 
-                document.querySelectorAll('[id^="promedio-"]').forEach(span => {
-                    span.textContent = '-';
-                    span.className = 'badge badge-secondary';
-                });
-
                 document.querySelectorAll('[id^="estado-"]').forEach(estado => {
-                    estado.innerHTML = '<i class="feather icon-minus mr-1"></i>Sin datos';
+                    estado.innerHTML = '<i class="feather icon-minus mr-1"></i>Ausente';
                     estado.className = 'badge badge-light';
                 });
 
@@ -477,7 +487,7 @@
             inputs.forEach(input => {
                 input.value = '';
             });
-            calcularPromedio(asignacionId);
+            calcularEstado(asignacionId);
         }
 
         // Sistema de mensajes copiado de asistencias
@@ -584,25 +594,27 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('=== INICIALIZANDO SISTEMA DE NOTAS ===');
 
-            // Calcular promedios iniciales
+            // Calcular estados iniciales
             @if (isset($alumnosConNotas) && count($alumnosConNotas) > 0)
                 @foreach ($alumnosConNotas as $alumno)
-                    calcularPromedio({{ $alumno['asignacion_id'] }});
+                    calcularEstado({{ $alumno['asignacion_id'] }});
                 @endforeach
             @endif
         });
 
-        // Actualizar promedios cuando cambian los valores
+        // Actualizar estados cuando cambian los valores
         document.addEventListener('input', function(e) {
             if (e.target.type === 'number' && e.target.name && e.target.name.includes('notas[')) {
                 const match = e.target.name.match(/notas\[(\d+)\]/);
                 if (match) {
                     const asignacionId = parseInt(match[1]);
                     console.log('Input cambiado para asignación:', asignacionId, 'Valor:', e.target.value);
-                    calcularPromedio(asignacionId);
+                    calcularEstado(asignacionId);
                 }
             }
-        }); // Manejar envío de ambos formularios
+        });
+
+        // Manejar envío de ambos formularios
         function handleFormSubmit(formElement, formName) {
             console.log(`=== FORMULARIO ${formName} ENVIADO ===`);
             console.log('Action URL:', formElement.action);
@@ -616,7 +628,7 @@
                 console.log(key + ': ' + value);
             }
 
-            mostrarMensaje('Guardando notas...', 'info', 10000);
+            mostrarMensaje('Guardando informes...', 'info', 10000);
 
             fetch(formElement.action, {
                     method: 'POST',
@@ -635,7 +647,7 @@
                 .then(data => {
                     console.log('Response data:', data);
                     if (data.success) {
-                        let mensaje = '✅ Notas guardadas correctamente';
+                        let mensaje = 'Informes guardados correctamente';
                         if (data.notas_nuevas > 0 && data.notas_actualizadas_eliminadas > 0) {
                             mensaje +=
                                 ` (${data.notas_nuevas} nuevas, ${data.notas_actualizadas_eliminadas} actualizadas/eliminadas)`;
@@ -652,7 +664,7 @@
                             window.location.reload();
                         }, 2000);
                     } else {
-                        mostrarMensaje(data.message || data.error || 'Error al guardar las notas', 'error');
+                        mostrarMensaje(data.message || data.error || 'Error al guardar los informes', 'error');
                     }
                 })
                 .catch(error => {

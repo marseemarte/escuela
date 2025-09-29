@@ -15,7 +15,7 @@ return new class extends Migration {
             // Relaciones
             $table->foreignId('id_materias')->constrained('materias')->onDelete('cascade');
             $table->foreignId('id_cursos')->constrained('cursos')->onDelete('cascade');
-            $table->foreignId('id_grupos')->constrained('grupos')->onDelete('cascade');
+            $table->foreignId('id_grupos')->constrained('grupos')->onDelete('cascade')->nullable();
 
             $table->string('estado', 1); // Estado del CUPOF (A=Activo, I=Inactivo, V=Vacante)
 

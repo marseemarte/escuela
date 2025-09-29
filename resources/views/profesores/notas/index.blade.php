@@ -1,11 +1,11 @@
-{{-- Vista principal de notas - Lista de materias --}}
-<x-layouts.profesores.dashboard notas titulo="Notas">
+{{-- Vista principal de informes - Lista de materias --}}
+<x-layouts.profesores.dashboard informes titulo="Informes" title="Mi Técnica | Panel de Profesores - Informes">
     <div class="asistencias-container">
         {{-- Header --}}
         <div class="asistencias-header">
             <div class="header-content">
-                <h1 class="main-title">Notas</h1>
-                <p class="main-subtitle">Seleccione una materia para cargar notas</p>
+                <h1 class="main-title">Informes</h1>
+                <p class="main-subtitle">Seleccione una materia para cargar informes</p>
             </div>
             <div class="header-info">
                 <div class="date-info">
@@ -48,10 +48,10 @@
 
                             {{-- Botones de acción --}}
                             <div class="materia-actions">
-                                <a href="{{ route('profesores.notas.cargar', $materia->cupof) }}"
+                                <a href="{{ route('profesores.informes.cargar', $materia->cupof) }}"
                                     class="btn-primary-custom">
                                     <i class="fas fa-edit"></i>
-                                    Cargar Notas
+                                    Cargar Informes
                                 </a>
                             </div>
                         </div>
@@ -66,7 +66,7 @@
                 </div>
                 <h3 class="empty-title">No hay materias asignadas</h3>
                 <p class="empty-subtitle">
-                    No tiene materias asignadas en este momento para cargar notas.
+                    No tiene materias asignadas en este momento para cargar informes.
                 </p>
             </div>
         @endif

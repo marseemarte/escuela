@@ -22,32 +22,20 @@ class AsistenciaController extends Controller
 
         if ($usuario instanceof Persona && $usuario->isProfesor()) {
             // Lógica para profesores
-            $materias = DB::table('cupof')
-                ->join('materias', 'cupof.id_materias', '=', 'materias.id')
-                ->join('cursos', 'cupof.id_cursos', '=', 'cursos.id')
-                ->join('grupos', 'cupof.id_grupos', '=', 'grupos.id')
-                ->join('revista', 'cupof.cupof', '=', 'revista.cupof')
-                ->join('tipousuario', 'revista.id_tipousuario', '=', 'tipousuario.id')
-                ->join('persona', 'tipousuario.id_persona', '=', 'persona.id')
-                ->where('persona.dni', $usuario->dni)
-                ->where('cupof.estado', 'A')
-                ->where('revista.situacion', 'A') // Solo asignaciones activas
-                ->select(
-                    'cupof.cupof',
-                    'materias.nombre as materia_nombre',
-                    'cursos.division',
-                    'cursos.ano',
-                    'grupos.nombre as grupo_nombre',
-                    'cupof.turno'
-                )
+            $materias = Cupof::query()
+                ->whereHas('revistas', function ($query) use ($usuario) {
+                    $query->where('situacion', 'A')
+                        ->whereHas('tipousuario.persona', function ($personaQuery) use ($usuario) {
+                            $personaQuery->where('dni', $usuario->dni);
+                        });
+                })
+                ->where('estado', 'A')
+                ->with(['materia:id,nombre', 'curso:id,division,ano', 'grupo:id,nombre'])
+                ->select('cupof', 'id_materias', 'id_cursos', 'id_grupos', 'turno')
                 ->distinct()
                 ->get();
 
             return view('profesores.asistencias.index', compact('materias'));
-        } else {
-            // Lógica para estudiantes/padres - mostrar asistencias del alumno
-            // Por ahora, redirigir al dashboard
-            return redirect()->route('dashboard')->with('info', 'Vista de asistencias para estudiantes en desarrollo');
         }
     }
 
