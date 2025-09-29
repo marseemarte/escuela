@@ -11,7 +11,7 @@ class MateriasController extends Controller
 {
     public function index()
     {
-        $materias = Materia::orderBy('nombre')->get();
+        $materias = Materia::orderBy('nombre')->get(); // SoftDeletes automáticamente excluye registros eliminados
         return view('materias.index', compact('materias'));
     }
     
@@ -135,5 +135,22 @@ class MateriasController extends Controller
         $materia->update($request->only(['nombre', 'abreviatura', 'estado', 'resumen', 'orientacion_id', 'anio', 'tipo']));
 
         return redirect()->route('materias.index')->with('success', 'Materia actualizada correctamente.');
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $materia = Materia::findOrFail($id);
+            $materia->delete(); // Borrado lógico
+            
+            return redirect()->route('materias.index')->with('success', 'Materia eliminada correctamente.');
+        } catch (\Exception $e) {
+            \Log::error('Error al eliminar materia', [
+                'error' => $e->getMessage(),
+                'materia_id' => $id
+            ]);
+            
+            return redirect()->back()->with('error', 'Error al eliminar la materia: ' . $e->getMessage());
+        }
     }
 }
