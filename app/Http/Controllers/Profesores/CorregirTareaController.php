@@ -15,26 +15,22 @@ use Illuminate\Support\Facades\Storage;
 
 class CorregirTareaController extends Controller
 {
-// Mostrar página de corrección con todos los alumnos
+    // Mostrar página de corrección con todos los alumnos
     public function index($tareaId)
     {
         try {
             $tarea = Tarea::findOrFail($tareaId);
-            
-            // Verificar permisos
             $this->verificarPermisos($tarea);
-            
-            // Verificar que sea una tarea con fecha de entrega (no un módulo)
+
             if (is_null($tarea->fecha_entrega)) {
                 return redirect()->back()->with('error', 'Los módulos de teoría no requieren corrección.');
             }
 
-            // Obtener información del curso y materia
             $revista = Revista::find($tarea->id_revista);
             $cupofModel = null;
             $curso = 'Sin asignar';
             $materia = 'Sin materia';
-            
+
             if ($revista) {
                 $cupofModel = Cupof::with(['materia', 'curso'])->find($revista->cupof);
                 if ($cupofModel) {
@@ -47,9 +43,7 @@ class CorregirTareaController extends Controller
                 }
             }
 
-            // Obtener TODOS los alumnos del curso (no solo los que entregaron)
             $entregas = collect();
-            
             if ($cupofModel && $cupofModel->curso) {
                 $entregas = DB::table('asignacionesalumnos as aa')
                     ->join('cursociclolectivo as ccl', 'aa.id_cursosciclolectivo', '=', 'ccl.id')
@@ -74,7 +68,7 @@ class CorregirTareaController extends Controller
                         'p.dni',
                         'ta.nombre_archivo',
                         'ta.ruta_archivo',
-                        'ta.fecha as fecha_entrega',  // Cambié de ta.fecha a ta.fecha
+                        'ta.fecha as fecha_entrega',
                         'ta.id as tarea_alumno_id',
                         'tn.nota',
                         'tn.devolucion'
@@ -84,12 +78,13 @@ class CorregirTareaController extends Controller
                     ->get()
                     ->map(function($entrega) use ($tarea) {
                         $entrego = !is_null($entrega->nombre_archivo);
+
                         return [
                             'asignacion_id' => $entrega->asignacion_id,
                             'nombre_completo' => $entrega->apellido . ', ' . $entrega->nombre,
                             'dni' => $entrega->dni,
-                            'archivo' => $entrega->nombre_archivo,
-                            'ruta_archivo' => $entrega->ruta_archivo,  // AGREGAR ESTE CAMPO
+                            'archivo' => $entrega->nombre_archivo, // ya trae la extensión correcta
+                            'ruta_archivo' => $entrega->ruta_archivo,
                             'fecha_entrega' => $entrega->fecha_entrega,
                             'tarea_alumno_id' => $entrega->tarea_alumno_id,
                             'nota' => $entrega->nota,
@@ -102,51 +97,62 @@ class CorregirTareaController extends Controller
             }
 
             return view('profesores.tareas.corregir', compact('tarea', 'entregas', 'curso', 'materia'));
-            
+
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Error al cargar la página de corrección: ' . $e->getMessage());
         }
     }
 
-    // Descargar respuesta del alumno - CORREGIDO para usar respuestas_alumnos
-    public function descargarRespuesta($tareaAlumnoId)
-    {
-        try {
-            $tareaAlumno = DB::table('tareas_alumnos as ta')
-                ->join('tareas as t', 'ta.id_tarea', '=', 't.id')
-                ->where('ta.id', $tareaAlumnoId)
-                ->where('ta.borrado_fisico', 0)
-                ->select('ta.*', 't.id_revista')
-                ->first();
+public function descargarRespuesta($tareaAlumnoId)
+{
+    try {
+        // Obtener la entrega del alumno
+        $tareaAlumno = DB::table('tareas_alumnos as ta')
+            ->where('ta.id', $tareaAlumnoId)
+            ->where('ta.borrado_fisico', 0)
+            ->first();
 
-            if (!$tareaAlumno) {
-                abort(404, 'Respuesta no encontrada');
-            }
-
-            // Verificar permisos - el profesor debe ser el owner de la tarea
-            $tarea = Tarea::findOrFail($tareaAlumno->id_tarea);
-            $this->verificarPermisos($tarea);
-
-            // Usar ruta_archivo si existe, sino construir ruta con respuestas_alumnos
-            if (!empty($tareaAlumno->ruta_archivo)) {
-                $rutaArchivo = $tareaAlumno->ruta_archivo;
-            } else {
-                // Si no hay ruta_archivo, usar la carpeta respuestas_alumnos
-                $rutaArchivo = 'respuestas_alumnos/' . $tareaAlumno->nombre_archivo;
-            }
-            
-            if (!Storage::disk('local')->exists($rutaArchivo)) {
-                abort(404, 'Archivo de respuesta no encontrado en: ' . $rutaArchivo);
-            }
-
-            $rutaCompleta = Storage::disk('local')->path($rutaArchivo);
-            
-            return response()->download($rutaCompleta, $tareaAlumno->nombre_archivo);
-
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error al descargar la respuesta: ' . $e->getMessage());
+        if (!$tareaAlumno) {
+            abort(404, 'Respuesta no encontrada');
         }
+
+        // Verificar permisos del profesor
+        $tarea = Tarea::findOrFail($tareaAlumno->id_tarea);
+        $this->verificarPermisos($tarea);
+
+        // Construir ruta absoluta del archivo en storage
+        $rutaArchivo = $tareaAlumno->ruta_archivo ?: 'respuestas_alumnos/' . $tareaAlumno->nombre_archivo;
+
+        if (!Storage::disk('local')->exists($rutaArchivo)) {
+            abort(404, 'Archivo de respuesta no encontrado');
+        }
+
+        $rutaCompleta = Storage::disk('local')->path($rutaArchivo);
+
+        // Nombre exacto del archivo para la descarga
+        $nombreFinal = basename($rutaCompleta);
+
+        // Detectar MIME type automáticamente
+        $mimeType = mime_content_type($rutaCompleta) ?: 'application/octet-stream';
+
+        // Abrir PDF en navegador, otros forzar descarga
+        $extension = strtolower(pathinfo($rutaCompleta, PATHINFO_EXTENSION));
+        if ($extension === 'pdf') {
+            return response()->file($rutaCompleta, [
+                'Content-Type' => $mimeType,
+                'Content-Disposition' => 'inline; filename="' . $nombreFinal . '"'
+            ]);
+        }
+
+        return response()->download($rutaCompleta, $nombreFinal, [
+            'Content-Type' => $mimeType
+        ]);
+
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Error al abrir/descargar la respuesta: ' . $e->getMessage());
     }
+}
+
 
     // Guardar corrección (nota y devolución)
     public function guardar(Request $request)
@@ -161,16 +167,14 @@ class CorregirTareaController extends Controller
         try {
             $tarea = Tarea::findOrFail($request->tarea_id);
             $this->verificarPermisos($tarea);
-            $notaString = strval($request->nota);
 
-            // Guardar o actualizar la nota
             DB::table('tareas_notas')->updateOrInsert(
                 [
                     'id_tarea' => $request->tarea_id,
                     'id_asignacionesalumnos' => $request->asignacion_id
                 ],
                 [
-                    'nota' => $notaString,
+                    'nota' => strval($request->nota),
                     'devolucion' => $request->devolucion,
                     'updated_at' => now(),
                     'created_at' => now()
@@ -178,11 +182,11 @@ class CorregirTareaController extends Controller
             );
 
             return response()->json([
-                'success' => true, 
+                'success' => true,
                 'message' => 'Nota guardada correctamente',
                 'has_correction' => true
             ]);
-            
+
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Error al guardar la nota: ' . $e->getMessage()], 500);
         }
@@ -206,47 +210,32 @@ class CorregirTareaController extends Controller
                 ->delete();
 
             return response()->json([
-                'success' => true, 
+                'success' => true,
                 'message' => 'Corrección eliminada correctamente',
-                'has_correction' => false  
+                'has_correction' => false
             ]);
-            
+
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Error al eliminar la corrección: ' . $e->getMessage()], 500);
         }
     }
-    // Método privado para determinar el estado de entrega
+
     private function determinarEstadoEntrega($entrego, $nota, $fechaLimite, $fechaEntrega)
     {
-        if (!$entrego) {
-            return 'no_entrego';
-        }
-        
-        if (!is_null($nota)) {
-            return 'corregido';
-        }
-        
-        if ($fechaLimite && $fechaEntrega) {
-            $limite = strtotime($fechaLimite);
-            $entrega = strtotime($fechaEntrega);
-            
-            if ($entrega > $limite) {
-                return 'tarde';
-            }
-        }
-        
+        if (!$entrego) return 'no_entrego';
+        if (!is_null($nota)) return 'corregido';
+        if ($fechaLimite && $fechaEntrega && strtotime($fechaEntrega) > strtotime($fechaLimite)) return 'tarde';
         return 'pendiente';
     }
 
-    // Método privado para verificar permisos
     private function verificarPermisos($tarea)
     {
         $usuarioId = Auth::id();
         $tienePermiso = Revista::whereHas('tipoUsuario.persona', function ($q) use ($usuarioId) {
             $q->where('id', $usuarioId);
         })
-            ->where('id', $tarea->id_revista)
-            ->exists();
+        ->where('id', $tarea->id_revista)
+        ->exists();
 
         if (!$tienePermiso) {
             abort(403, 'No tienes permisos para acceder a esta tarea.');

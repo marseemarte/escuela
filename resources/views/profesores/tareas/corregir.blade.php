@@ -468,13 +468,16 @@
                 }
             }, 5000);
         }
-
+        
         // Función para descargar respuesta del alumno
         function descargarRespuesta(tareaAlumnoId) {
             if (tareaAlumnoId) {
-                window.location.href = `{{ url('/profesores/tareas/alumno') }}/${tareaAlumnoId}/descargar`;
+                const url = `{{ url('/profesores/tareas/alumno') }}/${tareaAlumnoId}/descargar`;
+                
+                // Abrir en nueva pestaña (funcionará para PDFs y descargará otros archivos)
+                window.open(url, '_blank');
             } else {
-                mostrarMensaje('error', 'Error: No se puede descargar el archivo');
+                mostrarMensaje('error', 'Error: No se puede abrir el archivo');
             }
         }
     </script>
