@@ -202,7 +202,7 @@ class TareaController extends Controller
             'nombre' => 'required|string|max:150',
             'descripcion' => 'nullable|string|max:1000',
             'cupof' => 'required|integer|exists:cupof,cupof',
-            'archivo' => 'required|file|max:10240|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,jpg,jpeg,png',
+            'archivo' => 'required|file|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,jpg,jpeg,png,zip,rar,7z,tar,gz',
             'fecha_entrega' => 'nullable|date|after:today'
         ]);
 
@@ -367,22 +367,42 @@ class TareaController extends Controller
         }
     }
 
-    // Descargar archivo de tarea
-    public function descargar($id)
-    {
-        $tarea = Tarea::findOrFail($id);
-        $this->verificarPermisos($tarea);
+// Descargar/visualizar archivo de tarea
+public function descargar($id)
+{
+    $tarea = Tarea::findOrFail($id);
+    $this->verificarPermisos($tarea);
 
-        // Usa Storage::disk('local') y construye la ruta
-        if (!Storage::disk('local')->exists($tarea->ruta_archivo)) {
-            abort(404, 'Archivo no encontrado.');
-        }
-
-        // Usar Storage para obtener la ruta completa
-        $rutaCompleta = Storage::disk('local')->path($tarea->ruta_archivo);
-
-        return response()->download($rutaCompleta, $tarea->nombre_archivo);
+    if (!Storage::disk('local')->exists($tarea->ruta_archivo)) {
+        abort(404, 'Archivo no encontrado.');
     }
+
+    $rutaCompleta = Storage::disk('local')->path($tarea->ruta_archivo);
+    $extension = strtolower($tarea->tipo);
+
+    // Sanitizar nombre del archivo para headers
+    $nombreOriginal = $tarea->nombre_archivo;
+    $nombreSinExtension = pathinfo($nombreOriginal, PATHINFO_FILENAME);
+    
+    // Sanitizar (sin tocar extensión)
+    $nombreSanitizado = preg_replace('/[^\x20-\x7E]/', '', $nombreSinExtension);
+    $nombreSanitizado = preg_replace('/\s+/', '_', $nombreSanitizado);
+    $nombreSanitizado = trim($nombreSanitizado);
+    
+    // Reconstruir con extensión correcta
+    $nombreFinal = $nombreSanitizado . '.' . $extension;
+
+    // Si es PDF, mostrarlo en el navegador
+    if ($extension === 'pdf') {
+        return response()->file($rutaCompleta, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $nombreFinal . '"'
+        ]);
+    }
+
+    // Para otros archivos, descargar normalmente
+    return response()->download($rutaCompleta, $nombreFinal);
+}
 
     // Verificar permisos del profesor para la tarea
     private function verificarPermisos($tarea)

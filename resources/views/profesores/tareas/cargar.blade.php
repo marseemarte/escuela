@@ -242,10 +242,11 @@
                                             <td>
                                                 <a href="{{ route('profesores.tareas.descargar', $modulo['id']) }}"
                                                     class="download-link text-decoration-none"
-                                                    title="Descargar: {{ $modulo['archivo'] }}"
-                                                    data-toggle="tooltip">
+                                                    title="Ver archivo: {{ $modulo['archivo'] }}"
+                                                    data-toggle="tooltip"
+                                                    {{ Str::endsWith(strtolower($modulo['archivo']), '.pdf') ? 'target="_blank"' : '' }}>
                                                     <div class="d-flex align-items-center justify-content-center">
-                                                        <i class="feather icon-download text-primary mr-2"
+                                                        <i class="feather {{ Str::endsWith(strtolower($modulo['archivo']), '.pdf') ? 'icon-eye' : 'icon-download' }} text-primary mr-2"
                                                             style="font-size: 1.1rem;"></i>
                                                         <span class="text-primary font-weight-medium file-name">
                                                             {{ Str::limit($modulo['archivo'], 20) }}
@@ -313,9 +314,11 @@
                                             <td>
                                                 <a href="{{ route('profesores.tareas.descargar', $tarea['id']) }}"
                                                     class="download-link text-decoration-none"
-                                                    title="Descargar: {{ $tarea['archivo'] }}" data-toggle="tooltip">
+                                                    title="Ver archivo: {{ $tarea['archivo'] }}"
+                                                    data-toggle="tooltip"
+                                                    {{ Str::endsWith(strtolower($tarea['archivo']), '.pdf') ? 'target="_blank"' : '' }}>
                                                     <div class="d-flex align-items-center justify-content-center">
-                                                        <i class="feather icon-download text-primary mr-2"
+                                                        <i class="feather {{ Str::endsWith(strtolower($tarea['archivo']), '.pdf') ? 'icon-eye' : 'icon-download' }} text-primary mr-2"
                                                             style="font-size: 1.1rem;"></i>
                                                         <span class="text-primary font-weight-medium file-name">
                                                             {{ Str::limit($tarea['archivo'], 20) }}
