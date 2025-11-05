@@ -11,6 +11,7 @@ use App\Http\Controllers\Orientaciones\OrientacionesController;
 use App\Http\Controllers\RevistaController;
 use App\Http\Controllers\CupofController;
 use App\Http\Controllers\Profesores\AsistenciaController;
+use App\Http\Controllers\Profesores\PlanificacionController;
 use App\Http\Middleware\EnsureUserIsProfesor;
 use Illuminate\Support\Facades\Route;
 
@@ -64,6 +65,11 @@ Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->
         Route::get('totales/{cupof}', [AsistenciaController::class, 'totales'])->name('totales');
         Route::get('alumnos/{cupof}', [AsistenciaController::class, 'obtenerAlumnos'])->name('alumnos');
     });
+
+        Route::prefix('planificacion')->name('profesores.planificacion.')->group(function () {
+        Route::get('/', [PlanificacionController::class, 'index'])->name('index');
+
+        });
 
     Route::apiResource('horarios', HorariosController::class);
 });

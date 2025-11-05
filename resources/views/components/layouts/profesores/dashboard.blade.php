@@ -12,6 +12,7 @@
     $informes = isset($informes) ? $informes : 'false';
     $horarios = isset($horarios) ? $horarios : 'false';
     $titulo = isset($titulo) ? $titulo : 'Indefinido';
+    $planificacion = isset($planificacion) ? $planificacion : 'false';
 @endphp
 
 <body>
@@ -64,7 +65,7 @@
                 <div class="pcoded-wrapper">
                     <!-- Sidebar -->
                     <x-layouts.profesores.sidebar :inicio="$inicio" :asistencias="$asistencias" :tareas="$tareas"
-                        :informes="$informes" :horarios="$horarios" />
+                        :informes="$informes" :horarios="$horarios" :planificacion="$planificacion" />
 
                     <div class="pcoded-content">
                         <div class="pcoded-inner-content">

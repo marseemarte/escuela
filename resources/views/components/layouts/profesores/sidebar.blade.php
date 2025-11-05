@@ -26,6 +26,12 @@
                     <span class="pcoded-mtext">Tareas</span>
                 </a>
             </li>
+                <li class="{{ $planificacion == 'true' ? 'active' : '' }}">
+                <a href="{{ route('profesores.planificacion.index') }}">
+                    <span class="pcoded-micon"><i class="feather icon-calendar"></i></span>
+                    <span class="pcoded-mtext">Planificacion</span>
+                </a>
+            </li>
             <li class="{{ $horarios == 'true' ? 'active' : '' }}">
                 <a href="{{ route('horarios.index') }}">
                     <span class="pcoded-micon"><i class="feather icon-calendar"></i></span>
