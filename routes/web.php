@@ -68,6 +68,7 @@ Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->
 
         Route::prefix('planificacion')->name('profesores.planificacion.')->group(function () {
         Route::get('/', [PlanificacionController::class, 'index'])->name('index');
+        Route::get('{cupof}', [PlanificacionController::class, 'cargar'])->name('cargar');
 
         });
 

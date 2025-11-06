@@ -47,4 +47,14 @@ class PlanificacionController extends Controller
 
         return view('profesores.planificaciones.index', compact('materias'));
     }
+
+    public function cargar($cupof)
+    {
+        // Lógica para cargar las planificaciones de la materia específica
+        // Puedes obtener las planificaciones desde la base de datos según el cupof
+
+        
+
+        return view('profesores.planificaciones.cargar');
+    }
 }
