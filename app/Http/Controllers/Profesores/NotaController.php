@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Profesores;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cupof;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Models\Materia;
 use App\Models\InformePeriodo;
 use App\Models\Personas\Persona;
 
@@ -18,37 +18,26 @@ class NotaController extends Controller
         // Verificar si el usuario es profesor
         $usuario = Auth::user();
 
-        // Verificar que el usuario es una instancia de Persona y es profesor
-        if ($usuario instanceof Persona && $usuario->isProfesor()) {
-            // Lógica para profesores - obtener materias asignadas
-            $materias = DB::table('cupof')
-                ->join('materias', 'cupof.id_materias', '=', 'materias.id')
-                ->join('cursos', 'cupof.id_cursos', '=', 'cursos.id')
-                ->join('grupos', 'cupof.id_grupos', '=', 'grupos.id')
-                ->join('revista', 'cupof.cupof', '=', 'revista.cupof')
-                ->join('tipousuario', 'revista.id_tipousuario', '=', 'tipousuario.id')
-                ->join('persona', 'tipousuario.id_persona', '=', 'persona.id')
-                ->where('persona.dni', $usuario->dni)
-                ->where('cupof.estado', 'A')
-                ->where('revista.situacion', 'A') // Solo asignaciones activas
-                ->select(
-                    'cupof.cupof',
-                    'materias.id as materia_id',
-                    'materias.nombre as materia_nombre',
-                    'cursos.division',
-                    'cursos.ano',
-                    'grupos.nombre as grupo_nombre',
-                    'cupof.turno'
-                )
-                ->distinct()
-                ->get();
+        // Obtener materias asignadas al profesor de forma optimizada
+        $materias = Cupof::query()
+            ->where('estado', 'A')
+            ->whereHas('revistas', function ($query) use ($usuario) {
+                $query->where('situacion', 'A')
+                    ->whereHas('tipousuario.persona', function ($personaQuery) use ($usuario) {
+                        $personaQuery->where('dni', $usuario->dni);
+                    });
+            })
+            ->with([
+                'materia:id,nombre',
+                'curso:id,division,ano',
+                'grupo:id,nombre',
+            ])
+            ->select('cupof', 'id_materias', 'id_cursos', 'id_grupos', 'turno')
+            ->distinct()
+            ->orderBy('id_materias')
+            ->get();
 
-            return view('profesores.notas.index', compact('materias'));
-        } else {
-            // Lógica para estudiantes/padres - mostrar notas del alumno
-            // Por ahora, redirigir al dashboard
-            return redirect()->route('dashboard')->with('info', 'Vista de notas para estudiantes en desarrollo');
-        }
+        return view('profesores.notas.index', compact('materias'));
     }
 
     public function cargar(Request $request, $cupof)

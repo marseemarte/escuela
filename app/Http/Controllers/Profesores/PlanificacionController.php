@@ -4,45 +4,33 @@ namespace App\Http\Controllers\Profesores;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Tarea;
-use App\Models\Revista;
 use App\Models\Cupof;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class PlanificacionController extends Controller
 {
     public function index()
     {
-          // Verificar autenticación
-        $usuarioId = Auth::id();
+        // Verificar si el usuario es profesor
+        $usuario = Auth::user();
 
-        if (!$usuarioId) {
-            return redirect()->route('login');
-        }
-
-        // Obtener materias asignadas al profesor
-        $materias = DB::table('cupof')
-            ->join('materias', 'cupof.id_materias', '=', 'materias.id')
-            ->join('cursos', 'cupof.id_cursos', '=', 'cursos.id')
-            ->join('grupos', 'cupof.id_grupos', '=', 'grupos.id')
-            ->join('revista', 'cupof.cupof', '=', 'revista.cupof')
-            ->join('tipousuario', 'revista.id_tipousuario', '=', 'tipousuario.id')
-            ->join('persona', 'tipousuario.id_persona', '=', 'persona.id')
-            ->where('persona.id', $usuarioId)
-            ->where('cupof.estado', 'A')
-            ->where('revista.situacion', 'A') // Solo asignaciones activas
-            ->select(
-                'cupof.cupof',
-                'materias.id as materia_id',
-                'materias.nombre as materia_nombre',
-                'cursos.division',
-                'cursos.ano',
-                'grupos.nombre as grupo_nombre',
-                'cupof.turno'
-            )
+        // Obtener materias asignadas al profesor de forma optimizada
+        $materias = Cupof::query()
+            ->where('estado', 'A')
+            ->whereHas('revistas', function ($query) use ($usuario) {
+                $query->where('situacion', 'A')
+                    ->whereHas('tipousuario.persona', function ($personaQuery) use ($usuario) {
+                        $personaQuery->where('dni', $usuario->dni);
+                    });
+            })
+            ->with([
+                'materia:id,nombre',
+                'curso:id,division,ano',
+                'grupo:id,nombre',
+            ])
+            ->select('cupof', 'id_materias', 'id_cursos', 'id_grupos', 'turno')
             ->distinct()
+            ->orderBy('id_materias')
             ->get();
 
         return view('profesores.planificaciones.index', compact('materias'));
@@ -53,7 +41,7 @@ class PlanificacionController extends Controller
         // Lógica para cargar las planificaciones de la materia específica
         // Puedes obtener las planificaciones desde la base de datos según el cupof
 
-        
+
 
         return view('profesores.planificaciones.cargar');
     }

@@ -16,36 +16,27 @@ class TareaController extends Controller
     // Mostrar lista de materias asignadas al profesor
     public function index()
     {
-        // Verificar autenticación
-        $usuarioId = Auth::id();
+        // Verificar si el usuario es profesor
+        $usuario = Auth::user();
 
-        if (!$usuarioId) {
-            return redirect()->route('login');
-        }
-
-        // Obtener materias asignadas al profesor
-        $materias = DB::table('cupof')
-            ->join('materias', 'cupof.id_materias', '=', 'materias.id')
-            ->join('cursos', 'cupof.id_cursos', '=', 'cursos.id')
-            ->join('grupos', 'cupof.id_grupos', '=', 'grupos.id')
-            ->join('revista', 'cupof.cupof', '=', 'revista.cupof')
-            ->join('tipousuario', 'revista.id_tipousuario', '=', 'tipousuario.id')
-            ->join('persona', 'tipousuario.id_persona', '=', 'persona.id')
-            ->where('persona.id', $usuarioId)
-            ->where('cupof.estado', 'A')
-            ->where('revista.situacion', 'A') // Solo asignaciones activas
-            ->select(
-                'cupof.cupof',
-                'materias.id as materia_id',
-                'materias.nombre as materia_nombre',
-                'cursos.division',
-                'cursos.ano',
-                'grupos.nombre as grupo_nombre',
-                'cupof.turno'
-            )
+        // Obtener materias asignadas al profesor de forma optimizada
+        $materias = Cupof::query()
+            ->where('estado', 'A')
+            ->whereHas('revistas', function ($query) use ($usuario) {
+                $query->where('situacion', 'A')
+                    ->whereHas('tipousuario.persona', function ($personaQuery) use ($usuario) {
+                        $personaQuery->where('dni', $usuario->dni);
+                    });
+            })
+            ->with([
+                'materia:id,nombre',
+                'curso:id,division,ano',
+                'grupo:id,nombre',
+            ])
+            ->select('cupof', 'id_materias', 'id_cursos', 'id_grupos', 'turno')
             ->distinct()
+            ->orderBy('id_materias')
             ->get();
-
         return view('profesores.tareas.index', compact('materias'));
     }
 
@@ -367,42 +358,42 @@ class TareaController extends Controller
         }
     }
 
-// Descargar/visualizar archivo de tarea
-public function descargar($id)
-{
-    $tarea = Tarea::findOrFail($id);
-    $this->verificarPermisos($tarea);
+    // Descargar/visualizar archivo de tarea
+    public function descargar($id)
+    {
+        $tarea = Tarea::findOrFail($id);
+        $this->verificarPermisos($tarea);
 
-    if (!Storage::disk('local')->exists($tarea->ruta_archivo)) {
-        abort(404, 'Archivo no encontrado.');
+        if (!Storage::disk('local')->exists($tarea->ruta_archivo)) {
+            abort(404, 'Archivo no encontrado.');
+        }
+
+        $rutaCompleta = Storage::disk('local')->path($tarea->ruta_archivo);
+        $extension = strtolower($tarea->tipo);
+
+        // Sanitizar nombre del archivo para headers
+        $nombreOriginal = $tarea->nombre_archivo;
+        $nombreSinExtension = pathinfo($nombreOriginal, PATHINFO_FILENAME);
+
+        // Sanitizar (sin tocar extensión)
+        $nombreSanitizado = preg_replace('/[^\x20-\x7E]/', '', $nombreSinExtension);
+        $nombreSanitizado = preg_replace('/\s+/', '_', $nombreSanitizado);
+        $nombreSanitizado = trim($nombreSanitizado);
+
+        // Reconstruir con extensión correcta
+        $nombreFinal = $nombreSanitizado . '.' . $extension;
+
+        // Si es PDF, mostrarlo en el navegador
+        if ($extension === 'pdf') {
+            return response()->file($rutaCompleta, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . $nombreFinal . '"'
+            ]);
+        }
+
+        // Para otros archivos, descargar normalmente
+        return response()->download($rutaCompleta, $nombreFinal);
     }
-
-    $rutaCompleta = Storage::disk('local')->path($tarea->ruta_archivo);
-    $extension = strtolower($tarea->tipo);
-
-    // Sanitizar nombre del archivo para headers
-    $nombreOriginal = $tarea->nombre_archivo;
-    $nombreSinExtension = pathinfo($nombreOriginal, PATHINFO_FILENAME);
-    
-    // Sanitizar (sin tocar extensión)
-    $nombreSanitizado = preg_replace('/[^\x20-\x7E]/', '', $nombreSinExtension);
-    $nombreSanitizado = preg_replace('/\s+/', '_', $nombreSanitizado);
-    $nombreSanitizado = trim($nombreSanitizado);
-    
-    // Reconstruir con extensión correcta
-    $nombreFinal = $nombreSanitizado . '.' . $extension;
-
-    // Si es PDF, mostrarlo en el navegador
-    if ($extension === 'pdf') {
-        return response()->file($rutaCompleta, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="' . $nombreFinal . '"'
-        ]);
-    }
-
-    // Para otros archivos, descargar normalmente
-    return response()->download($rutaCompleta, $nombreFinal);
-}
 
     // Verificar permisos del profesor para la tarea
     private function verificarPermisos($tarea)

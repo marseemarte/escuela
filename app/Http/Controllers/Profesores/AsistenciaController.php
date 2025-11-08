@@ -20,23 +20,26 @@ class AsistenciaController extends Controller
         // Verificar si el usuario es profesor
         $usuario = Auth::user();
 
-        if ($usuario instanceof Persona && $usuario->isProfesor()) {
-            // Lógica para profesores
-            $materias = Cupof::query()
-                ->whereHas('revistas', function ($query) use ($usuario) {
-                    $query->where('situacion', 'A')
-                        ->whereHas('tipousuario.persona', function ($personaQuery) use ($usuario) {
-                            $personaQuery->where('dni', $usuario->dni);
-                        });
-                })
-                ->where('estado', 'A')
-                ->with(['materia:id,nombre', 'curso:id,division,ano', 'grupo:id,nombre'])
-                ->select('cupof', 'id_materias', 'id_cursos', 'id_grupos', 'turno')
-                ->distinct()
-                ->get();
+        // Obtener materias asignadas al profesor de forma optimizada
+        $materias = Cupof::query()
+            ->where('estado', 'A')
+            ->whereHas('revistas', function ($query) use ($usuario) {
+                $query->where('situacion', 'A')
+                    ->whereHas('tipousuario.persona', function ($personaQuery) use ($usuario) {
+                        $personaQuery->where('dni', $usuario->dni);
+                    });
+            })
+            ->with([
+                'materia:id,nombre',
+                'curso:id,division,ano',
+                'grupo:id,nombre',
+            ])
+            ->select('cupof', 'id_materias', 'id_cursos', 'id_grupos', 'turno')
+            ->distinct()
+            ->orderBy('id_materias')
+            ->get();
 
-            return view('profesores.asistencias.index', compact('materias'));
-        }
+        return view('profesores.asistencias.index', compact('materias'));
     }
 
     public function tomar(Request $request, $cupof)
