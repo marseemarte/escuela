@@ -52,7 +52,7 @@
 
                             {{-- Botones de acción --}}
                             <div class="materia-actions">
-                                <a href="{{ route('profesores.planificacion.cargar', $cupof->cupof) }}"
+                                <a href="{{ route('profesores.planificaciones.cargar', $cupof->cupof) }}"
                                     class="btn-primary-custom">
                                     <i class="fas fa-edit"></i>
                                     Cargar Planificacion
