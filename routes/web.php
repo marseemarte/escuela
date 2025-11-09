@@ -65,12 +65,14 @@ Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->
         Route::get('totales/{cupof}', [AsistenciaController::class, 'totales'])->name('totales');
         Route::get('alumnos/{cupof}', [AsistenciaController::class, 'obtenerAlumnos'])->name('alumnos');
     });
-
-        Route::prefix('planificacion')->name('profesores.planificacion.')->group(function () {
+    // Rutas de planificación
+    Route::prefix('planificaciones')->name('profesores.planificaciones.')->group(function () {
         Route::get('/', [PlanificacionController::class, 'index'])->name('index');
-        Route::get('{cupof}', [PlanificacionController::class, 'cargar'])->name('cargar');
-
-        });
+        Route::get('/{cupof}', [PlanificacionController::class, 'cargar'])->name('cargar');
+        Route::post('/guardar', [PlanificacionController::class, 'guardar'])->name('guardar');
+        Route::delete('/{id}', [PlanificacionController::class, 'eliminar'])->name('eliminar');
+        Route::get('/descargar/{id}', [PlanificacionController::class, 'descargar'])->name('descargar');
+    });
 
     Route::apiResource('horarios', HorariosController::class);
 });
