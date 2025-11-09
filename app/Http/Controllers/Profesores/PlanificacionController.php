@@ -117,14 +117,30 @@ class PlanificacionController extends Controller
     {
         try {
             $request->validate([
-                'archivo' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240',
+                'archivo' => [
+                    'required',
+                    'file',
+                    'max:10240', // 10 MB
+                ],
                 'id_materia' => 'required|exists:materias,id',
                 'id_revista' => 'required|exists:revista,id',
             ], [
                 'archivo.required' => 'Debe seleccionar un archivo',
-                'archivo.mimes' => 'El archivo debe ser PDF, Word, Excel o PowerPoint',
                 'archivo.max' => 'El archivo no debe superar los 10 MB',
             ]);
+
+            // Validación adicional manual del tipo de archivo
+            $archivo = $request->file('archivo');
+            $extension = strtolower($archivo->getClientOriginalExtension());
+            $extensionesPermitidas = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'];
+            
+            if (!in_array($extension, $extensionesPermitidas)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Solo se permiten archivos PDF, Word, Excel o PowerPoint',
+                    'errors' => ['archivo' => ['Tipo de archivo no permitido']]
+                ], 422);
+            }
 
             DB::beginTransaction();
 
@@ -151,23 +167,21 @@ class PlanificacionController extends Controller
 
             if ($planificacionExistente) {
                 // Eliminar el archivo anterior
-                if (Storage::disk('private')->exists($planificacionExistente->ruta_archivo)) {
-                    Storage::disk('private')->delete($planificacionExistente->ruta_archivo);
+                if (Storage::disk('local')->exists($planificacionExistente->ruta_archivo)) {
+                    Storage::disk('local')->delete($planificacionExistente->ruta_archivo);
                 }
             }
 
             // Procesar el nuevo archivo
-            $archivo = $request->file('archivo');
             $nombreOriginal = $archivo->getClientOriginalName();
             $tamanio = $archivo->getSize();
-            $extension = $archivo->getClientOriginalExtension();
 
             $nombreArchivo = Str::slug(pathinfo($nombreOriginal, PATHINFO_FILENAME))
                 . '_' . time()
                 . '.' . $extension;
 
             $rutaDirectorio = "planificaciones/{$request->id_materia}/{$request->id_revista}";
-            $rutaArchivo = $archivo->storeAs($rutaDirectorio, $nombreArchivo, 'private');
+            $rutaArchivo = $archivo->storeAs($rutaDirectorio, $nombreArchivo, 'local');
 
             // Crear o actualizar la planificación
             $planificacion = Planificacion::updateOrCreate(
@@ -206,8 +220,8 @@ class PlanificacionController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            if (isset($rutaArchivo) && Storage::disk('private')->exists($rutaArchivo)) {
-                Storage::disk('private')->delete($rutaArchivo);
+            if (isset($rutaArchivo) && Storage::disk('local')->exists($rutaArchivo)) {
+                Storage::disk('local')->delete($rutaArchivo);
             }
 
             return response()->json([
@@ -240,9 +254,9 @@ class PlanificacionController extends Controller
             }
 
             // Eliminar archivo físico
-            if (Storage::disk('private')->exists($planificacion->ruta_archivo)) {
-                Storage::disk('private')->delete($planificacion->ruta_archivo);
-            }
+            if (Storage::disk('local')->exists($planificacion->ruta_archivo)) {
+            Storage::disk('local')->delete($planificacion->ruta_archivo);
+        }
 
             $planificacion->delete();
             DB::commit();
