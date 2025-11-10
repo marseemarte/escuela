@@ -47,8 +47,13 @@ class DatosPruebaAsistenciaSeeder extends Seeder
         $tipoProfesor = DB::table('tipopersona')->insertGetId([
             'tipo' => 'Profesor'
         ]);
+        $tipoJefeDepartamento = DB::table('tipopersona')->insertGetId([
+            'tipo' => 'Jefe de Departamento'
+        ]);
+        
 
-        // 3. Crear personas (1 profesor y varios alumnos)
+
+        // 3. Crear personas (1 profesor, 1 jefe de departamento y varios alumnos)
         $profesor = Persona::create([
             'dni' => 12345678,
             'apellido' => 'García',
@@ -57,11 +62,26 @@ class DatosPruebaAsistenciaSeeder extends Seeder
             'sexo' => 'F',
             'domicilio' => 'Av. Corrientes 1234',
             'id_localidad' => $localidadId,
-            'pass' => '123456', // Sin hashear, que el modelo lo haga automáticamente
+            'pass' => '123456',
             'telefono' => '11-1234-5678',
             'mail' => 'maria.garcia@escuela.edu.ar'
         ]);
         $profesorId = $profesor->id;
+
+        // Crear Jefe de Departamento
+        $jefeDepartamento = Persona::create([
+            'dni' => 20123456,
+            'apellido' => 'Morales',
+            'nombre' => 'Carlos Alberto',
+            'fechan' => '1975-03-20',
+            'sexo' => 'M',
+            'domicilio' => 'Av. Rivadavia 2345',
+            'id_localidad' => $localidadId,
+            'pass' => '123456',
+            'telefono' => '11-2345-6789',
+            'mail' => 'carlos.morales@escuela.edu.ar'
+        ]);
+        $jefeDepartamentoId = $jefeDepartamento->id;
 
         // Crear alumnos
         $alumnosData = [
@@ -85,7 +105,7 @@ class DatosPruebaAsistenciaSeeder extends Seeder
                 'sexo' => 'M',
                 'domicilio' => 'Calle Falsa 123',
                 'id_localidad' => $localidadId,
-                'pass' => '123456', // Sin hashear, que el modelo lo haga automáticamente
+                'pass' => '123456',
                 'telefono' => '11-0000-0000',
                 'mail' => Str::lower($alumno['nombre'] . '.' . $alumno['apellido']) . '@estudiante.edu.ar'
             ])->id;
@@ -95,6 +115,11 @@ class DatosPruebaAsistenciaSeeder extends Seeder
         $tipoUsuarioProfesor = DB::table('tipousuario')->insertGetId([
             'id_persona' => $profesorId,
             'id_tipopersona' => $tipoProfesor
+        ]);
+
+        $tipoUsuarioJefeDepartamento = DB::table('tipousuario')->insertGetId([
+            'id_persona' => $jefeDepartamentoId,
+            'id_tipopersona' => $tipoJefeDepartamento
         ]);
 
         $tiposUsuarioAlumnos = [];
@@ -190,6 +215,7 @@ class DatosPruebaAsistenciaSeeder extends Seeder
 
         $this->command->info('Datos de prueba creados exitosamente:');
         $this->command->info('- Profesor: María García (DNI: 12345678, pass: 123456)');
+        $this->command->info('- Jefe de Departamento: Carlos Alberto Morales (DNI: 20123456, pass: 123456)');
         $this->command->info('- 8 alumnos en 4° A turno mañana');
         $this->command->info('- 4 materias con CUPOFs asignados');
         $this->command->info('- Ciclo lectivo 2025 activo');
