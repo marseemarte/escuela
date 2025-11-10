@@ -12,6 +12,7 @@ use App\Http\Controllers\RevistaController;
 use App\Http\Controllers\CupofController;
 use App\Http\Controllers\Profesores\AsistenciaController;
 use App\Http\Controllers\Profesores\PlanificacionController;
+use App\Http\Controllers\Profesores\ProyectoController;
 use App\Http\Middleware\EnsureUserIsProfesor;
 use Illuminate\Support\Facades\Route;
 
@@ -73,6 +74,13 @@ Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->
         Route::delete('/{id}', [PlanificacionController::class, 'eliminar'])->name('eliminar');
         Route::get('/descargar/{id}', [PlanificacionController::class, 'descargar'])->name('descargar');
     });
+
+    //Rutas para Proyectos
+    Route::prefix('proyecto')->name('profesores.proyecto.')->group(function () {
+        Route::get('/', [ProyectoController::class, 'index'])->name('index');
+    
+    });
+
 
     Route::apiResource('horarios', HorariosController::class);
 });
