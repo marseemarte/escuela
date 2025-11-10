@@ -113,7 +113,8 @@
                                             </a>
                                         </td>
                                         <td>
-                                            <span class="badge badge-light">{{ $miPlanificacion->tamanio_formateado }}</span>
+                                            <span
+                                                class="badge badge-light">{{ $miPlanificacion->tamanio_formateado }}</span>
                                         </td>
                                         <td>
                                             <i class="feather icon-calendar mr-1 text-muted"></i>
@@ -139,8 +140,7 @@
                                                     <i class="feather icon-refresh-cw"></i>
                                                 </button>
                                                 <button type="button" class="btn btn-sm btn-outline-danger"
-                                                    id="eliminarPlanificacionBtn" 
-                                                    data-id="{{ $miPlanificacion->id }}"
+                                                    id="eliminarPlanificacionBtn" data-id="{{ $miPlanificacion->id }}"
                                                     title="Eliminar">
                                                     <i class="feather icon-trash-2"></i>
                                                 </button>
@@ -193,10 +193,11 @@
                                                 {{ $planificacion->revista->tipoUsuario->persona->nombre }}
                                             </td>
                                             <td>
-                                                {{ $planificacion->revista->cupof->curso->ano }}º
-                                                {{ $planificacion->revista->cupof->curso->division }}
-                                                @if ($planificacion->revista->cupof->grupo)
-                                                    - {{ $planificacion->revista->cupof->grupo->nombre }}
+                                                {{ $planificacion->revista->getRelation('cupof')->curso->ano }}º
+                                                {{ $planificacion->revista->getRelation('cupof')->curso->division }}
+                                                @if ($planificacion->revista->getRelation('cupof')->grupo)
+                                                    -
+                                                    {{ $planificacion->revista->getRelation('cupof')->grupo->nombre }}
                                                 @endif
                                             </td>
                                             <td>
@@ -447,15 +448,17 @@
                     btnSubir.innerHTML = '<i class="feather icon-loader mr-1"></i> Subiendo...';
 
                     try {
-                        const response = await fetch('{{ route('profesores.planificaciones.guardar') }}', {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                    .content,
-                                'Accept': 'application/json'
-                            },
-                            body: formData
-                        });
+                        const response = await fetch(
+                            '{{ route('profesores.planificaciones.guardar') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector(
+                                            'meta[name="csrf-token"]')
+                                        .content,
+                                    'Accept': 'application/json'
+                                },
+                                body: formData
+                            });
 
                         const data = await response.json();
 
@@ -471,7 +474,8 @@
                         mostrarMensaje('Error al subir la planificación: ' + error.message, 'error');
                     } finally {
                         btnSubir.disabled = false;
-                        btnSubir.innerHTML = '<i class="feather icon-upload mr-1"></i> Subir planificación';
+                        btnSubir.innerHTML =
+                            '<i class="feather icon-upload mr-1"></i> Subir planificación';
                     }
                 });
             }
@@ -517,7 +521,8 @@
                             'success');
                         setTimeout(() => location.reload(), 1500);
                     } else {
-                        throw new Error(data.message || 'Error desconocido al eliminar la planificación');
+                        throw new Error(data.message ||
+                            'Error desconocido al eliminar la planificación');
                     }
 
                 } catch (error) {
@@ -639,12 +644,12 @@
                 margin-left: 0 !important;
                 margin-top: 0.5rem;
             }
-            
+
             .btn-group {
                 display: flex;
                 flex-direction: column;
             }
-            
+
             .btn-group .btn {
                 margin-bottom: 0.25rem;
             }
@@ -653,7 +658,7 @@
         .btn-group .btn {
             margin-right: 2px;
         }
-        
+
         .btn-group .btn:last-child {
             margin-right: 0;
         }
@@ -699,14 +704,14 @@
         .text-center i[style*="font-size: 3rem"] {
             opacity: 0.3;
         }
-        
+
         /* Badge personalizado */
         .badge-light {
             background-color: #f8f9fa;
             color: #495057;
             border: 1px solid #dee2e6;
         }
-        
+
         /* Mejora visual para thead */
         .thead-light th {
             font-weight: 600;

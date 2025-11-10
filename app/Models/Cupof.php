@@ -42,12 +42,12 @@ class Cupof extends Model
 
     public function curso(): BelongsTo
     {
-        return $this->belongsTo(Curso::class, 'id_cursos');
+        return $this->belongsTo(Curso::class, 'id_cursos', 'id');
     }
 
     public function grupo(): BelongsTo
     {
-        return $this->belongsTo(Grupo::class, 'id_grupos');
+        return $this->belongsTo(Grupo::class, 'id_grupos', 'id');
     }
 
     public function revistas(): HasMany

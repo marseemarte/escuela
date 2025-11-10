@@ -36,7 +36,7 @@ class Curso extends Model
     }
     public function grupos(): HasMany
     {
-        return $this->hasMany(Grupo::class, 'id_cursos');
+        return $this->hasMany(Grupo::class, 'id_cursos',);
     }
     public function cupof(): HasMany
     {

@@ -87,20 +87,24 @@ class PlanificacionController extends Controller
 
             // Obtener planificaciones de OTROS profesores de la misma materia y año
             $otrasPlanificaciones = Planificacion::where('id_materia', $cupofInfo->id_materias)
-                ->where('id_revista', '!=', $miRevista->id) // Excluir la mía
+                ->where('id_revista', '!=', $miRevista->id)
                 ->whereHas('revista', function ($query) use ($cupofInfo) {
-                    // Solo de profesores con la misma materia del mismo año
                     $query->where('situacion', 'A')
                         ->whereHas('cupof', function ($cupofQuery) use ($cupofInfo) {
-                            $cupofQuery->whereHas('curso', function ($cursoQuery) use ($cupofInfo) {
-                                $cursoQuery->where('ano', $cupofInfo->curso->ano);
-                            });
+                            $cupofQuery->where('estado', 'A')
+                                ->whereHas('curso', function ($cursoQuery) use ($cupofInfo) {
+                                    $cursoQuery->where('ano', $cupofInfo->curso->ano);
+                                });
                         });
                 })
-                ->with(['revista.tipoUsuario.persona', 'revista.cupof.curso', 'revista.cupof.grupo'])
+                ->with([
+                    'revista.tipoUsuario.persona',
+                    'revista.cupof:cupof,id_cursos,id_grupos',
+                    'revista.cupof.curso:id,division,ano',
+                    'revista.cupof.grupo:id,nombre'
+                ])
                 ->orderBy('created_at', 'desc')
                 ->get();
-
             return view('profesores.planificaciones.cargar', compact(
                 'cupofInfo',
                 'miRevista',
@@ -133,7 +137,7 @@ class PlanificacionController extends Controller
             $archivo = $request->file('archivo');
             $extension = strtolower($archivo->getClientOriginalExtension());
             $extensionesPermitidas = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'];
-            
+
             if (!in_array($extension, $extensionesPermitidas)) {
                 return response()->json([
                     'success' => false,
@@ -255,8 +259,8 @@ class PlanificacionController extends Controller
 
             // Eliminar archivo físico
             if (Storage::disk('local')->exists($planificacion->ruta_archivo)) {
-            Storage::disk('local')->delete($planificacion->ruta_archivo);
-        }
+                Storage::disk('local')->delete($planificacion->ruta_archivo);
+            }
 
             $planificacion->delete();
             DB::commit();

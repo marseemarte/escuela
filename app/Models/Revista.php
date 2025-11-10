@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Personas\TipoUsuario;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -32,12 +33,12 @@ class Revista extends Model
     // Relaciones
     public function tipoUsuario(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Personas\TipoUsuario::class, 'id_tipousuario');
+        return $this->belongsTo(TipoUsuario::class, 'id_tipousuario', 'id');
     }
 
     public function cupof(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Cupof::class, 'cupof', 'cupof');
+        return $this->belongsTo(Cupof::class, 'cupof', 'cupof');
     }
 
     public function tareas(): HasMany
