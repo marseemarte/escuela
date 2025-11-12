@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Models\Cursos\Curso;
 use App\Models\User;
 use Database\Seeders\DatosPruebaAsistenciaSeeder2;
-use Horarios;
+use HorariosTest;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -20,7 +20,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             DatosPruebaAsistenciaSeeder::class,
             DatosPruebaAsistenciaSeeder2::class,
-            //Horarios::class,
+            DatosPruebaPlanificacionSeeder::class,
+            ProyectosTestSeeder::class,
+            //HorariosTest::class,
         ]);
     }
 }

@@ -22,21 +22,13 @@ Route::get('/', function () {
     return view('app');
 })->name('home');
 
-
-
-Route::get('/profesores/horarios/create', [HorariosController::class, 'create'])
-    ->name('horarios.create');
-
-Route::post('/profesores/horarios', [HorariosController::class, 'store'])
-    ->name('horarios.store');
-
-Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->group(function () {
+Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->name('profesores.')->group(function () {
 
     // Ruta principal de profesores
-    Route::get('/', [ProfesorController::class, 'index'])->name('profesores.index');
+    Route::get('/', [ProfesorController::class, 'index'])->name('index');
 
     // Sección de Tareas
-    Route::prefix('tareas')->name('profesores.tareas.')->group(function () {
+    Route::prefix('tareas')->name('tareas.')->group(function () {
         Route::get('/', [TareaController::class, 'index'])->name('index');
         Route::post('/', [TareaController::class, 'store'])->name('store');
         Route::get('corregir', [TareaController::class, 'corregir'])->name('corregir');
@@ -51,36 +43,45 @@ Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->
     });
 
     // Sección de Informes
-    Route::prefix('informes')->name('profesores.informes.')->group(function () {
-        Route::get('/', [NotaController::class, 'index'])->name('index');
-        Route::get('{cupof}', [NotaController::class, 'cargar'])->name('cargar');
-        Route::get('totales/{cupof}', [NotaController::class, 'totales'])->name('totales');
-        Route::post('guardar', [NotaController::class, 'guardarNotas'])->name('guardar');
+    Route::controller(NotaController::class)->prefix('informes')->name('informes.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('{cupof}', 'cargar')->name('cargar');
+        Route::get('totales/{cupof}', 'totales')->name('totales');
+        Route::post('guardar', 'guardarNotas')->name('guardar');
     });
 
     // Rutas específicas de asistencias
-    Route::prefix('asistencias')->name('profesores.asistencias.')->group(function () {
-        Route::get('/', [AsistenciaController::class, 'index'])->name('index');
-        Route::get('tomar/{cupof}', [AsistenciaController::class, 'tomar'])->name('tomar');
-        Route::post('guardar', [AsistenciaController::class, 'guardarAsistencia'])->name('guardar');
-        Route::get('totales/{cupof}', [AsistenciaController::class, 'totales'])->name('totales');
-        Route::get('alumnos/{cupof}', [AsistenciaController::class, 'obtenerAlumnos'])->name('alumnos');
+    Route::controller(AsistenciaController::class)->prefix('asistencias')->name('asistencias.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('tomar/{cupof}', 'tomar')->name('tomar');
+        Route::post('guardar', 'guardarAsistencia')->name('guardar');
+        Route::get('totales/{cupof}', 'totales')->name('totales');
+        Route::get('alumnos/{cupof}', 'obtenerAlumnos')->name('alumnos');
     });
     // Rutas de planificación
-    Route::prefix('planificaciones')->name('profesores.planificaciones.')->group(function () {
-        Route::get('/', [PlanificacionController::class, 'index'])->name('index');
-        Route::get('/{cupof}', [PlanificacionController::class, 'cargar'])->name('cargar');
-        Route::post('/guardar', [PlanificacionController::class, 'guardar'])->name('guardar');
-        Route::delete('/{id}', [PlanificacionController::class, 'eliminar'])->name('eliminar');
-        Route::get('/descargar/{id}', [PlanificacionController::class, 'descargar'])->name('descargar');
+    Route::controller(PlanificacionController::class)->prefix('planificaciones')->name('planificaciones.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/{cupof}', 'cargar')->name('cargar');
+        Route::post('/guardar', 'guardar')->name('guardar');
+        Route::delete('/{id}', 'eliminar')->name('eliminar');
+        Route::get('/descargar/{id}', 'descargar')->name('descargar');
     });
 
-    //Rutas para Proyectos
-    Route::prefix('proyecto')->name('profesores.proyecto.')->group(function () {
-        Route::get('/', [ProyectoController::class, 'index'])->name('index');
-    
+    // Rutas de proyectos
+    Route::controller(ProyectoController::class)->prefix('proyectos')->name('proyectos.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/cargar/{cupof}', 'cargar')->name('cargar');
+        Route::post('/guardar', 'guardar')->name('guardar');
+        Route::delete('/eliminar/{id}', 'eliminar')->name('eliminar');
+        Route::get('/descargar/{id}', 'descargar')->name('descargar');
     });
 
+    // Rutas de horarios
+    Route::controller(HorariosController::class)->prefix('horarios')->name('horarios.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+    });
 
     Route::apiResource('horarios', HorariosController::class);
 });

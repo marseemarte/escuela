@@ -4,7 +4,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
 
-class Horarios extends Seeder
+class HorariosTest extends Seeder
 {
     public function run()
     {
@@ -64,7 +64,7 @@ class Horarios extends Seeder
             }
 
             // 4) Cursos y Grupos
-            if (!DB::table('cursos')->where([['division','A'],['ano',5],['turno','D']])->exists()) {
+            if (!DB::table('cursos')->where([['division', 'A'], ['ano', 5], ['turno', 'D']])->exists()) {
                 $cursoId = DB::table('cursos')->insertGetId([
                     'division' => 'A',
                     'ano' => 5,
@@ -74,7 +74,7 @@ class Horarios extends Seeder
                     'updated_at' => $now,
                 ]);
             } else {
-                $cursoId = DB::table('cursos')->where([['division','A'],['ano',5],['turno','D']])->value('id');
+                $cursoId = DB::table('cursos')->where([['division', 'A'], ['ano', 5], ['turno', 'D']])->value('id');
             }
 
             if (!DB::table('grupos')->where('id_cursos', $cursoId)->exists()) {
@@ -90,7 +90,7 @@ class Horarios extends Seeder
             }
 
             // 5) Cupof (vincula materia + curso + grupo)
-            $cupofMaterias = ['PP-SI','SO','PROY-SW','PROY-MOB','ORG-MET','MOD-SIS','PDI-SYS'];
+            $cupofMaterias = ['PP-SI', 'SO', 'PROY-SW', 'PROY-MOB', 'ORG-MET', 'MOD-SIS', 'PDI-SYS'];
 
             foreach ($cupofMaterias as $abre) {
                 $materiaId = DB::table('materias')->where('abreviatura', $abre)->value('id');
@@ -119,27 +119,27 @@ class Horarios extends Seeder
             }
 
             // 6) Horarios
-            $getHoraId = function($nombre) {
+            $getHoraId = function ($nombre) {
                 return DB::table('horas')->where('nombre', $nombre)->value('id');
             };
-            $getSalonId = function($numero) {
+            $getSalonId = function ($numero) {
                 return DB::table('salones')->where('numero', $numero)->value('id');
             };
 
-            $getCupofByAbre = function($abre) use ($cursoId, $grupoId) {
+            $getCupofByAbre = function ($abre) use ($cursoId, $grupoId) {
                 $matId = DB::table('materias')->where('abreviatura', $abre)->value('id');
                 if (!$matId) return null;
                 return DB::table('cupof')->where([['id_materias', $matId], ['id_cursos', $cursoId], ['id_grupos', $grupoId]])->value('cupof');
             };
 
             $horarios = [
-                ['dia'=>'LUN','hora'=>'07:20-08:20','salon'=>101,'materia'=>'PP-SI'],
-                ['dia'=>'LUN','hora'=>'08:20-09:20','salon'=>101,'materia'=>'PP-SI'],
-                ['dia'=>'MAR','hora'=>'13:00-15:00','salon'=>102,'materia'=>'SO'],
-                ['dia'=>'MIE','hora'=>'09:50-10:50','salon'=>101,'materia'=>'PP-SI'],
-                ['dia'=>'JUE','hora'=>'13:00-15:00','salon'=>102,'materia'=>'PROY-MOB'],
-                ['dia'=>'VIE','hora'=>'13:00-15:00','salon'=>1,'materia'=>'ORG-MET'],
-                ['dia'=>'LUN','hora'=>'20:00-21:00','salon'=>1,'materia'=>'MOD-SIS'],
+                ['dia' => 'LUN', 'hora' => '07:20-08:20', 'salon' => 101, 'materia' => 'PP-SI'],
+                ['dia' => 'LUN', 'hora' => '08:20-09:20', 'salon' => 101, 'materia' => 'PP-SI'],
+                ['dia' => 'MAR', 'hora' => '13:00-15:00', 'salon' => 102, 'materia' => 'SO'],
+                ['dia' => 'MIE', 'hora' => '09:50-10:50', 'salon' => 101, 'materia' => 'PP-SI'],
+                ['dia' => 'JUE', 'hora' => '13:00-15:00', 'salon' => 102, 'materia' => 'PROY-MOB'],
+                ['dia' => 'VIE', 'hora' => '13:00-15:00', 'salon' => 1, 'materia' => 'ORG-MET'],
+                ['dia' => 'LUN', 'hora' => '20:00-21:00', 'salon' => 1, 'materia' => 'MOD-SIS'],
             ];
 
             foreach ($horarios as $h) {
@@ -166,7 +166,7 @@ class Horarios extends Seeder
 
             $primerCupEnHorarios = DB::table('horarios')->distinct()->pluck('cupof')->first();
 
-            $tipopersonaId = DB::table('tipopersona')->where('tipo','DOCENTE')->value('id');
+            $tipopersonaId = DB::table('tipopersona')->where('tipo', 'DOCENTE')->value('id');
             if (!$tipopersonaId) {
                 $tipopersonaId = DB::table('tipopersona')->insertGetId([
                     'tipo' => 'DOCENTE',
@@ -221,7 +221,6 @@ class Horarios extends Seeder
                     'updated_at' => $now,
                 ]);
             }
-
         }); // transaction
 
         $this->command->info('SeederTodosHorarios: datos insertados (si no existían).');

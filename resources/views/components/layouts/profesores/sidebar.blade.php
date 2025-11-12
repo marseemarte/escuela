@@ -26,21 +26,21 @@
                     <span class="pcoded-mtext">Tareas</span>
                 </a>
             </li>
-                <li class="{{ $proyecto == 'true' ? 'active' : '' }}">
-                    <a href="{{ route('profesores.proyecto.index') }}">
-                        <span class="pcoded-micon"><i class="feather icon-folder"></i></span>
-                        <span class="pcoded-mtext">Proyecto</span>
-                    </a>
-                </li>
-                <li class="{{ $planificacion == 'true' ? 'active' : '' }}">
-                    <a href="{{ route('profesores.planificaciones.index') }}">
-                        <span class="pcoded-micon"><i class="feather icon-file-text"></i></span>
-                        <span class="pcoded-mtext">Planificacion</span>
-                    </a>
-                </li>
+            <li class="{{ $proyectos == 'true' ? 'active' : '' }}">
+                <a href="{{ route('profesores.proyectos.index') }}">
+                    <span class="pcoded-micon"><i class="feather icon-folder"></i></span>
+                    <span class="pcoded-mtext">Proyectos</span>
+                </a>
+            </li>
+            <li class="{{ $planificacion == 'true' ? 'active' : '' }}">
+                <a href="{{ route('profesores.planificaciones.index') }}">
+                    <span class="pcoded-micon"><i class="feather icon-file-text"></i></span>
+                    <span class="pcoded-mtext">Planificacion</span>
+                </a>
+            </li>
             </li>
             <li class="{{ $horarios == 'true' ? 'active' : '' }}">
-                <a href="{{ route('horarios.index') }}">
+                <a href="{{ route('profesores.horarios.index') }}">
                     <span class="pcoded-micon"><i class="feather icon-calendar"></i></span>
                     <span class="pcoded-mtext">Horarios</span>
                 </a>

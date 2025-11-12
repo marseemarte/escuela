@@ -60,6 +60,11 @@ class Cupof extends Model
         return $this->hasMany(Asistencia::class, 'cupof', 'cupof');
     }
 
+    public function proyectos(): HasMany
+    {
+        return $this->hasMany(Proyecto::class, 'cupof', 'cupof');
+    }
+
     // Scopes y Accessors
 
     public function scopePorDescripcion($query, $descripcion)
@@ -70,5 +75,15 @@ class Cupof extends Model
     public function scopeActivos($query)
     {
         return $query->where('estado', 'A');
+    }
+
+    public function proyectosRecientes($limit = 5)
+    {
+        return $this->proyectos()->masRecientes()->limit($limit)->get();
+    }
+
+    public function totalProyectos()
+    {
+        return $this->proyectos()->count();
     }
 }

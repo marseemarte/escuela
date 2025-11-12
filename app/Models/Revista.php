@@ -55,4 +55,21 @@ class Revista extends Model
     {
         return $this->hasOne(Planificacion::class, 'id_revista')->latestOfMany();
     }
+
+    public function proyectos(): HasMany
+    {
+        return $this->hasMany(Proyecto::class, 'id_revista');
+    }
+
+    // Scopes y Accessors
+
+    public function proyectosRecientes($limit = 5)
+    {
+        return $this->proyectos()->masRecientes()->limit($limit)->get();
+    }
+
+    public function totalProyectos()
+    {
+        return $this->proyectos()->count();
+    }
 }
