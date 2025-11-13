@@ -10,9 +10,11 @@ use App\Http\Controllers\Materias\MateriasController;
 use App\Http\Controllers\Orientaciones\OrientacionesController;
 use App\Http\Controllers\RevistaController;
 use App\Http\Controllers\CupofController;
+use App\Http\Controllers\JefesDepartamento\JefeDepartamentoController;
 use App\Http\Controllers\Profesores\AsistenciaController;
 use App\Http\Controllers\Profesores\PlanificacionController;
 use App\Http\Controllers\Profesores\ProyectoController;
+use App\Http\Middleware\EnsureUserIsJefeDepartamento;
 use App\Http\Middleware\EnsureUserIsProfesor;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +23,11 @@ use Livewire\Volt\Volt;
 Route::get('/', function () {
     return view('app');
 })->name('home');
+Route::prefix('departamento')->middleware(['auth', EnsureUserIsJefeDepartamento::class])->name('departamento.')->group(function () {
+
+    // Ruta principal de jefes de departamento
+    Route::get('/', [JefeDepartamentoController::class, 'index'])->name('index');
+});
 
 Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->name('profesores.')->group(function () {
 

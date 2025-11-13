@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             DatosPruebaAsistenciaSeeder2::class,
             DatosPruebaPlanificacionSeeder::class,
             ProyectosTestSeeder::class,
+            JefesDepartamentoTestSeeder::class,
             //HorariosTest::class,
         ]);
     }

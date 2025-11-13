@@ -1,8 +1,11 @@
 <?php
+// filepath: bootstrap/app.php
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Middleware\EnsureUserIsProfesor;
+use App\Http\Middleware\EnsureUserIsJefeDepartamento;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -11,8 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Laravel 12 tiene el middleware configurado por defecto
-        // Solo agregamos configuraciones específicas si es necesario
+        $middleware->alias([
+            'profesor' => EnsureUserIsProfesor::class,
+            'jefe.departamento' => EnsureUserIsJefeDepartamento::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
