@@ -62,6 +62,15 @@ class Persona extends Authenticatable
             ->exists();
     }
 
+    public function isJefeDepartamento(): bool
+    {
+        return $this->tiposUsuario()
+            ->whereHas('tipoPersona', function ($q) {
+                $q->where('tipo', 'Jefe de Departamento');
+            })
+            ->exists();
+    }
+
     // Scopes y Accessors
     public function getNombreCompletoAttribute()
     {

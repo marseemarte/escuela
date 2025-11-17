@@ -14,10 +14,10 @@
                     <span class="pcoded-mtext">Proyectos</span>
                 </a>
             </li>
-            <li class="{{ $planificacion == 'true' ? 'active' : '' }}">
+            <li class="{{ $planificaciones == 'true' ? 'active' : '' }}">
                 <a href="{{ route('profesores.planificaciones.index') }}">
                     <span class="pcoded-micon"><i class="feather icon-file-text"></i></span>
-                    <span class="pcoded-mtext">Planificacion</span>
+                    <span class="pcoded-mtext">Planificaciones</span>
                 </a>
             </li>
         </ul>

@@ -1,308 +1,191 @@
 <?php
-// filepath: database/seeders/JefesDepartamentoTestSeeder.php
 
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use App\Models\Personas\Persona;
-use App\Models\Personas\TipoUsuario;
 use App\Models\Personas\TipoPersona;
-use App\Models\JefeDepartamentoMateria;
+use App\Models\Personas\TipoUsuario;
 use App\Models\Materia;
-use Carbon\Carbon;
+use App\Models\JefeDepartamentoMateria;
 
 class JefesDepartamentoTestSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $this->command->info('🚀 Iniciando seeder de Jefes de Departamento...');
-        $this->command->newLine();
+        $this->command->info('Creando datos de prueba para Jefes de Departamento...');
 
-        DB::beginTransaction();
+        // 1. Obtener o crear tipo de persona "Jefe de Departamento"
+        $tipoJefe = TipoPersona::firstOrCreate(
+            ['tipo' => 'Jefe de Departamento'],
+        );
 
-        try {
-            // 1. Verificar/Crear tipo de persona "Jefe de Departamento"
-            $tipoJefe = TipoPersona::where('tipo', 'Jefe de Departamento')->first();
+        // 2. Crear jefes de departamento
+        $jefesData = [
+            [
+                'dni' => 30111222,
+                'apellido' => 'Gómez',
+                'nombre' => 'Roberto Carlos',
+                'email' => 'roberto.gomez@escuela.edu.ar',
+                'departamento' => 'Matemática y Física'
+            ],
+            [
+                'dni' => 30222333,
+                'apellido' => 'Silva',
+                'nombre' => 'Patricia Andrea',
+                'email' => 'patricia.silva@escuela.edu.ar',
+                'departamento' => 'Lengua y Literatura'
+            ],
+            [
+                'dni' => 30333444,
+                'apellido' => 'Ramírez',
+                'nombre' => 'Jorge Luis',
+                'email' => 'jorge.ramirez@escuela.edu.ar',
+                'departamento' => 'Ciencias Sociales'
+            ],
+            [
+                'dni' => 30444555,
+                'apellido' => 'Méndez',
+                'nombre' => 'Laura Beatriz',
+                'email' => 'laura.mendez@escuela.edu.ar',
+                'departamento' => 'Ciencias Naturales'
+            ],
+        ];
 
-            if (!$tipoJefe) {
-                $this->command->info('📝 Creando tipo de persona: Jefe de Departamento');
-                $tipoJefe = TipoPersona::create([
-                    'tipo' => 'Jefe de Departamento',
-                    'descripcion' => 'Jefe de Departamento a cargo de la gestión de materias',
-                ]);
-                $this->command->info('✅ Tipo de persona creado con ID: ' . $tipoJefe->id);
-            } else {
-                $this->command->info('✅ Tipo de persona ya existe: Jefe de Departamento (ID: ' . $tipoJefe->id . ')');
-            }
-            $this->command->newLine();
+        $jefes = [];
+        $localidadId = DB::table('localidades')->first()->id ?? 1;
 
-            // 2. Obtener materias activas
-            $materias = Materia::where('estado', 'H')->get();
-
-            if ($materias->isEmpty()) {
-                $this->command->error('❌ No hay materias habilitadas en el sistema');
-                $this->command->info('💡 Ejecuta primero: php artisan db:seed --class=MateriasSeeder');
-                DB::rollBack();
-                return;
-            }
-
-            $this->command->info("✅ Encontradas {$materias->count()} materias habilitadas");
-            $this->command->newLine();
-
-            // 3. Datos de jefes de departamento de prueba
-            $jefesData = [
+        foreach ($jefesData as $jefeData) {
+            // Crear persona
+            $persona = Persona::firstOrCreate(
+                ['dni' => $jefeData['dni']],
                 [
-                    'dni' => '20111222',
-                    'cuil' => '20-20111222-3',
-                    'nombre' => 'María',
-                    'apellido' => 'González',
-                    'email' => 'maria.gonzalez@tecnica.edu.ar',
-                    'telefono' => '3815551001',
-                    'sexo' => 'F',
-                    'materias_asignar' => 3,
+                    'apellido' => $jefeData['apellido'],
+                    'nombre' => $jefeData['nombre'],
+                    'fechan' => '1975-01-01',
+                    'sexo' => in_array($jefeData['nombre'], ['Patricia Andrea', 'Laura Beatriz']) ? 'F' : 'M',
+                    'domicilio' => 'Calle Ejemplo 123',
+                    'id_localidad' => $localidadId,
+                    'pass' => '123456',
+                    'telefono' => '11-' . rand(1000, 9999) . '-' . rand(1000, 9999),
+                    'mail' => $jefeData['email']
+                ]
+            );
+
+            // Crear TipoUsuario
+            $tipoUsuario = TipoUsuario::firstOrCreate(
+                [
+                    'id_persona' => $persona->id,
+                    'id_tipopersona' => $tipoJefe->id
                 ],
                 [
-                    'dni' => '20222333',
-                    'cuil' => '20-20222333-4',
-                    'nombre' => 'Roberto',
-                    'apellido' => 'Fernández',
-                    'email' => 'roberto.fernandez@tecnica.edu.ar',
-                    'telefono' => '3815551002',
-                    'sexo' => 'M',
-                    'materias_asignar' => 4,
-                ],
-                [
-                    'dni' => '20333444',
-                    'cuil' => '20-20333444-5',
-                    'nombre' => 'Ana',
-                    'apellido' => 'Martínez',
-                    'email' => 'ana.martinez@tecnica.edu.ar',
-                    'telefono' => '3815551003',
-                    'sexo' => 'F',
-                    'materias_asignar' => 2,
-                ],
-                [
-                    'dni' => '20444555',
-                    'cuil' => '20-20444555-6',
-                    'nombre' => 'Carlos',
-                    'apellido' => 'López',
-                    'email' => 'carlos.lopez@tecnica.edu.ar',
-                    'telefono' => '3815551004',
-                    'sexo' => 'M',
-                    'materias_asignar' => 3,
-                ],
-                [
-                    'dni' => '20555666',
-                    'cuil' => '20-20555666-7',
-                    'nombre' => 'Laura',
-                    'apellido' => 'Rodríguez',
-                    'email' => 'laura.rodriguez@tecnica.edu.ar',
-                    'telefono' => '3815551005',
-                    'sexo' => 'F',
-                    'materias_asignar' => 2,
-                ],
+                    'estado' => 'A'
+                ]
+            );
+
+            $jefes[] = [
+                'tipoUsuario' => $tipoUsuario,
+                'departamento' => $jefeData['departamento'],
+                'persona' => $persona
             ];
 
-            $jefesCreados = 0;
-            $jefesActualizados = 0;
-            $asignacionesCreadas = 0;
-            $materiasUsadas = collect();
+            $this->command->info("✓ Jefe creado: {$persona->nombre_completo} (DNI: {$persona->dni})");
+        }
 
-            // 4. Crear/Actualizar jefes y asignar materias
-            foreach ($jefesData as $index => $jefeData) {
-                $this->command->info("🔄 Procesando: {$jefeData['nombre']} {$jefeData['apellido']}");
+        // 3. Obtener materias existentes o crear algunas de ejemplo
+        $materias = Materia::all();
 
-                // Verificar si ya existe la persona
-                $persona = Persona::where('dni', $jefeData['dni'])->first();
+        if ($materias->isEmpty()) {
+            $this->command->warn('No hay materias. Creando materias de ejemplo...');
 
-                if ($persona) {
-                    $this->command->warn("   ⚠️  Persona ya existe (ID: {$persona->id})");
+            $orientacionId = DB::table('orientaciones')->first()->id ?? null;
 
-                    // Verificar si ya tiene el rol de jefe
-                    $tipoUsuario = TipoUsuario::where('id_persona', $persona->id)
-                        ->where('id_tipopersona', $tipoJefe->id)
-                        ->first();
+            $materiasEjemplo = [
+                ['nombre' => 'Matemática', 'abreviatura' => 'MAT', 'resumen' => 'Matemática General'],
+                ['nombre' => 'Física', 'abreviatura' => 'FIS', 'resumen' => 'Física General'],
+                ['nombre' => 'Lengua', 'abreviatura' => 'LEN', 'resumen' => 'Lengua y Literatura'],
+                ['nombre' => 'Literatura', 'abreviatura' => 'LIT', 'resumen' => 'Literatura Universal'],
+                ['nombre' => 'Historia', 'abreviatura' => 'HIST', 'resumen' => 'Historia Argentina'],
+                ['nombre' => 'Geografía', 'abreviatura' => 'GEO', 'resumen' => 'Geografía Mundial'],
+                ['nombre' => 'Biología', 'abreviatura' => 'BIO', 'resumen' => 'Biología General'],
+                ['nombre' => 'Química', 'abreviatura' => 'QUI', 'resumen' => 'Química General'],
+            ];
 
-                    if ($tipoUsuario) {
-                        $this->command->warn("   ⚠️  Ya tiene rol de Jefe de Departamento");
-                        $jefesActualizados++;
-                    } else {
-                        // Crear solo el TipoUsuario
-                        $tipoUsuario = TipoUsuario::create([
-                            'id_persona' => $persona->id,
-                            'id_tipopersona' => $tipoJefe->id,
-                            'usuario' => $jefeData['dni'],
-                            'password' => Hash::make('123456'),
-                            'estado' => 'A',
-                        ]);
-                        $this->command->info("   ✓ Rol de jefe agregado (TipoUsuario ID: {$tipoUsuario->id})");
-                        $jefesCreados++;
-                    }
-                } else {
-                    // Crear persona nueva
-                    $persona = Persona::create([
-                        'dni' => $jefeData['dni'],
-                        'cuil' => $jefeData['cuil'],
-                        'nombre' => $jefeData['nombre'],
-                        'apellido' => $jefeData['apellido'],
-                        'email' => $jefeData['email'],
-                        'telefono' => $jefeData['telefono'],
-                        'fecha_nacimiento' => Carbon::now()->subYears(rand(35, 55))->format('Y-m-d'),
-                        'direccion' => 'Av. Educación ' . rand(100, 999),
-                        'localidad' => 'San Miguel de Tucumán',
-                        'provincia' => 'Tucumán',
-                        'codigo_postal' => '4000',
-                        'sexo' => $jefeData['sexo'],
-                        'estado_civil' => ['Soltero/a', 'Casado/a', 'Divorciado/a'][rand(0, 2)],
-                        'nacionalidad' => 'Argentina',
-                    ]);
-
-                    // Crear tipo usuario (Jefe de Departamento)
-                    $tipoUsuario = TipoUsuario::create([
-                        'id_persona' => $persona->id,
-                        'id_tipopersona' => $tipoJefe->id,
-                        'usuario' => $jefeData['dni'],
-                        'password' => Hash::make('123456'),
-                        'estado' => 'A',
-                    ]);
-
-                    $this->command->info("   ✓ Jefe creado (Persona ID: {$persona->id}, TipoUsuario ID: {$tipoUsuario->id})");
-                    $jefesCreados++;
-                }
-
-                // Asignar materias (evitar duplicados)
-                $cantidadMaterias = min($jefeData['materias_asignar'], $materias->count());
-
-                // Filtrar materias no usadas o con pocos jefes
-                $materiasDisponibles = $materias->filter(function ($materia) use ($materiasUsadas) {
-                    $vecesUsada = $materiasUsadas->where('id', $materia->id)->count();
-                    return $vecesUsada < 2; // Máximo 2 jefes por materia
-                });
-
-                if ($materiasDisponibles->isEmpty()) {
-                    $materiasDisponibles = $materias;
-                }
-
-                $materiasAsignadas = $materiasDisponibles->random(min($cantidadMaterias, $materiasDisponibles->count()));
-
-                foreach ($materiasAsignadas as $materia) {
-                    // Verificar si ya existe la asignación
-                    $asignacionExistente = JefeDepartamentoMateria::where('id_jefe', $tipoUsuario->id)
-                        ->where('id_materia', $materia->id)
-                        ->first();
-
-                    if ($asignacionExistente) {
-                        if ($asignacionExistente->estado === 'I') {
-                            $asignacionExistente->activar();
-                            $this->command->info("   → Reactivada asignación: {$materia->nombre}");
-                        } else {
-                            $this->command->warn("   ⚠️  Ya asignado a: {$materia->nombre}");
-                        }
-                    } else {
-                        JefeDepartamentoMateria::create([
-                            'id_jefe' => $tipoUsuario->id,
-                            'id_materia' => $materia->id,
-                            'fecha_asignacion' => Carbon::now()->subDays(rand(1, 90)),
-                            'estado' => 'A',
-                        ]);
-
-                        $materiasUsadas->push($materia);
-                        $asignacionesCreadas++;
-                        $this->command->info("   ✓ Asignado a: {$materia->nombre}");
-                    }
-                }
-
-                $this->command->newLine();
+            foreach ($materiasEjemplo as $mat) {
+                Materia::create(array_merge($mat, [
+                    'estado' => 'H',
+                    'orientacion_id' => $orientacionId,
+                    'anio' => null,
+                    'tipo' => null
+                ]));
             }
 
-            DB::commit();
+            $materias = Materia::all();
+        }
 
-            // Resumen final
-            $this->command->info('═══════════════════════════════════════════════════════════');
-            $this->command->info('✅ SEEDER COMPLETADO EXITOSAMENTE');
-            $this->command->info('═══════════════════════════════════════════════════════════');
-            $this->command->newLine();
+        // 4. Asignar materias a jefes de departamento
+        $asignaciones = [
+            // Roberto Gómez - Matemática y Física
+            ['jefe_index' => 0, 'materias' => ['Matemática', 'Física']],
+            // Patricia Silva - Lengua y Literatura
+            ['jefe_index' => 1, 'materias' => ['Lengua', 'Literatura', 'Lengua y Literatura']],
+            // Jorge Ramírez - Ciencias Sociales
+            ['jefe_index' => 2, 'materias' => ['Historia', 'Geografía']],
+            // Laura Méndez - Ciencias Naturales
+            ['jefe_index' => 3, 'materias' => ['Biología', 'Química']],
+        ];
 
-            $this->command->info('📊 RESUMEN:');
-            $this->command->info("   • Jefes nuevos creados: {$jefesCreados}");
-            $this->command->info("   • Jefes existentes actualizados: {$jefesActualizados}");
-            $this->command->info("   • Total jefes procesados: " . ($jefesCreados + $jefesActualizados));
-            $this->command->info("   • Asignaciones de materias creadas: {$asignacionesCreadas}");
-            $this->command->newLine();
+        $totalAsignaciones = 0;
+        foreach ($asignaciones as $asignacion) {
+            $jefe = $jefes[$asignacion['jefe_index']];
 
-            $this->command->info('═══════════════════════════════════════════════════════════');
-            $this->command->info('💡 CREDENCIALES DE ACCESO:');
-            $this->command->info('═══════════════════════════════════════════════════════════');
-            $this->command->newLine();
+            foreach ($asignacion['materias'] as $nombreMateria) {
+                $materia = $materias->firstWhere('nombre', $nombreMateria);
 
-            foreach ($jefesData as $jefe) {
-                $this->command->info("   👤 {$jefe['apellido']}, {$jefe['nombre']}");
-                $this->command->info("      Usuario: {$jefe['dni']}");
-                $this->command->info("      Email: {$jefe['email']}");
+                if ($materia) {
+                    JefeDepartamentoMateria::firstOrCreate(
+                        [
+                            'id_jefe' => $jefe['tipoUsuario']->id,
+                            'id_materia' => $materia->id
+                        ],
+                        [
+                            'fecha_asignacion' => now()->subDays(rand(0, 180)),
+                            'estado' => 'A'
+                        ]
+                    );
+
+                    $totalAsignaciones++;
+                    $this->command->info("  → Materia asignada: {$materia->nombre}");
+                }
             }
+        }
 
-            $this->command->newLine();
-            $this->command->info('   🔑 Contraseña para todos: 123456');
-            $this->command->info('   🌐 Ruta de acceso: /jefes');
-            $this->command->newLine();
+        // 5. Crear algunas asignaciones inactivas (históricas)
+        if ($materias->count() > 0 && count($jefes) > 0) {
+            $materiaHistorica = $materias->random();
+            $jefeHistorico = $jefes[array_rand($jefes)];
 
-            // Verificación de datos
-            $this->command->info('═══════════════════════════════════════════════════════════');
-            $this->command->info('🔍 VERIFICACIÓN:');
-            $this->command->info('═══════════════════════════════════════════════════════════');
-            $this->command->newLine();
+            JefeDepartamentoMateria::create([
+                'id_jefe' => $jefeHistorico['tipoUsuario']->id,
+                'id_materia' => $materiaHistorica->id,
+                'fecha_asignacion' => now()->subYear(),
+                'estado' => 'I'
+            ]);
 
-            $totalJefes = TipoUsuario::where('id_tipopersona', $tipoJefe->id)
-                ->where('estado', 'A')
-                ->count();
+            $this->command->info("✓ Asignación histórica creada (inactiva)");
+        }
 
-            $totalAsignaciones = JefeDepartamentoMateria::where('estado', 'A')->count();
+        $this->command->newLine();
+        $this->command->info('=== Resumen ===');
+        $this->command->info("Jefes de Departamento creados: " . count($jefes));
+        $this->command->info("Asignaciones activas: {$totalAsignaciones}");
+        $this->command->info("Materias disponibles: {$materias->count()}");
+        $this->command->newLine();
 
-            $this->command->info("   ✓ Total de Jefes de Departamento activos: {$totalJefes}");
-            $this->command->info("   ✓ Total de asignaciones activas: {$totalAsignaciones}");
-            $this->command->newLine();
-
-            // Mostrar distribución de materias
-            $this->command->info('📚 DISTRIBUCIÓN DE MATERIAS:');
-            $this->command->newLine();
-
-            $distribucion = JefeDepartamentoMateria::with(['jefe.persona', 'materia'])
-                ->where('estado', 'A')
-                ->get()
-                ->groupBy('id_jefe');
-
-            foreach ($distribucion as $idJefe => $asignaciones) {
-                $jefe = $asignaciones->first()->jefe;
-                $nombreJefe = "{$jefe->persona->apellido}, {$jefe->persona->nombre}";
-                $cantidadMaterias = $asignaciones->count();
-                $materiasNombres = $asignaciones->pluck('materia.nombre')->implode(', ');
-
-                $this->command->info("   👤 {$nombreJefe} ({$cantidadMaterias} materias)");
-                $this->command->info("      → {$materiasNombres}");
-            }
-
-            $this->command->newLine();
-            $this->command->info('═══════════════════════════════════════════════════════════');
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            $this->command->newLine();
-            $this->command->error('═══════════════════════════════════════════════════════════');
-            $this->command->error('❌ ERROR AL EJECUTAR EL SEEDER');
-            $this->command->error('═══════════════════════════════════════════════════════════');
-            $this->command->newLine();
-            $this->command->error('Mensaje: ' . $e->getMessage());
-            $this->command->error('Archivo: ' . $e->getFile());
-            $this->command->error('Línea: ' . $e->getLine());
-            $this->command->newLine();
-            $this->command->error('Stack Trace:');
-            $this->command->error($e->getTraceAsString());
-            $this->command->newLine();
+        $this->command->info('Credenciales de acceso (todos con password: 123456):');
+        foreach ($jefes as $jefe) {
+            $this->command->info("  - DNI: {$jefe['persona']->dni} | {$jefe['persona']->nombre_completo} ({$jefe['departamento']})");
         }
     }
 }

@@ -27,6 +27,15 @@ Route::prefix('departamento')->middleware(['auth', EnsureUserIsJefeDepartamento:
 
     // Ruta principal de jefes de departamento
     Route::get('/', [JefeDepartamentoController::class, 'index'])->name('index');
+
+    // Ruta para gestión de materias del departamento
+    Route::get('/materias', [JefeDepartamentoController::class, 'materias'])->name('materias');
+
+    // Ruta para ver profesores del departamento
+    Route::get('/profesores', [JefeDepartamentoController::class, 'profesores'])->name('profesores');
+
+    // Ruta para ver proyectos del departamento
+    Route::get('/proyectos', [JefeDepartamentoController::class, 'proyectos'])->name('proyectos');
 });
 
 Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->name('profesores.')->group(function () {

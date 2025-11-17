@@ -3,6 +3,7 @@
 
 namespace App\Models\Personas;
 
+use App\Models\JefeDepartamentoMateria;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -12,7 +13,7 @@ class TipoPersona extends Model
 
     protected $fillable = [
         'tipo',
-        'descripcion',
+        'estado',
     ];
 
     /**
