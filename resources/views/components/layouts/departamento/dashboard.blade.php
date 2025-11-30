@@ -55,12 +55,12 @@
         <div class="pcoded-container navbar-wrapper">
 
             <!-- Header -->
-            <x-layouts.jefes-departamento.header :titulo="$titulo" />
+            <x-layouts.departamento.header :titulo="$titulo" />
 
             <div class="pcoded-main-container">
                 <div class="pcoded-wrapper">
                     <!-- Sidebar -->
-                    <x-layouts.jefes-departamento.sidebar :inicio="$inicio" :planificaciones="$planificaciones" :proyectos="$proyectos" />
+                    <x-layouts.departamento.sidebar :inicio="$inicio" :planificaciones="$planificaciones" :proyectos="$proyectos" />
 
                     <div class="pcoded-content">
                         <div class="pcoded-inner-content">

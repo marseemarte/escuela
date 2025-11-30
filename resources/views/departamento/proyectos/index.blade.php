@@ -1,5 +1,6 @@
 {{-- filepath: c:\xampp\htdocs\Laravel\escuela\resources\views\profesores\proyectos\index.blade.php --}}
-<x-layouts.profesores.dashboard proyectos titulo="Proyectos" title="Mi Técnica | Panel de Profesores - Proyectos">
+<x-layouts.departamento.dashboard proyectos titulo="Proyectos"
+    title="Mi Técnica | Panel de Jefes de Departamento - Proyectos">
 
     <div class="asistencias-container">
         {{-- Header --}}
@@ -92,4 +93,4 @@
             </div>
         @endif
     </div>
-</x-layouts.profesores.dashboard>
+</x-layouts.departamento.dashboard>

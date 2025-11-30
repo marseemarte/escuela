@@ -8,7 +8,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Hash;
 
 class Persona extends Authenticatable
 {
@@ -58,15 +57,6 @@ class Persona extends Authenticatable
         return $this->tiposUsuario()
             ->whereHas('tipoPersona', function ($q) {
                 $q->where('tipo', 'Profesor');
-            })
-            ->exists();
-    }
-
-    public function isJefeDepartamento(): bool
-    {
-        return $this->tiposUsuario()
-            ->whereHas('tipoPersona', function ($q) {
-                $q->where('tipo', 'Jefe de Departamento');
             })
             ->exists();
     }

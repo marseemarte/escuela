@@ -1,6 +1,6 @@
 {{-- filepath: c:\xampp\htdocs\Laravel\escuela\resources\views\profesores\proyectos\cargar.blade.php --}}
-<x-layouts.profesores.dashboard proyectos titulo="Proyectos" title="Mi Técnica | Panel de Profesores - Proyectos">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+<x-layouts.departamento.dashboard proyectos titulo="Proyectos"
+    title="Mi Técnica | Panel de Jefes de Departamento - Proyectos">
 
     <div class="row">
         <div class="col-12">
@@ -670,4 +670,4 @@
         }
     </style>
 
-</x-layouts.profesores.dashboard>
+</x-layouts.departamento.dashboard>

@@ -6,7 +6,6 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureUserIsJefeDepartamento
@@ -25,15 +24,22 @@ class EnsureUserIsJefeDepartamento
 
         $user = Auth::user();
 
-        // Verificar si el usuario es Jefe de Departamento
-        $esJefeDepartamento = DB::table('tipousuario')
-            ->join('tipopersona', 'tipousuario.id_tipopersona', '=', 'tipopersona.id')
-            ->where('tipousuario.id_persona', $user->id)
-            ->where('tipopersona.tipo', 'Jefe de Departamento')
+        // Verificar si el usuario es Profesor y es Jefe de Departamento
+        $tipoUsuario = $user->tiposUsuario()
+            ->whereHas('tipoPersona', fn($q) => $q->where('tipo', 'Profesor'))
+            ->first();
+
+        if (!$tipoUsuario) {
+            return redirect()->route('home')->with('error', 'No tiene permisos de Profesor');
+        }
+
+        // Verificar si es jefe de algún departamento
+        $esJefeDepartamento = \App\Models\Departamento::where('id_tipousuario', $tipoUsuario->id)
+            ->where('estado', 'A')
             ->exists();
 
         if (!$esJefeDepartamento) {
-            return redirect()->route('home')->with('error', 'No tiene permisos para acceder a esta sección');
+            return redirect()->route('home')->with('error', 'No es jefe de ningún departamento');
         }
 
         return $next($request);

@@ -8,7 +8,6 @@ use App\Models\Personas\Persona;
 use App\Models\Personas\TipoPersona;
 use App\Models\Personas\TipoUsuario;
 use App\Models\Materia;
-use App\Models\JefeDepartamentoMateria;
 
 class JefesDepartamentoTestSeeder extends Seeder
 {
@@ -16,40 +15,48 @@ class JefesDepartamentoTestSeeder extends Seeder
     {
         $this->command->info('Creando datos de prueba para Jefes de Departamento...');
 
-        // 1. Obtener o crear tipo de persona "Jefe de Departamento"
-        $tipoJefe = TipoPersona::firstOrCreate(
-            ['tipo' => 'Jefe de Departamento'],
+        // 1. Obtener o crear tipo de persona "Profesor"
+        $tipoProfesor = TipoPersona::firstOrCreate(
+            ['tipo' => 'Profesor'],
         );
 
-        // 2. Crear jefes de departamento
+        // 2. Crear departamentos
+        $departamentosData = [
+            ['nombre' => 'Matemática y Física', 'descripcion' => 'Departamento de Ciencias Exactas'],
+            ['nombre' => 'Lengua y Literatura', 'descripcion' => 'Departamento de Humanidades'],
+            ['nombre' => 'Ciencias Sociales', 'descripcion' => 'Departamento de Historia y Geografía'],
+            ['nombre' => 'Ciencias Naturales', 'descripcion' => 'Departamento de Biología y Química'],
+        ];
+
+        // 3. Crear jefes de departamento (profesores)
         $jefesData = [
             [
                 'dni' => 30111222,
                 'apellido' => 'Gómez',
                 'nombre' => 'Roberto Carlos',
                 'email' => 'roberto.gomez@escuela.edu.ar',
-                'departamento' => 'Matemática y Física'
+                'departamento' => 'Matemática y Física',
             ],
             [
                 'dni' => 30222333,
                 'apellido' => 'Silva',
                 'nombre' => 'Patricia Andrea',
                 'email' => 'patricia.silva@escuela.edu.ar',
-                'departamento' => 'Lengua y Literatura'
+                'departamento' => 'Lengua y Literatura',
             ],
             [
                 'dni' => 30333444,
                 'apellido' => 'Ramírez',
                 'nombre' => 'Jorge Luis',
                 'email' => 'jorge.ramirez@escuela.edu.ar',
-                'departamento' => 'Ciencias Sociales'
+                'departamento' => 'Ciencias Sociales',
             ],
             [
                 'dni' => 30444555,
                 'apellido' => 'Méndez',
                 'nombre' => 'Laura Beatriz',
                 'email' => 'laura.mendez@escuela.edu.ar',
-                'departamento' => 'Ciencias Naturales'
+                'departamento' => 'Ciencias Naturales',
             ],
         ];
 
@@ -77,16 +84,26 @@ class JefesDepartamentoTestSeeder extends Seeder
             $tipoUsuario = TipoUsuario::firstOrCreate(
                 [
                     'id_persona' => $persona->id,
-                    'id_tipopersona' => $tipoJefe->id
+                    'id_tipopersona' => $tipoProfesor->id
                 ],
                 [
                     'estado' => 'A'
                 ]
             );
 
+            // Crear Departamento
+            $departamento = \App\Models\Departamento::firstOrCreate(
+                ['nombre' => $departamentosData[count($jefes)]['nombre']],
+                [
+                    'id_tipousuario' => $tipoUsuario->id,
+                    'descripcion' => $departamentosData[array_search($jefeData['departamento'], array_column($departamentosData, 'nombre'))]['descripcion'],
+                    'estado' => 'A'
+                ]
+            );
+
             $jefes[] = [
                 'tipoUsuario' => $tipoUsuario,
-                'departamento' => $jefeData['departamento'],
+                'departamento' => $departamento,
                 'persona' => $persona
             ];
 
@@ -144,36 +161,13 @@ class JefesDepartamentoTestSeeder extends Seeder
                 $materia = $materias->firstWhere('nombre', $nombreMateria);
 
                 if ($materia) {
-                    JefeDepartamentoMateria::firstOrCreate(
-                        [
-                            'id_jefe' => $jefe['tipoUsuario']->id,
-                            'id_materia' => $materia->id
-                        ],
-                        [
-                            'fecha_asignacion' => now()->subDays(rand(0, 180)),
-                            'estado' => 'A'
-                        ]
-                    );
+                    // Usar la tabla pivote departamento_materia
+                    $jefe['departamento']->materias()->attach($materia->id);
 
                     $totalAsignaciones++;
                     $this->command->info("  → Materia asignada: {$materia->nombre}");
                 }
             }
-        }
-
-        // 5. Crear algunas asignaciones inactivas (históricas)
-        if ($materias->count() > 0 && count($jefes) > 0) {
-            $materiaHistorica = $materias->random();
-            $jefeHistorico = $jefes[array_rand($jefes)];
-
-            JefeDepartamentoMateria::create([
-                'id_jefe' => $jefeHistorico['tipoUsuario']->id,
-                'id_materia' => $materiaHistorica->id,
-                'fecha_asignacion' => now()->subYear(),
-                'estado' => 'I'
-            ]);
-
-            $this->command->info("✓ Asignación histórica creada (inactiva)");
         }
 
         $this->command->newLine();
@@ -185,7 +179,7 @@ class JefesDepartamentoTestSeeder extends Seeder
 
         $this->command->info('Credenciales de acceso (todos con password: 123456):');
         foreach ($jefes as $jefe) {
-            $this->command->info("  - DNI: {$jefe['persona']->dni} | {$jefe['persona']->nombre_completo} ({$jefe['departamento']})");
+            $this->command->info("  - DNI: {$jefe['persona']->dni} | {$jefe['persona']->nombre_completo} ({$jefe['departamento']->nombre})");
         }
     }
 }

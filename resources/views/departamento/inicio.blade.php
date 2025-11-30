@@ -1,5 +1,4 @@
-<x-layouts.jefes-departamento.dashboard inicio titulo="Inicio"
-    title="Mi Técnica | Panel de Jefes de Departamento - Inicio">
+<x-layouts.departamento.dashboard inicio titulo="Inicio" title="Mi Técnica | Panel de Jefes de Departamento - Inicio">
     <div class="asistencias-container">
         <!-- Header de bienvenida -->
         <div class="asistencias-header">
@@ -21,43 +20,93 @@
         <div class="quick-actions-section">
             <h2 class="section-title">Accesos Rápidos</h2>
             <div class="quick-actions-grid">
-                <a href="/profesores/informes" class="quick-action-card">
+                <a href="{{ route('departamento.materias') }}" class="quick-action-card">
                     <div class="action-icon action-primary">
-                        <i class="fas fa-edit"></i>
+                        <i class="fas fa-book"></i>
                     </div>
-                    <h3 class="action-title">Cargar Informes</h3>
-                    <p class="action-description">Registra los informes de tus estudiantes</p>
+                    <h3 class="action-title">Materias del Departamento</h3>
+                    <p class="action-description">Consulta las materias bajo tu supervisión</p>
                 </a>
 
-                <a href="/profesores/asistencias" class="quick-action-card">
+                <a href="{{ route('departamento.profesores') }}" class="quick-action-card">
                     <div class="action-icon action-success">
-                        <i class="fas fa-check-square"></i>
+                        <i class="fas fa-chalkboard-teacher"></i>
                     </div>
-                    <h3 class="action-title">Tomar Asistencia</h3>
-                    <p class="action-description">Registra la asistencia de la clase de hoy</p>
+                    <h3 class="action-title">Profesores</h3>
+                    <p class="action-description">Revisa los profesores del departamento</p>
                 </a>
 
-                <a href="/profesores/tareas" class="quick-action-card">
+                <a href="{{ route('departamento.proyectos') }}" class="quick-action-card">
                     <div class="action-icon action-warning">
-                        <i class="fas fa-tasks"></i>
+                        <i class="fas fa-project-diagram"></i>
                     </div>
-                    <h3 class="action-title">Gestionar Tareas</h3>
-                    <p class="action-description">Sube nuevas tareas y revisa entregas</p>
+                    <h3 class="action-title">Proyectos</h3>
+                    <p class="action-description">Supervisa los proyectos de las materias</p>
                 </a>
 
-                <a href="/profesores/horarios" class="quick-action-card">
+                <a href="{{ route('departamento.planificaciones') }}" class="quick-action-card">
                     <div class="action-icon action-info">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <h3 class="action-title">Planificaciones</h3>
+                    <p class="action-description">Revisa las planificaciones de las materias</p>
+                </a>
+            </div>
+        </div>
+
+        <!-- Estadísticas del Departamento -->
+        <div class="stats-section">
+            <h2 class="section-title">Estadísticas del Departamento</h2>
+            <div class="stats-grid">
+                <div class="stat-card stat-primary">
+                    <div class="stat-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="pr-2">{{ $materias->count() }}</h3>
+                        <p>Materias</p>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-success">
+                    <div class="stat-icon">
                         <i class="fas fa-users"></i>
                     </div>
-                    <h3 class="action-title">Ver Horarios</h3>
-                    <p class="action-description">Consulta información de tus horarios</p>
-                </a>
+                    <div class="stat-content">
+                        <h3 class="pr-2">{{ $totalProfesores ?? 0 }}</h3>
+                        <p>Profesores</p>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-warning">
+                    <div class="stat-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="pr-2">{{ $totalProyectos ?? 0 }}</h3>
+                        <p>Proyectos</p>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-info">
+                    <div class="stat-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="pr-2">{{ $totalPlanificaciones ?? 0 }}</h3>
+                        <p>Planificaciones</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <style>
-        /* Stats Grid */
+        /* Stats Section */
+        .stats-section {
+            margin-bottom: 2rem;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -73,7 +122,21 @@
             display: flex;
             align-items: center;
             gap: 1rem;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.2s;
+            border: 1px solid #e5e7eb;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.3s ease;
         }
 
         .stat-card:hover {
@@ -81,15 +144,36 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
+        .stat-card:hover::before {
+            width: 6px;
+        }
+
+        .stat-primary::before {
+            background: #3b82f6;
+        }
+
+        .stat-success::before {
+            background: #10b981;
+        }
+
+        .stat-warning::before {
+            background: #f59e0b;
+        }
+
+        .stat-info::before {
+            background: #06b6d4;
+        }
+
         .stat-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             color: white;
+            flex-shrink: 0;
         }
 
         .stat-primary .stat-icon {
@@ -108,20 +192,26 @@
             background: #06b6d4;
         }
 
+        .stat-content {
+            flex: 1;
+        }
+
         .stat-content h3 {
-            font-size: 2rem;
+            font-size: 1.875rem;
             font-weight: 700;
             margin: 0;
             color: #1f2937;
         }
 
         .stat-content p {
-            margin: 0;
+            margin: 0.25rem 0 0 0;
             color: #6b7280;
             font-size: 0.875rem;
+            font-weight: 500;
         }
 
         /* Sections */
+
         .section-title {
             font-size: 1.25rem;
             font-weight: 600;
@@ -345,9 +435,23 @@
                 grid-template-columns: 1fr;
             }
 
+            .stat-card {
+                padding: 1.25rem;
+            }
+
+            .stat-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 1.125rem;
+            }
+
+            .stat-content h3 {
+                font-size: 1.5rem;
+            }
+
             .quick-actions-grid {
                 grid-template-columns: 1fr;
             }
         }
     </style>
-</x-layouts.jefes-departamento.dashboard>
+</x-layouts.departamento.dashboard>

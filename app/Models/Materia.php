@@ -47,6 +47,11 @@ class Materia extends Model
         return $this->hasOne(Planificacion::class, 'id_materia')->latestOfMany();
     }
 
+    public function departamento(): BelongsToMany
+    {
+        return $this->belongsToMany(Departamento::class, 'departamento_materia', 'id_materia', 'id_departamento')
+            ->withTimestamps();
+    }
     /**
      * Relación: Asignaciones de jefes de departamento
      */

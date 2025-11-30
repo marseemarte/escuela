@@ -1,6 +1,5 @@
-<x-layouts.jefes-departamento.dashboard planificacion titulo="Planificaciones"
+<x-layouts.departamento.dashboard planificacion titulo="Planificaciones"
     title="Mi Técnica | Panel de Jefes de Departamento - Planificaciones">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <div class="row">
         <div class="col-12">
@@ -721,4 +720,4 @@
         }
     </style>
 
-</x-layouts.jefes-departamento.dashboard>
+</x-layouts.departamento.dashboard>

@@ -3,7 +3,6 @@
 
 namespace App\Models\Personas;
 
-use App\Models\JefeDepartamentoMateria;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -25,26 +24,10 @@ class TipoPersona extends Model
     }
 
     /**
-     * Relación: Asignaciones como jefe de departamento
-     */
-    public function asignacionesJefe(): HasMany
-    {
-        return $this->hasMany(JefeDepartamentoMateria::class, 'id_jefe');
-    }
-
-    /**
      * Scope: Por tipo específico
      */
     public function scopePorTipo($query, $tipo)
     {
         return $query->where('tipo', $tipo);
-    }
-
-    /**
-     * Verificar si es tipo jefe de departamento
-     */
-    public function esJefeDepartamento(): bool
-    {
-        return $this->tipo === 'Jefe de Departamento';
     }
 }

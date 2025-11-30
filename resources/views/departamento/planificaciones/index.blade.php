@@ -1,4 +1,4 @@
-<x-layouts.jefes-departamento.dashboard planificacion titulo="planificacion"
+<x-layouts.departamento.dashboard planificacion titulo="planificacion"
     title="Mi Técnica | Panel de Jefes de Departamento - planificaciones">
 
 
@@ -75,4 +75,4 @@
             </div>
         @endif
     </div>
-</x-layouts.jefes-departamento.dashboard>
+</x-layouts.departamento.dashboard>

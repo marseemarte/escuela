@@ -10,7 +10,7 @@ use App\Http\Controllers\Materias\MateriasController;
 use App\Http\Controllers\Orientaciones\OrientacionesController;
 use App\Http\Controllers\RevistaController;
 use App\Http\Controllers\CupofController;
-use App\Http\Controllers\JefesDepartamento\JefeDepartamentoController;
+use App\Http\Controllers\Departamentos\DepartamentoController;
 use App\Http\Controllers\Profesores\AsistenciaController;
 use App\Http\Controllers\Profesores\PlanificacionController;
 use App\Http\Controllers\Profesores\ProyectoController;
@@ -26,16 +26,19 @@ Route::get('/', function () {
 Route::prefix('departamento')->middleware(['auth', EnsureUserIsJefeDepartamento::class])->name('departamento.')->group(function () {
 
     // Ruta principal de jefes de departamento
-    Route::get('/', [JefeDepartamentoController::class, 'index'])->name('index');
+    Route::get('/', [DepartamentoController::class, 'index'])->name('index');
 
     // Ruta para gestión de materias del departamento
-    Route::get('/materias', [JefeDepartamentoController::class, 'materias'])->name('materias');
+    Route::get('/materias', [DepartamentoController::class, 'materias'])->name('materias');
 
     // Ruta para ver profesores del departamento
-    Route::get('/profesores', [JefeDepartamentoController::class, 'profesores'])->name('profesores');
+    Route::get('/profesores', [DepartamentoController::class, 'profesores'])->name('profesores');
 
     // Ruta para ver proyectos del departamento
-    Route::get('/proyectos', [JefeDepartamentoController::class, 'proyectos'])->name('proyectos');
+    Route::get('/proyectos', [DepartamentoController::class, 'proyectos'])->name('proyectos');
+
+    // Ruta para ver planificaciones del departamento
+    Route::get('/planificaciones', [DepartamentoController::class, 'planificaciones'])->name('planificaciones');
 });
 
 Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->name('profesores.')->group(function () {
