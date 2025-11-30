@@ -19,7 +19,7 @@ class Proyecto extends Model
         'nombre_archivo',
         'ruta_archivo',
         'cupof',
-        'id_revista'
+        'id_revista',
     ];
 
     protected $casts = [

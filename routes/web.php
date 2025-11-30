@@ -11,9 +11,11 @@ use App\Http\Controllers\Orientaciones\OrientacionesController;
 use App\Http\Controllers\RevistaController;
 use App\Http\Controllers\CupofController;
 use App\Http\Controllers\Departamentos\DepartamentoController;
+use App\Http\Controllers\Departamentos\PlanificacionController as DeptPlanificacionController;
+use App\Http\Controllers\Departamentos\ProyectoController as DeptProyectoController;
 use App\Http\Controllers\Profesores\AsistenciaController;
-use App\Http\Controllers\Profesores\PlanificacionController;
-use App\Http\Controllers\Profesores\ProyectoController;
+use App\Http\Controllers\Profesores\PlanificacionController as ProfPlanificacionController;
+use App\Http\Controllers\Profesores\ProyectoController as ProfProyectoController;
 use App\Http\Middleware\EnsureUserIsJefeDepartamento;
 use App\Http\Middleware\EnsureUserIsProfesor;
 use Illuminate\Support\Facades\Route;
@@ -29,16 +31,19 @@ Route::prefix('departamento')->middleware(['auth', EnsureUserIsJefeDepartamento:
     Route::get('/', [DepartamentoController::class, 'index'])->name('index');
 
     // Ruta para gestión de materias del departamento
-    Route::get('/materias', [DepartamentoController::class, 'materias'])->name('materias');
+    //Route::get('/materias', [DepartamentoController::class, 'materias'])->name('materias');
 
     // Ruta para ver profesores del departamento
     Route::get('/profesores', [DepartamentoController::class, 'profesores'])->name('profesores');
 
-    // Ruta para ver proyectos del departamento
-    Route::get('/proyectos', [DepartamentoController::class, 'proyectos'])->name('proyectos');
-
-    // Ruta para ver planificaciones del departamento
-    Route::get('/planificaciones', [DepartamentoController::class, 'planificaciones'])->name('planificaciones');
+    Route::controller(DeptPlanificacionController::class)->prefix('planificaciones')->name('planificaciones.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/ver/{materiaId}', 'show')->name('show');
+    });
+    Route::controller(DeptProyectoController::class)->prefix('proyectos')->name('proyectos.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/ver/{materiaId}', 'show')->name('show');
+    });
 });
 
 Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->name('profesores.')->group(function () {
@@ -78,7 +83,7 @@ Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->
         Route::get('alumnos/{cupof}', 'obtenerAlumnos')->name('alumnos');
     });
     // Rutas de planificación
-    Route::controller(PlanificacionController::class)->prefix('planificaciones')->name('planificaciones.')->group(function () {
+    Route::controller(ProfPlanificacionController::class)->prefix('planificaciones')->name('planificaciones.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/{cupof}', 'cargar')->name('cargar');
         Route::post('/guardar', 'guardar')->name('guardar');
@@ -87,7 +92,7 @@ Route::prefix('profesores')->middleware(['auth', EnsureUserIsProfesor::class])->
     });
 
     // Rutas de proyectos
-    Route::controller(ProyectoController::class)->prefix('proyectos')->name('proyectos.')->group(function () {
+    Route::controller(ProfProyectoController::class)->prefix('proyectos')->name('proyectos.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/cargar/{cupof}', 'cargar')->name('cargar');
         Route::post('/guardar', 'guardar')->name('guardar');

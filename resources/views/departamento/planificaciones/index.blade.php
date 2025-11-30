@@ -1,13 +1,13 @@
-<x-layouts.departamento.dashboard planificacion titulo="planificacion"
-    title="Mi Técnica | Panel de Jefes de Departamento - planificaciones">
+<x-layouts.departamento.dashboard planificaciones titulo="Planificaciones"
+    title="Mi Técnica | Panel de Jefes de Departamento - Planificaciones">
 
 
     <div class="asistencias-container">
         {{-- Header --}}
         <div class="asistencias-header">
             <div class="header-content">
-                <h1 class="main-title">Planificacion</h1>
-                <p class="main-subtitle">Seleccione una materia para cargar una planificacion</p>
+                <h1 class="main-title">Planificaciones del Departamento</h1>
+                <p class="main-subtitle">Revise las planificaciones de las materias de su departamento</p>
             </div>
             <div class="header-info">
                 <div class="date-info">
@@ -20,42 +20,64 @@
         {{-- Lista de materias --}}
         @if ($materias && count($materias) > 0)
             <div class="materias-grid">
-                @foreach ($materias as $cupof)
+                @foreach ($materias as $materia)
                     <div class="materia-card">
                         <div class="materia-content">
                             {{-- Cabecera de la materia --}}
                             <div class="materia-header">
                                 <div class="materia-info">
                                     <h3 class="materia-title">
-                                        {{ $cupof->materia->nombre }}
+                                        {{ $materia->nombre }}
                                     </h3>
                                     <p class="materia-subtitle">
-                                        {{ $cupof->curso->ano }}° {{ $cupof->curso->division }} -
-                                        {{ $cupof->grupo->nombre }}
+                                        @if ($materia->orientacion)
+                                            {{ $materia->orientacion->nombre }}
+                                        @endif
                                     </p>
                                 </div>
+                                {{-- Badge con cantidad de planificaciones --}}
+                                @php
+                                    $totalPlanificaciones = $materia->planificaciones->count();
+                                @endphp
+                                @if ($totalPlanificaciones > 0)
+                                    <span class="badge badge-success">
+                                        <i class="fas fa-check-circle"></i>
+                                        {{ $totalPlanificaciones }}
+                                        {{ $totalPlanificaciones == 1 ? 'planificación' : 'planificaciones' }}
+                                    </span>
+                                @else
+                                    <span class="badge badge-warning">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        Sin planificaciones
+                                    </span>
+                                @endif
                             </div>
 
                             {{-- Información adicional --}}
                             <div class="materia-details">
                                 <div class="detail-item">
-                                    <i class="fas fa-clock"></i>
-                                    <span>Turno:
-                                        {{ ucfirst($cupof->turno === 'M' ? 'Mañana' : ($cupof->turno === 'T' ? 'Tarde' : 'Noche')) }}</span>
+                                    <i class="fas fa-book"></i>
+                                    <span>{{ $materia->anio }}° Año - {{ $materia->tipo }}</span>
                                 </div>
                                 <div class="detail-item">
-                                    <i class="fas fa-users"></i>
-                                    <span>Curso: {{ $cupof->curso->ano }}° Año División
-                                        {{ $cupof->curso->division }}</span>
+                                    <i class="fas fa-folder"></i>
+                                    <span>
+                                        @if ($totalPlanificaciones > 0)
+                                            {{ $totalPlanificaciones }}
+                                            {{ $totalPlanificaciones == 1 ? 'planificación cargada' : 'planificaciones cargadas' }}
+                                        @else
+                                            Sin planificaciones cargadas
+                                        @endif
+                                    </span>
                                 </div>
                             </div>
 
                             {{-- Botones de acción --}}
                             <div class="materia-actions">
-                                <a href="{{ route('profesores.planificaciones.cargar', $cupof->cupof) }}"
+                                <a href="{{ route('departamento.planificaciones.show', $materia->id) }}"
                                     class="btn-primary-custom">
-                                    <i class="fas fa-edit"></i>
-                                    Cargar Planificacion
+                                    <i class="fas fa-eye"></i>
+                                    {{ $totalPlanificaciones > 0 ? 'Ver Planificaciones' : 'No hay planificaciones' }}
                                 </a>
                             </div>
                         </div>

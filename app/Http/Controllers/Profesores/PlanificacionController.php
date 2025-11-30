@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Profesores;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Cupof;
+use App\Models\Departamento;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Planificacion;
@@ -281,7 +282,34 @@ class PlanificacionController extends Controller
     public function descargar($id)
     {
         try {
+            $usuario = Auth::user();
             $planificacion = Planificacion::findOrFail($id);
+
+            // Verificar si es profesor de la misma materia
+            $esProfesorMateria = Revista::where('situacion', 'A')
+                ->whereHas('cupof', function ($query) use ($planificacion) {
+                    $query->where('id_materias', $planificacion->id_materia)
+                        ->where('estado', 'A');
+                })
+                ->whereHas('tipousuario.persona', function ($query) use ($usuario) {
+                    $query->where('dni', $usuario->dni);
+                })
+                ->exists();
+
+            // Verificar si es jefe del departamento al que pertenece la materia
+            $esJefeDepartamento = Departamento::whereHas('materias', function ($query) use ($planificacion) {
+                $query->where('materias.id', $planificacion->id_materia);
+            })
+                ->whereHas('tipoUsuario.persona', function ($query) use ($usuario) {
+                    $query->where('dni', $usuario->dni);
+                })
+                ->where('estado', 'A')
+                ->exists();
+
+            if (!$esProfesorMateria && !$esJefeDepartamento) {
+                return redirect()->back()->with('error', 'No tiene permiso para descargar esta planificación');
+            }
+
             $rutaCompleta = storage_path('app/private/' . $planificacion->ruta_archivo);
 
             if (!file_exists($rutaCompleta)) {

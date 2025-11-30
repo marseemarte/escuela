@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Profesores;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Cupof;
+use App\Models\Departamento;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Proyecto;
@@ -269,17 +270,26 @@ class ProyectoController extends Controller
     {
         try {
             $usuario = Auth::user();
+            $proyecto = Proyecto::with('cupof')->findOrFail($id);
 
-            $proyecto = Proyecto::findOrFail($id);
-
-            // Verificar que el profesor tenga permiso (debe ser el propietario)
-            $revista = Revista::where('id', $proyecto->id_revista)
+            // Verificar si es el profesor propietario
+            $esPropietario = Revista::where('id', $proyecto->id_revista)
                 ->whereHas('tipousuario.persona', function ($query) use ($usuario) {
                     $query->where('dni', $usuario->dni);
                 })
-                ->first();
+                ->exists();
 
-            if (!$revista) {
+            // Verificar si es jefe del departamento al que pertenece la materia
+            $esJefeDepartamento = Departamento::whereHas('materias', function ($query) use ($proyecto) {
+                $query->where('materias.id', $proyecto->getRelation('cupof')->id_materias);
+            })
+                ->whereHas('tipoUsuario.persona', function ($query) use ($usuario) {
+                    $query->where('dni', $usuario->dni);
+                })
+                ->where('estado', 'A')
+                ->exists();
+
+            if (!$esPropietario && !$esJefeDepartamento) {
                 return redirect()->back()->with('error', 'No tiene permiso para descargar este proyecto');
             }
 

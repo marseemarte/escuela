@@ -3,6 +3,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Departamento;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -34,7 +35,7 @@ class EnsureUserIsJefeDepartamento
         }
 
         // Verificar si es jefe de algún departamento
-        $esJefeDepartamento = \App\Models\Departamento::where('id_tipousuario', $tipoUsuario->id)
+        $esJefeDepartamento = Departamento::where('id_tipousuario', $tipoUsuario->id)
             ->where('estado', 'A')
             ->exists();
 

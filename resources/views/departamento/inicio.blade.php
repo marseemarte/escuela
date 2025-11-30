@@ -20,15 +20,8 @@
         <div class="quick-actions-section">
             <h2 class="section-title">Accesos Rápidos</h2>
             <div class="quick-actions-grid">
-                <a href="{{ route('departamento.materias') }}" class="quick-action-card">
-                    <div class="action-icon action-primary">
-                        <i class="fas fa-book"></i>
-                    </div>
-                    <h3 class="action-title">Materias del Departamento</h3>
-                    <p class="action-description">Consulta las materias bajo tu supervisión</p>
-                </a>
 
-                <a href="{{ route('departamento.profesores') }}" class="quick-action-card">
+                <a href="{{ route('departamento.index') }}" class="quick-action-card">
                     <div class="action-icon action-success">
                         <i class="fas fa-chalkboard-teacher"></i>
                     </div>
@@ -36,7 +29,7 @@
                     <p class="action-description">Revisa los profesores del departamento</p>
                 </a>
 
-                <a href="{{ route('departamento.proyectos') }}" class="quick-action-card">
+                <a href="{{ route('departamento.proyectos.index') }}" class="quick-action-card">
                     <div class="action-icon action-warning">
                         <i class="fas fa-project-diagram"></i>
                     </div>
@@ -44,7 +37,7 @@
                     <p class="action-description">Supervisa los proyectos de las materias</p>
                 </a>
 
-                <a href="{{ route('departamento.planificaciones') }}" class="quick-action-card">
+                <a href="{{ route('departamento.planificaciones.index') }}" class="quick-action-card">
                     <div class="action-icon action-info">
                         <i class="fas fa-clipboard-list"></i>
                     </div>

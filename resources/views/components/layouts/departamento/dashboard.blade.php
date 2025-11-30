@@ -9,6 +9,7 @@
     $inicio = isset($inicio) ? $inicio : 'false';
     $proyectos = isset($proyectos) ? $proyectos : 'false';
     $planificaciones = isset($planificaciones) ? $planificaciones : 'false';
+    $profesores = isset($profesores) ? $profesores : 'false';
 @endphp
 
 <body>
@@ -60,7 +61,8 @@
             <div class="pcoded-main-container">
                 <div class="pcoded-wrapper">
                     <!-- Sidebar -->
-                    <x-layouts.departamento.sidebar :inicio="$inicio" :planificaciones="$planificaciones" :proyectos="$proyectos" />
+                    <x-layouts.departamento.sidebar :inicio="$inicio" :planificaciones="$planificaciones" :proyectos="$proyectos"
+                        :profesores="$profesores" />
 
                     <div class="pcoded-content">
                         <div class="pcoded-inner-content">

@@ -4,9 +4,7 @@ namespace App\Http\Controllers\Departamentos;
 
 use App\Http\Controllers\Controller;
 use App\Models\Departamento;
-use App\Models\Proyecto;
 use App\Models\Revista;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DepartamentoController extends Controller
@@ -35,71 +33,53 @@ class DepartamentoController extends Controller
         return view('departamento.inicio', compact('departamento', 'materias'));
     }
 
-    public function materias()
-    {
-        $tipoUsuario = Auth::user()->tiposUsuario()
-            ->whereHas('tipoPersona', fn($q) => $q->where('tipo', 'Profesor'))
-            ->first();
-
-        $departamento = Departamento::where('id_tipousuario', $tipoUsuario->id)
-            ->with(['materias.orientacion', 'materias.cupof.grupo.curso'])
-            ->first();
-
-        if (!$departamento) {
-            abort(403, 'No es jefe de ningún departamento');
-        }
-
-        $materias = $departamento->materias;
-
-        return view('departamento.materias', compact('departamento', 'materias'));
-    }
-
     public function profesores()
     {
         $tipoUsuario = Auth::user()->tiposUsuario()
             ->whereHas('tipoPersona', fn($q) => $q->where('tipo', 'Profesor'))
             ->first();
 
-        $departamento = Departamento::where('id_tipousuario', $tipoUsuario->id)->first();
+        $departamento = \App\Models\Departamento::where('id_tipousuario', $tipoUsuario->id)->first();
 
         if (!$departamento) {
             abort(403, 'No es jefe de ningún departamento');
         }
 
-        // Obtener profesores que imparten materias del departamento
-        $materias = $departamento->materias->pluck('id');
+        // Obtener IDs de materias del departamento
+        $materiaIds = $departamento->materias->pluck('id');
 
-        $profesores = Revista::whereHas('cupof', function ($query) use ($materias) {
-            $query->whereIn('id_materias', $materias);
-        })
-            ->with(['tipoUsuario.persona', 'cupof.materia', 'cupof.grupo.curso'])
-            ->get()
-            ->groupBy('id_tipo_usuario');
-
-        return view('departamento.profesores', compact('departamento', 'profesores'));
-    }
-
-    public function proyectos()
-    {
-        $tipoUsuario = Auth::user()->tiposUsuario()
-            ->whereHas('tipoPersona', fn($q) => $q->where('tipo', 'Profesor'))
-            ->first();
-
-        $departamento = Departamento::where('id_tipousuario', $tipoUsuario->id)->first();
-
-        if (!$departamento) {
-            abort(403, 'No es jefe de ningún departamento');
-        }
-
-        $materias = $departamento->materias->pluck('id');
-
-        $proyectos = Proyecto::whereHas('revista.cupof', function ($query) use ($materias) {
-            $query->whereIn('id_materias', $materias);
-        })
-            ->with(['revista.cupof.materia', 'revista.cupof.grupo.curso', 'revista.tipoUsuario.persona'])
-            ->orderBy('created_at', 'desc')
+        // Obtener profesores con sus asignaciones
+        $revistas = \App\Models\Revista::where('situacion', 'A')
+            ->whereHas('cupof', function ($query) use ($materiaIds) {
+                $query->whereIn('id_materias', $materiaIds)
+                    ->where('estado', 'A');
+            })
+            ->with([
+                'tipoUsuario.persona',
+                'cupof.materia',
+                'cupof.curso',
+                'cupof.grupo'
+            ])
             ->get();
 
-        return view('departamento.proyectos', compact('departamento', 'proyectos'));
+        // Construir array de profesores con verificación de proyectos y planificaciones
+        $profesores = $revistas->map(function ($revista) {
+            $cupof = $revista->getRelation('cupof');
+
+            return [
+                'persona' => $revista->tipoUsuario->persona,
+                'materia' => $cupof->materia,
+                'curso' => $cupof->curso,
+                'grupo' => $cupof->grupo,
+                'tiene_proyecto' => \App\Models\Proyecto::where('id_revista', $revista->id)->exists(),
+                'tiene_planificacion' => \App\Models\Planificacion::where('id_revista', $revista->id)
+                    ->where('id_materia', $cupof->id_materias)
+                    ->exists(),
+            ];
+        })->sortBy(function ($profesor) {
+            return $profesor['persona']->apellido;
+        });
+
+        return view('departamento.profesores', compact('departamento', 'profesores'));
     }
 }

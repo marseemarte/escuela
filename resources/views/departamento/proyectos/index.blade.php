@@ -1,4 +1,7 @@
 {{-- filepath: c:\xampp\htdocs\Laravel\escuela\resources\views\profesores\proyectos\index.blade.php --}}
+@php
+    use App\Models\Proyecto;
+@endphp
 <x-layouts.departamento.dashboard proyectos titulo="Proyectos"
     title="Mi Técnica | Panel de Jefes de Departamento - Proyectos">
 
@@ -6,8 +9,8 @@
         {{-- Header --}}
         <div class="asistencias-header">
             <div class="header-content">
-                <h1 class="main-title">Proyectos</h1>
-                <p class="main-subtitle">Seleccione una materia para gestionar sus proyectos</p>
+                <h1 class="main-title">Proyectos del Departamento</h1>
+                <p class="main-subtitle">Revise los proyectos de las materias de su departamento</p>
             </div>
             <div class="header-info">
                 <div class="date-info">
@@ -27,18 +30,25 @@
                             <div class="materia-header">
                                 <div class="materia-info">
                                     <h3 class="materia-title">
-                                        {{ $materia['materia'] }}
+                                        {{ $materia->nombre }}
                                     </h3>
                                     <p class="materia-subtitle">
-                                        {{ $materia['curso'] }} - {{ $materia['grupo'] }}
+                                        @if ($materia->orientacion)
+                                            {{ $materia->orientacion->nombre }}
+                                        @endif
                                     </p>
                                 </div>
                                 {{-- Badge con cantidad de proyectos --}}
-                                @if ($materia['tiene_proyectos'])
+                                @php
+                                    $totalProyectos = Proyecto::whereHas('revista.cupof', function ($q) use ($materia) {
+                                        $q->where('id_materias', $materia->id);
+                                    })->count();
+                                @endphp
+                                @if ($totalProyectos > 0)
                                     <span class="badge badge-success">
                                         <i class="fas fa-check-circle"></i>
-                                        {{ $materia['total_proyectos'] }}
-                                        {{ $materia['total_proyectos'] == 1 ? 'proyecto' : 'proyectos' }}
+                                        {{ $totalProyectos }}
+                                        {{ $totalProyectos == 1 ? 'proyecto' : 'proyectos' }}
                                     </span>
                                 @else
                                     <span class="badge badge-warning">
@@ -51,16 +61,15 @@
                             {{-- Información adicional --}}
                             <div class="materia-details">
                                 <div class="detail-item">
-                                    <i class="fas fa-clock"></i>
-                                    <span>Turno:
-                                        {{ ucfirst($materia['turno'] === 'M' ? 'Mañana' : ($materia['turno'] === 'T' ? 'Tarde' : 'Noche')) }}</span>
+                                    <i class="fas fa-book"></i>
+                                    <span>{{ $materia->anio }}° Año - {{ $materia->tipo }}</span>
                                 </div>
                                 <div class="detail-item">
                                     <i class="fas fa-folder"></i>
                                     <span>
-                                        @if ($materia['tiene_proyectos'])
-                                            {{ $materia['total_proyectos'] }}
-                                            {{ $materia['total_proyectos'] == 1 ? 'proyecto cargado' : 'proyectos cargados' }}
+                                        @if ($totalProyectos > 0)
+                                            {{ $totalProyectos }}
+                                            {{ $totalProyectos == 1 ? 'proyecto cargado' : 'proyectos cargados' }}
                                         @else
                                             Sin proyectos cargados
                                         @endif
@@ -70,10 +79,10 @@
 
                             {{-- Botones de acción --}}
                             <div class="materia-actions">
-                                <a href="{{ route('profesores.proyectos.cargar', $materia['cupof']) }}"
+                                <a href="{{ route('departamento.proyectos.show', $materia->id) }}"
                                     class="btn-primary-custom">
-                                    <i class="fas fa-folder-open"></i>
-                                    {{ $materia['tiene_proyectos'] ? 'Ver/Gestionar Proyectos' : 'Subir Proyecto' }}
+                                    <i class="fas fa-eye"></i>
+                                    {{ $totalProyectos > 0 ? 'Ver Proyectos' : 'No hay proyectos' }}
                                 </a>
                             </div>
                         </div>

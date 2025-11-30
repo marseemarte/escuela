@@ -46,5 +46,27 @@
                 </a>
             </li>
         </ul>
+        @php
+            $esJefeDepartamento = \App\Models\Departamento::where(
+                'id_tipousuario',
+                Auth::user()->tiposUsuario()->whereHas('tipoPersona', fn($q) => $q->where('tipo', 'Profesor'))->first()
+                    ?->id,
+            )
+                ->where('estado', 'A')
+                ->exists();
+        @endphp
+
+        @if ($esJefeDepartamento)
+            <ul class="pcoded-item pcoded-left-item"
+                style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                <li class="">
+                    <a href="{{ route('departamento.index') }}" class="waves-effect waves-dark"
+                        style="background: rgba(255,255,255,0.05); border-radius: 4px; margin: 0 10px;">
+                        <span class="pcoded-micon"><i class="feather icon-external-link"></i></span>
+                        <span class="pcoded-mtext" style="font-weight: 500;">Portal de Departamento</span>
+                    </a>
+                </li>
+            </ul>
+        @endif
     </div>
 </nav>
