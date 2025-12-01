@@ -21,14 +21,6 @@
             <h2 class="section-title">Accesos Rápidos</h2>
             <div class="quick-actions-grid">
 
-                <a href="{{ route('departamento.index') }}" class="quick-action-card">
-                    <div class="action-icon action-success">
-                        <i class="fas fa-chalkboard-teacher"></i>
-                    </div>
-                    <h3 class="action-title">Profesores</h3>
-                    <p class="action-description">Revisa los profesores del departamento</p>
-                </a>
-
                 <a href="{{ route('departamento.proyectos.index') }}" class="quick-action-card">
                     <div class="action-icon action-warning">
                         <i class="fas fa-project-diagram"></i>
@@ -47,7 +39,7 @@
             </div>
         </div>
 
-        <!-- Estadísticas del Departamento -->
+       <!--  Estadísticas del Departamento
         <div class="stats-section">
             <h2 class="section-title">Estadísticas del Departamento</h2>
             <div class="stats-grid">
@@ -92,7 +84,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <style>
         /* Stats Section */

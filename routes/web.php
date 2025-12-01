@@ -31,9 +31,6 @@ Route::prefix('departamento')->middleware(['auth', EnsureUserIsJefeDepartamento:
     // Ruta principal de jefes de departamento
     Route::get('/', [DepartamentoController::class, 'index'])->name('index');
 
-    // Ruta para gestión de materias del departamento
-    //Route::get('/materias', [DepartamentoController::class, 'materias'])->name('materias');
-
     // Ruta para ver profesores del departamento
     Route::get('/profesores', [DepartamentoController::class, 'profesores'])->name('profesores');
 

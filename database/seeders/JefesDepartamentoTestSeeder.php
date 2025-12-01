@@ -221,6 +221,139 @@ class JefesDepartamentoTestSeeder extends Seeder
         $departamentoMatematica = $jefes[0]['departamento'];
         $materiasMatematica = $jefes[0]['departamento']->materias()->get();
 
+        // Asignar materias a Roberto Gómez como profesor
+        $this->command->info('Asignando materias a Roberto Gómez como profesor...');
+        
+        $tipoUsuarioRoberto = $jefes[0]['tipoUsuario'];
+        $cursos = DB::table('cursos')->where('estado', 'A')->get();
+        $ultimoCupof = DB::table('cupof')->max('cupof') ?? 2000;
+        
+        if (!$cursos->isEmpty() && !$materiasMatematica->isEmpty()) {
+            $materiasRoberto = $materiasMatematica->take(2); // Asignar primeras 2 materias
+            $cupofCount = 0;
+            
+            foreach ($materiasRoberto as $materia) {
+                foreach ($cursos->take(2) as $curso) { // Asignar a 2 cursos
+                    $grupo = DB::table('grupos')->where('id_cursos', $curso->id)->first();
+                    if (!$grupo) {
+                        $grupoId = DB::table('grupos')->insertGetId([
+                            'nombre' => 1,
+                            'id_cursos' => $curso->id
+                        ]);
+                    } else {
+                        $grupoId = $grupo->id;
+                    }
+                    
+                    $cupofNumero = $ultimoCupof + 100 + $cupofCount;
+                    
+                    DB::table('cupof')->insert([
+                        'cupof' => $cupofNumero,
+                        'turno' => 'M',
+                        'hsmodcar' => 4,
+                        'id_materias' => $materia->id,
+                        'id_cursos' => $curso->id,
+                        'id_grupos' => $grupoId,
+                        'estado' => 'A',
+                        'funcion' => 'PROF',
+                        'cargo' => 'TIT'
+                    ]);
+                    
+                    DB::table('revista')->insert([
+                        'cupof' => $cupofNumero,
+                        'id_tipousuario' => $tipoUsuarioRoberto->id,
+                        'fd' => now()->startOfYear()->format('Y-m-d'),
+                        'fh' => now()->endOfYear()->format('Y-m-d'),
+                        'secuencia' => 1,
+                        'situacion' => 'A',
+                        'estado' => 'A'
+                    ]);
+                    
+                    $cupofCount++;
+                    $this->command->info("  ✓ Roberto Gómez asignado a {$materia->nombre} ({$curso->ano}º {$curso->division})");
+                }
+            }
+        } else {
+            $this->command->warn('No hay cursos activos o materias disponibles para Roberto Gómez.');
+        }
+
+        // Crear o buscar curso 7º C
+        $this->command->newLine();
+        $this->command->info('Creando/buscando curso 7º C...');
+        
+        $cursoSeptimoC = DB::table('cursos')
+            ->where('ano', 7)
+            ->where('division', 'C')
+            ->first();
+        
+        if (!$cursoSeptimoC) {
+            // Crear nuevo curso 7º C
+            $cursoSeptimoC = DB::table('cursos')->insertGetId([
+                'ano' => 7,
+                'division' => 'C',
+                'turno' => 'M',
+                'estado' => 'A',
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+            
+            // Obtener el registro completo
+            $cursoSeptimoC = DB::table('cursos')->where('id', $cursoSeptimoC)->first();
+            $this->command->info("  ✓ Curso 7º C creado exitosamente");
+        } else {
+            $this->command->info("  ✓ Curso 7º C ya existe");
+        }
+        
+        // Asignar materia nueva a Roberto Gómez en 7º C
+        $this->command->info('Asignando materia nueva a Roberto Gómez en 7º C...');
+        
+        if ($cursoSeptimoC && !$materiasMatematica->isEmpty()) {
+            // Obtener o crear grupo de 7º C
+            $grupoSeptimoC = DB::table('grupos')
+                ->where('id_cursos', $cursoSeptimoC->id)
+                ->first();
+            
+            if (!$grupoSeptimoC) {
+                $grupoId = DB::table('grupos')->insertGetId([
+                    'nombre' => 1,
+                    'id_cursos' => $cursoSeptimoC->id,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            } else {
+                $grupoId = $grupoSeptimoC->id;
+            }
+            
+            // Usar la última materia disponible
+            $materiaNueva = $materiasMatematica->last();
+            $cupofNuevo = $ultimoCupof + 200;
+            
+            DB::table('cupof')->insert([
+                'cupof' => $cupofNuevo,
+                'turno' => 'M',
+                'hsmodcar' => 4,
+                'id_materias' => $materiaNueva->id,
+                'id_cursos' => $cursoSeptimoC->id,
+                'id_grupos' => $grupoId,
+                'estado' => 'A',
+                'funcion' => 'PROF',
+                'cargo' => 'TIT'
+            ]);
+            
+            DB::table('revista')->insert([
+                'cupof' => $cupofNuevo,
+                'id_tipousuario' => $tipoUsuarioRoberto->id,
+                'fd' => now()->startOfYear()->format('Y-m-d'),
+                'fh' => now()->endOfYear()->format('Y-m-d'),
+                'secuencia' => 1,
+                'situacion' => 'A',
+                'estado' => 'A'
+            ]);
+            
+            $this->command->info("  ✓ Roberto Gómez asignado a {$materiaNueva->nombre} en 7º C (CUPOF: {$cupofNuevo})");
+        } else {
+            $this->command->warn('No hay materias disponibles para asignar.');
+        }
+
         // Obtener cursos existentes
         $cursos = DB::table('cursos')->where('estado', 'A')->get();
 
