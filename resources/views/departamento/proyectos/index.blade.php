@@ -62,7 +62,8 @@
                             <div class="materia-details">
                                 <div class="detail-item">
                                     <i class="fas fa-book"></i>
-                                    <span>{{ $materia->anio }}° Año - {{ $materia->tipo }}</span>
+                                    <span>Orientación
+                                        {{ $materia->orientacion ? $materia->orientacion->nombre : 'N/A' }}</span>
                                 </div>
                                 <div class="detail-item">
                                     <i class="fas fa-folder"></i>
