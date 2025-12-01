@@ -20,5 +20,4 @@
 <!-- Style.css -->
 <link rel="stylesheet" href="{{ asset('libraries/assets/css/style.css') }}">
 <link rel="stylesheet" href="{{ asset('libraries/assets/css/jquery.mCustomScrollbar.css') }}">
-
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

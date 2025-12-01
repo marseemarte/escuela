@@ -3,6 +3,7 @@
 
 <head>
     @include('partials.head')
+    @yield('head')
 </head>
 
 <body>
@@ -358,6 +359,12 @@
                                     <a href="{{ route('cupof.index') }}">
                                         <span class="pcoded-micon"><i class="feather icon-users"></i></span>
                                         <span class="pcoded-mtext">Cupof</span>
+                                    </a>
+                                </li>
+                                <li class="">
+                                    <a href="{{ route('departamentos.index') }}">
+                                        <span class="pcoded-micon"><i class="feather icon-users"></i></span>
+                                        <span class="pcoded-mtext">Departamentos</span>
                                     </a>
                                 </li>
                             </ul>

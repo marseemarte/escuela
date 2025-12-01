@@ -13,6 +13,7 @@ use App\Http\Controllers\CupofController;
 use App\Http\Controllers\Departamentos\DepartamentoController;
 use App\Http\Controllers\Departamentos\PlanificacionController as DeptPlanificacionController;
 use App\Http\Controllers\Departamentos\ProyectoController as DeptProyectoController;
+use App\Http\Controllers\DepartamentosController;
 use App\Http\Controllers\Profesores\AsistenciaController;
 use App\Http\Controllers\Profesores\PlanificacionController as ProfPlanificacionController;
 use App\Http\Controllers\Profesores\ProyectoController as ProfProyectoController;
@@ -172,6 +173,20 @@ Route::view('/mmo', 'orientaciones.mmo.index')->name('mmo.index');
 Route::view('/ciclo_basico', 'orientaciones.ciclo_basico.index')->name('ciclo_basico.index');
 Route::view('/turismo', 'orientaciones.turismo.index')->name('turismo.index');
 
+// Crear Departamentos
+
+Route::controller(DepartamentosController::class)->prefix('departamentos')->name('departamentos.')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('/crear', 'create')->name('create');
+    Route::post('/', 'store')->name('store');
+    Route::get('/{id}', 'show')->name('show');
+    Route::get('/{id}/editar', 'edit')->name('edit');
+    Route::put('/{id}', 'update')->name('update');
+    Route::delete('/{id}', 'destroy')->name('destroy');
+    Route::get('/{id}/materias', 'materias')->name('materias');
+    Route::post('/{id}/asignar-materias', 'asignarMaterias')->name('asignar-materias');
+    Route::delete('/{id}/materias/{materiaId}', 'quitarMateria')->name('quitar-materia');
+});
 // Incluir rutas de autenticación
 require __DIR__ . '/auth.php';
 

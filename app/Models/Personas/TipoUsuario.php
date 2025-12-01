@@ -40,9 +40,9 @@ class TipoUsuario extends Model
         return $this->hasOne(AsignacionAlumno::class, 'id_tipousuario');
     }
 
-    public function departamentos()
+    public function departamento()
     {
-        return $this->hasMany(Departamento::class, 'id_tipousuario');
+        return $this->hasOne(\App\Models\Departamento::class, 'id_tipousuario');
     }
 
 
